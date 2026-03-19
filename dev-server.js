@@ -48,8 +48,7 @@ function cleanupResources() {
  * 生成页面URL
  */
 function generateUrls(page, port) {
-	const baseUrl = `http://localhost:${port}`, url = `${baseUrl}/${page}`,
-		needsEncoding = !/^[a-zA-Z0-9\-_.~]+$/.test(page); // 检查是否包含需要编码的字符
+	const baseUrl = `http://localhost:${port}`, url = `${baseUrl}/${page}`, needsEncoding = !/^[a-zA-Z0-9\-_.~/]+$/.test(page);
 
 	return { url, encodedUrl: `${baseUrl}/${encodeURI(page)}`, needsEncoding };
 }
