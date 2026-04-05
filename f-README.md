@@ -49,7 +49,7 @@ graph TB
 
 ## 安装
 
-```bash
+```sh
 # 初始化项目（如果尚未初始化）
 npm init -y
 
@@ -86,7 +86,7 @@ npm i flun-windows # Window服务安装和管理
 ```
 
 然后使用：
-```bash
+```sh
 # 启动开发服务器（实时预览和热重载）
 npm run dev
 
@@ -95,7 +95,7 @@ npm run build
 ```
 
 ### 方式二：直接运行文件
-```bash
+```sh
 # 启动开发服务器
 node dev.js
 
@@ -159,12 +159,12 @@ HBuilder自定义代码块配置(HTML和js)：
 ## 项目维护
 
 ### 更新版本
-```bash
+```sh
 npm update flun-html-template
 ```
 
 ### 恢复初始文件
-```bash
+```sh
 # 基本命令（跳过已存在目录）
 node ./node_modules/flun-html-template/copy-files.js
 
