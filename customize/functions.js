@@ -1,6 +1,6 @@
 // 自定义工具函数示例
 
-module.exports = {
+export default {
 	functions: {
 		// 简单计算器函数
 		add: function (a, b) {

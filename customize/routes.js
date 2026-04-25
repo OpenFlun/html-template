@@ -1,21 +1,27 @@
 // /customize/routes.js
-// 非认证路由：元素样式、CSS编辑、图片管理等
-const express = require('express'), fs = require('fs'), path = require('path'), DATA_FILE = path.join(__dirname, 'data.json');
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
-	setupRoutes: app => {
+const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
+	dataFile = path.join(__dirname, 'data.json'), imgDir = path.join(__dirname, '../static/img');
+
+// 非认证路由：元素样式、CSS编辑、图片管理、自定义API等
+export default {
+	setupRoutes: (app) => {
 		app.use(express.json(), express.urlencoded({ extended: true }));
 
 		// ============ 元素样式 API ============
 		let data;
 		try {
-			data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+			data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
 		} catch (e) {
 			data = {};
 		}
 
 		const elements = ['topImg', 'themeImg', 'longPic', 'cssEditor', 'preview'],
-			getElementStyle = elementKey => {
+			getElementStyle = (elementKey) => {
 				return (req, res) => {
 					try {
 						res.json(data[elementKey] || {});
@@ -25,23 +31,23 @@ module.exports = {
 					}
 				};
 			},
-			updateElementStyle = elementKey => {
+			updateElementStyle = (elementKey) => {
 				return (req, res) => {
 					try {
 						const devViewSize = Object.keys(req.body)[0];
 						if (!devViewSize) return res.status(400).json({ error: '缺少设备标识' });
 						if (!data[elementKey]) data[elementKey] = {};
 						data[elementKey][devViewSize] = req.body[devViewSize];
-						fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+						fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
 						res.json({ success: true, message: `${elementKey}已更新`, deviceId: devViewSize });
 					} catch (error) {
 						console.error(`更新${elementKey}失败:`, error);
 						res.status(500).json({ error: '服务器错误' });
 					}
 				};
-			}
+			};
 
-		elements.forEach(element => {
+		elements.forEach((element) => {
 			app.get(`/api/${element}`, getElementStyle(element));
 			app.post(`/api/${element}`, updateElementStyle(element));
 		});
@@ -72,7 +78,8 @@ module.exports = {
 
 			try {
 				const normalizedPath = fileDir.startsWith('/') ? fileDir.slice(1) : fileDir,
-					filePath = path.resolve(normalizedPath), dir = path.dirname(filePath);
+					filePath = path.resolve(normalizedPath),
+					dir = path.dirname(filePath);
 				if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 				fs.writeFileSync(filePath, content, 'utf8');
 				res.json({ success: true, message: 'CSS 已保存' });
@@ -86,9 +93,8 @@ module.exports = {
 		// ============ 图片列表 ============
 		app.get('/api/images', (req, res) => {
 			try {
-				const imgDir = path.join(__dirname, '../static/img');
 				if (!fs.existsSync(imgDir)) return res.json([]);
-				const files = fs.readdirSync(imgDir), imgs = files.filter(f => /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(f));
+				const files = fs.readdirSync(imgDir), imgs = files.filter((f) => /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(f));
 				res.json(imgs);
 			} catch (error) {
 				console.error('获取图片列表失败:', error);
@@ -98,28 +104,22 @@ module.exports = {
 		console.log('✅ 非认证路由加载完成（routes.js）');
 
 		// ============ 其它自定义API路由 ============
-		// 添加一个简单的路由
 		app.get('/api/greeting', (req, res) => {
 			res.json({ message: '你好！这是来自用户自定义路由的问候！' });
 		});
 
-		// 添加一个带参数的路由
 		app.get('/api/user/:name', (req, res) => {
 			res.json({
-				message: `你好, ${req.params.name}!`,
-				timestamp: new Date().toLocaleString('zh-CN')
+				message: `你好, ${req.params.name}!`, timestamp: new Date().toLocaleString('zh-CN'),
 			});
 		});
 
-		// 添加POST路由
 		app.post('/api/contact', (req, res) => {
-			// 这里可以处理表单数据
 			res.json({
-				success: true,
-				message: '感谢您的留言！'
+				success: true, message: '感谢您的留言！',
 			});
 		});
 
 		console.log('✅ 自定义路由已加载！');
-	}
+	},
 };

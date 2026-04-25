@@ -33,7 +33,7 @@
 		"f-CHANGELOG.md",
 		"LICENSE"
 	],
-	"type": "commonjs",
+	"type": "module",
 	"exports": {
 		".": "./index.js"
 	},
@@ -57,9 +57,9 @@
 		"express": "^5.2.1",
 		"express-rate-limit": "^8.3.2",
 		"express-session": "^1.19.0",
-		"flun-env": "^3.1.2",
-		"flun-mail": "^2.0.11",
-		"flun-webauthn-server": "^2.0.4",
+		"flun-env": "^3.1.3",
+		"flun-mail": "^2.1.2",
+		"flun-webauthn-server": "^2.0.5",
 		"mysql2": "^3.20.0",
 		"otplib": "^13.4.0",
 		"qrcode": "^1.5.4",

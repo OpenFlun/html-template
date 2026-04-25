@@ -1,20 +1,33 @@
 // /customize/account.js
 // 用户认证模块：包含 session、登录保护中间件及所有认证路由
-const express = require('express'), fs = require('fs'), path = require('path'), flunMail = require('flun-mail'),
-    crypto = require('crypto'), bcrypt = require('bcrypt'), qrcode = require('qrcode'), session = require('express-session'),
-    FileStore = require('session-file-store')(session), rateLimit = require('express-rate-limit'), { env } = require('flun-env'),
-    { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse }
-        = require('flun-webauthn-server'), { fromBuffer, toBuffer } = require('flun-webauthn-server/helpers'), { generateSecret,
-            verify, generateURI } = require('otplib'), CWD = process.cwd(), pageDir = 'templates', accountDir = 'account',
-    USERS_FILE = path.join(__dirname, 'users.json'), pendingRegistrations = new Map(), recentPasswordResets = new Map(),
-    mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { env } from 'flun-env';
+import { createTransport } from 'flun-mail';
+import {
+    generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse
+} from 'flun-webauthn-server';
+import { fromBuffer, toBuffer } from 'flun-webauthn-server/helpers';
+import { randomBytes } from 'crypto';
+import { hashSync, hash, compare } from 'bcrypt';
+import { toDataURL } from 'qrcode';
+import session from 'express-session';
+import sessionFileStoreFactory from 'session-file-store';
+import { rateLimit } from 'express-rate-limit';
+import { generateSecret, verify, generateURI } from 'otplib';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename), CWD = process.cwd(),
+    pageDir = 'templates', accountDir = 'account', usersFile = path.join(__dirname, 'users.json'), pendingRegistrations = new Map(),
+    recentPasswordResets = new Map(), FileStore = sessionFileStoreFactory(session), mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // 邮件发送配置检查
 if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PASS)
     console.error('❌ 邮件服务未配置,请在根目录env文件中正确配置 MAIL_HOST、MAIL_USER、MAIL_PASS 后重新启动!'), process.exit(1);
 
 // 邮件发送配置
-const transporter = flunMail.createTransport({
+const transporter = createTransport({
     host: env.MAIL_HOST,
     port: env.MAIL_PORT,
     secure: true,
@@ -23,12 +36,12 @@ const transporter = flunMail.createTransport({
     // ========== 辅助函数 ==========
     readUsers = () => {
         try {
-            if (!fs.existsSync(USERS_FILE)) return [];
-            const data = fs.readFileSync(USERS_FILE, 'utf8');
+            if (!fs.existsSync(usersFile)) return [];
+            const data = fs.readFileSync(usersFile, 'utf8');
             return JSON.parse(data);
         } catch (err) { return []; }
     },
-    writeUsers = users => fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2)),
+    writeUsers = users => fs.writeFileSync(usersFile, JSON.stringify(users, null, 2)),
     createUserObject = (username, email, hashedPassword, emailVerified = false) => {
         const now = Date.now();
         return {
@@ -46,7 +59,7 @@ const transporter = flunMail.createTransport({
     initAdminUser = () => {
         const users = readUsers();
         if (users.length <= 0) {
-            const adminPassword = env.PWD || 'admin', hashedPassword = bcrypt.hashSync(adminPassword, 10),
+            const adminPassword = env.PWD || 'admin', hashedPassword = hashSync(adminPassword, 10),
                 adminUser = createUserObject('admin', null, hashedPassword);
             users.push(adminUser), writeUsers(users);
         }
@@ -55,7 +68,7 @@ const transporter = flunMail.createTransport({
         if (transporter) await transporter.sendMail({ from: `"Your App" <${env.MAIL_USER}>`, to, subject, html });
         else console.log(`\n--- 模拟邮件 ---\n收件人: ${to}\n主题: ${subject}\n内容:\n${html}\n---`);
     },
-    validateEmail = email => mailRegex.test(email), generateToken = () => crypto.randomBytes(32).toString('hex'),
+    validateEmail = email => mailRegex.test(email), generateToken = () => randomBytes(32).toString('hex'),
     hasAllFields = (body, fields) => fields.every(f => body[f]),
     getCurrentUser = req => {
         const users = readUsers(), user = users.find(u => u.id === req.session.userId);
@@ -70,14 +83,14 @@ const transporter = flunMail.createTransport({
     generateBackupCodes = () => {
         const plainCodes = [], hashedCodes = [];
         for (let i = 0; i < 10; i++) {
-            const code = crypto.randomBytes(5).toString('hex').toUpperCase();
-            plainCodes.push(code), hashedCodes.push(bcrypt.hashSync(code, 10));
+            const code = randomBytes(5).toString('hex').toUpperCase();
+            plainCodes.push(code), hashedCodes.push(hashSync(code, 10));
         }
         return { plainCodes, hashedCodes };
     },
     validatePasswordLength = password => password && password.length >= 6,
-    hashPassword = async password => await bcrypt.hash(password, 10),
-    verifyPassword = async (plain, hash) => await bcrypt.compare(plain, hash),
+    hashPassword = async password => await hash(password, 10),
+    verifyPassword = async (plain, hash) => await compare(plain, hash),
     isUsernameTaken = (users, username, excludeUserId = null) =>
         users.some(u => u.id !== excludeUserId && u.username === username),
     isEmailTaken = (users, email, excludeUserId = null) => users.some(u => u.id !== excludeUserId && u.email === email),
@@ -145,7 +158,7 @@ const transporter = flunMail.createTransport({
     };
 
 // ========== 路由设置 ==========
-module.exports = {
+export default {
     setupRoutes: app => {
         // 1. 配置 session
         const sessionsDir = path.join(CWD, 'sessions');
@@ -439,7 +452,7 @@ module.exports = {
 
             const { user, users } = result, secret = generateSecret({ length: 32 }), otpauth_url = generateURI({
                 issuer: 'YourApp', label: user.username, secret,
-            }), qrCodeUrl = await qrcode.toDataURL(otpauth_url);
+            }), qrCodeUrl = await toDataURL(otpauth_url);
 
             user.twoFactorSecret = secret, touchAndSaveUser(users, user), res.json({ secret, qrCode: qrCodeUrl });
         });

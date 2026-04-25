@@ -1,5 +1,5 @@
 // customize/variables.js
-module.exports = {
+export default {
     variables: {
         // ============= 基础信息变量 ============
         year: new Date().getFullYear(),

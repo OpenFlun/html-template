@@ -62,9 +62,12 @@ npm i flun-html-template # 简写
 npm i -g flun-html-template # 简写
 
 # flun其它npm家族安装包:
-npm i flun-env     # .env 文件的环境变量调用
-npm i flun-mail    # 邮件发送
-npm i flun-windows # Window服务安装和管理
+npm i flun-env              # .env 文件的环境变量调用
+npm i flun-mail             # 邮件发送
+npm i flun-windows          # Window服务安装和管理
+npm i flun-webauthn-server  # 身份验证服务后端处理
+npm i flun-webauthn-browser # 身份验证前端处理
+# 所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
 ```
 > **重要提示**：初次使用最好在空项目中执行安装，安装过程会自动安装示例和必要文件到根目录
 
