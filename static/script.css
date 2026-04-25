@@ -1,0 +1,318 @@
+/* script.css */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+#cssEditor {
+    display: flex;
+    flex-direction: column;
+    background: rgb(175, 63, 63);
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 700px;
+    height: 800px;
+    min-width: 300px;
+    min-height: 200px;
+    overflow: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    cursor: grab;
+    box-sizing: border-box;
+    resize: none;
+    z-index: 1001;
+}
+
+#cssEditor:active {
+    cursor: grabbing;
+}
+
+#cssEditor .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: grab;
+}
+
+#cssEditor .header:active {
+    cursor: grabbing;
+}
+
+#cssEditor h2 {
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.close-btn {
+    font-size: 30px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.editor-info {
+    background: #069d57;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #333aa6;
+}
+
+/* 隐藏原始 textarea */
+#cssContent {
+    display: none;
+}
+
+/* CodeMirror 容器 */
+#cssEditor .CodeMirror {
+    flex: 1;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    background: #282a36;
+}
+
+#cssEditor .CodeMirror-gutters {
+    border-right: 1px solid #444;
+    background: #1e1f29;
+}
+
+#cssEditor .CodeMirror-linenumber {
+    color: #6272a4;
+}
+
+/* 注释颜色 */
+.CodeMirror .cm-comment {
+    color: #3b9e3b !important;
+}
+
+/* ---------- 颜色色块组件样式 ---------- */
+.cm-color-widget {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border-radius: 3px;
+    margin: 0 2px;
+    padding: 0 2px;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+}
+
+.cm-color-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.1s;
+    flex-shrink: 0;
+}
+
+.cm-color-swatch:hover {
+    transform: scale(1.2);
+    border-color: white;
+}
+
+.cm-color-text {
+    color: #f8f8f2;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0 4px;
+    border-radius: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-user-select: text;
+    user-select: text;
+    cursor: text;
+}
+
+/* -------------------------------------- */
+
+#cssEditor .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#previewBtn {
+    background: #3498db;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+#previewBtn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+#cancelPreviewBtn {
+    display: none;
+    background: #d94bec;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+#cancelPreviewBtn:hover {
+    background-color: #821d90;
+    transform: translateY(-2px);
+}
+
+#saveBtn {
+    background: #0ca55e;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+#cancelBtn {
+    background: #bdb330;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+#saveBtn:hover {
+    background-color: #17723d;
+    transform: translateY(-2px);
+}
+
+#cancelBtn:hover {
+    background-color: #566214;
+    transform: translateY(-2px);
+}
+
+#preview {
+    display: none;
+    position: fixed;
+    width: 800px;
+    height: 600px;
+    top: 40px;
+    left: 20px;
+    background: #181f3a;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+#preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1002;
+    background: transparent;
+    cursor: grab;
+}
+
+#preview:active::before {
+    cursor: grabbing;
+}
+
+#previewFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#loader {
+    display: none;
+}
+
+.loader {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    z-index: 1005;
+    text-align: center;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    #cssEditor {
+        width: 95%;
+        height: 100%;
+    }
+
+    #cssEditor .actions {
+        flex-wrap: wrap;
+    }
+
+    #cssEditor h2 {
+        font-size: 18px;
+    }
+
+    #previewBtn,
+    #cancelPreviewBtn,
+    #saveBtn,
+    #cancelBtn {
+        min-width: 80px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

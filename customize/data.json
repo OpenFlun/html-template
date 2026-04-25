@@ -1,0 +1,484 @@
+{
+  "topImg": {
+    "1492x874": {
+      "style": {
+        "left": "1375px",
+        "top": "793.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x682": {
+      "style": {
+        "left": "321.722px",
+        "top": "602.178px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "357x669": {
+      "style": {
+        "left": "334.089px",
+        "top": "522.044px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    }
+  },
+  "themeImg": {
+    "1492x874": {
+      "style": {
+        "left": "22px",
+        "top": "24.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x682": {
+      "style": {
+        "left": "14.4px",
+        "top": "9.18329px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x332": {
+      "style": {
+        "left": "15px",
+        "top": "17px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x544": {
+      "style": {
+        "left": "26.5px",
+        "top": "23.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x359": {
+      "style": {
+        "left": "28.5px",
+        "top": "15px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x564": {
+      "style": {
+        "left": "50px",
+        "top": "70.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x273": {
+      "style": {
+        "left": "30.5px",
+        "top": "25.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1480x544": {
+      "style": {
+        "left": "136px",
+        "top": "129.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "700x800": {
+      "style": {
+        "left": "18px",
+        "top": "28px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x868": {
+      "style": {
+        "left": "25px",
+        "top": "25.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    }
+  },
+  "longPic": {
+    "1492x874": {
+      "style": {
+        "left": "50%",
+        "top": "50%",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x868": {
+      "style": {
+        "left": "931px",
+        "top": "246px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    }
+  },
+  "cssEditor": {
+    "1492x874": {
+      "style": {
+        "left": "721.5px",
+        "top": "50px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x682": {
+      "style": {
+        "left": "15.4555px",
+        "top": "14.4833px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x602": {
+      "style": {
+        "left": "390px",
+        "top": "24px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x288": {
+      "style": {
+        "left": "383px",
+        "top": "74px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x542": {
+      "style": {
+        "left": "400px",
+        "top": "17px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x544": {
+      "style": {
+        "left": "256px",
+        "top": "30.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x359": {
+      "style": {
+        "left": "563.5px",
+        "top": "71px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x564": {
+      "style": {
+        "left": "564px",
+        "top": "74px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x273": {
+      "style": {
+        "left": "766.5px",
+        "top": "35.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1500x849": {
+      "style": {
+        "left": "769px",
+        "top": "41px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "400x685": {
+      "style": {
+        "left": "730.5px",
+        "top": "38.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x691": {
+      "style": {
+        "left": "52.5333px",
+        "top": "-2.31111px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "357x669": {
+      "style": {
+        "left": "32.7722px",
+        "top": "6px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x868": {
+      "style": {
+        "left": "753px",
+        "top": "33.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x693": {
+      "style": {
+        "left": "24.2923px",
+        "top": "1.08228px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "desktop": {
+      "top": 27,
+      "left": 764
+    },
+    "1492x170": {
+      "style": {
+        "left": "764px",
+        "top": "25px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x606": {
+      "style": {
+        "left": "743.5px",
+        "top": "15px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x464": {
+      "style": {
+        "left": "750px",
+        "top": "40px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x150": {
+      "style": {
+        "left": "757px",
+        "top": "48px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x153": {
+      "style": {
+        "left": "753px",
+        "top": "34px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x271": {
+      "style": {
+        "left": "750px",
+        "top": "40px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x231": {
+      "style": {
+        "left": "741px",
+        "top": "33px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x182": {
+      "style": {
+        "left": "744px",
+        "top": "32px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x622": {
+      "style": {
+        "left": "745px",
+        "top": "43.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x194": {
+      "style": {
+        "left": "740px",
+        "top": "29.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x405": {
+      "style": {
+        "left": "766px",
+        "top": "29px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x336": {
+      "style": {
+        "left": "754px",
+        "top": "47px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x547": {
+      "style": {
+        "left": "756px",
+        "top": "34px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x161": {
+      "style": {
+        "left": "744px",
+        "top": "38px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    }
+  },
+  "preview": {
+    "1492x874": {
+      "style": {
+        "left": "31px",
+        "top": "53px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x682": {
+      "style": {
+        "left": "-236.989px",
+        "top": "52.5556px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x602": {
+      "style": {
+        "left": "390px",
+        "top": "24px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x288": {
+      "style": {
+        "left": "383px",
+        "top": "74px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x542": {
+      "style": {
+        "left": "400px",
+        "top": "17px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1479x544": {
+      "style": {
+        "left": "256px",
+        "top": "30.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x359": {
+      "style": {
+        "left": "563.5px",
+        "top": "71px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x564": {
+      "style": {
+        "left": "564px",
+        "top": "74px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x273": {
+      "style": {
+        "left": "766.5px",
+        "top": "35.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1500x849": {
+      "style": {
+        "left": "44px",
+        "top": "39px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "400x685": {
+      "style": {
+        "left": "-269px",
+        "top": "39px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "357x669": {
+      "style": {
+        "left": "-320px",
+        "top": "114.599px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "1492x868": {
+      "style": {
+        "left": "15px",
+        "top": "38.5px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "384x693": {
+      "style": {
+        "left": "-157.932px",
+        "top": "57.3333px",
+        "right": "auto",
+        "bottom": "auto"
+      }
+    },
+    "desktop": {
+      "top": 11,
+      "left": -3
+    }
+  }
+}

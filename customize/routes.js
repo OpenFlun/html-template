@@ -1,48 +1,102 @@
-// 自定义路由示例
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-// 这个文件中的路由会在服务器启动时自动加载
+// /customize/routes.js
+// 非认证路由：元素样式、CSS编辑、图片管理等
+const express = require('express'), fs = require('fs'), path = require('path'), DATA_FILE = path.join(__dirname, 'data.json');
+
 module.exports = {
-	// 设置路由的函数
-	setupRoutes: function (app) {
-		// ============ 元素样式API路由 ============
-		// 获取数据文件路径, 读取数据, 定义操作元素(返回顶部图标和切换主题图标)
-		const positionFile = path.join(process.cwd(), 'static', 'position.json'),
-			positionData = JSON.parse(fs.readFileSync(positionFile, 'utf8')), elements = ['topImg', 'themeImg'];
+	setupRoutes: app => {
+		app.use(express.json(), express.urlencoded({ extended: true }));
 
-		// 获取元素储存数据
-		function getElementStyle(elementKey) {
-			return (req, res) => {
-				try {
-					res.json(positionData[elementKey]);
-				} catch (error) {
-					console.error(`读取${elementKey}储存样式数据失败:`, error);
-				}
-			};
+		// ============ 元素样式 API ============
+		let data;
+		try {
+			data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+		} catch (e) {
+			data = {};
 		}
 
-		// 更新元素储存数据
-		function updateElementStyle(elementKey) {
-			return (req, res) => {
-				try {
-					const devViewSize = Object.keys(req.body)[0];	 // 请求中的第一个键名是设备视口尺寸
-					positionData[elementKey][devViewSize] = req.body[devViewSize];
-					fs.writeFileSync(positionFile, JSON.stringify(positionData, null, 2));
-					res.json({ success: true, message: `${elementKey}储存样式数据已更新`, deviceId: devViewSize });
-				} catch (error) {
-					console.error(`更新${elementKey}储存样式数据失败:`, error);
-				}
-			};
-		}
+		const elements = ['topImg', 'themeImg', 'longPic', 'cssEditor', 'preview'],
+			getElementStyle = elementKey => {
+				return (req, res) => {
+					try {
+						res.json(data[elementKey] || {});
+					} catch (error) {
+						console.error(`读取${elementKey}样式失败:`, error);
+						res.status(500).json({ error: '服务器错误' });
+					}
+				};
+			},
+			updateElementStyle = elementKey => {
+				return (req, res) => {
+					try {
+						const devViewSize = Object.keys(req.body)[0];
+						if (!devViewSize) return res.status(400).json({ error: '缺少设备标识' });
+						if (!data[elementKey]) data[elementKey] = {};
+						data[elementKey][devViewSize] = req.body[devViewSize];
+						fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+						res.json({ success: true, message: `${elementKey}已更新`, deviceId: devViewSize });
+					} catch (error) {
+						console.error(`更新${elementKey}失败:`, error);
+						res.status(500).json({ error: '服务器错误' });
+					}
+				};
+			}
 
-		// 使用公共函数批量注册元素样式路由
 		elements.forEach(element => {
 			app.get(`/api/${element}`, getElementStyle(element));
-			app.post(`/api/${element}`, express.json(), updateElementStyle(element));
+			app.post(`/api/${element}`, updateElementStyle(element));
+		});
+		console.log('✅ 元素样式路由已加载');
+
+		// ============ CSS 文件操作 ============
+		app.get('/api/css', (req, res) => {
+			const fileDir = req.query.fileDir;
+			if (!fileDir) return res.status(400).json({ error: '缺少文件路径' });
+			if (!fileDir.endsWith('.css')) return res.status(403).json({ error: '只允许操作 CSS 文件' });
+
+			try {
+				const normalizedPath = fileDir.startsWith('/') ? fileDir.slice(1) : fileDir,
+					filePath = path.resolve(normalizedPath);
+				if (!fs.existsSync(filePath)) return res.status(404).json({ error: '文件不存在' });
+				const content = fs.readFileSync(filePath, 'utf8');
+				res.type('text/plain').send(content);
+			} catch (error) {
+				console.error('读取 CSS 失败:', error);
+				res.status(500).json({ error: '服务器错误' });
+			}
 		});
 
-		console.log('✅ 元素样式路由已加载！');
+		app.post('/api/css', (req, res) => {
+			const { fileDir, content } = req.body;
+			if (!fileDir || content === undefined) return res.status(400).json({ error: '缺少参数' });
+			if (!fileDir.endsWith('.css')) return res.status(403).json({ error: '只允许操作 CSS 文件' });
+
+			try {
+				const normalizedPath = fileDir.startsWith('/') ? fileDir.slice(1) : fileDir,
+					filePath = path.resolve(normalizedPath), dir = path.dirname(filePath);
+				if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+				fs.writeFileSync(filePath, content, 'utf8');
+				res.json({ success: true, message: 'CSS 已保存' });
+			} catch (error) {
+				console.error('保存 CSS 失败:', error);
+				res.status(500).json({ error: '服务器错误' });
+			}
+		});
+		console.log('✅ CSS 编辑路由已加载');
+
+		// ============ 图片列表 ============
+		app.get('/api/images', (req, res) => {
+			try {
+				const imgDir = path.join(__dirname, '../static/img');
+				if (!fs.existsSync(imgDir)) return res.json([]);
+				const files = fs.readdirSync(imgDir), imgs = files.filter(f => /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(f));
+				res.json(imgs);
+			} catch (error) {
+				console.error('获取图片列表失败:', error);
+				res.status(500).json({ error: '服务器错误' });
+			}
+		});
+		console.log('✅ 非认证路由加载完成（routes.js）');
+
 		// ============ 其它自定义API路由 ============
 		// 添加一个简单的路由
 		app.get('/api/greeting', (req, res) => {

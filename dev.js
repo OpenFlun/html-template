@@ -1,4 +1,4 @@
 const { startDevServer } = require('flun-html-template');
 
 // 启动开发服务器
-startDevServer(7296, true); // 7296为开发服务器默认端口(可自己指定), true表示启用热更新(默认启用)
+startDevServer({ port: 7296, hotReload: true, account: false }); // 默认参数:开发服务器端口7296,启用热更新,不启用登录系统;

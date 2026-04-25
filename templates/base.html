@@ -24,8 +24,16 @@
 </head>
 
 <body onload="document.body.classList.add('page-ready')">
+
 	<header>
-		[!header]<a href="index.html">← 返回首页</a>[~header]
+		[!header]<a href="index.html" class="home-link">← 返回首页</a>[~header]
+
+		[!my]
+		<!-- 个人中心按钮 注意: 此按钮仅在用户启用登录并成功登录后显示 -->
+		<div id="userCenter" class="user-center" style="display: none;">
+			<a href="/profile">👤 个人中心</a>
+		</div>
+		[~my]
 	</header>
 	<div class="container">
 		<!-- 默认内容区域 -->
@@ -34,6 +42,7 @@
 		[~content]
 	</div>
 
+	[!variables]
 	<!-- 变量替换测试 -->
 	<div style="background: #459064; padding: 15px; margin: 20px 0; border-radius: 5px;">
 		<h3>模板功能测试 - 变量替换</h3>
@@ -41,18 +50,19 @@
 		<p>时间戳: {{timestamp}}</p>
 		<p>基础URL: {{baseUrl}}</p>
 	</div>
+	[~variables]
 
 	<footer>
 		<!-- 脚本 -->
 		[!footer][~footer]
 	</footer>
 
-	<!-- 逻辑处理 -->
+	<!-- 公共逻辑 -->
 	<script src="./static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
 	<script src="./static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
 	<script src="./static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
 	<script src="./static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
-
+	<script src="./static/auth.js" defer></script><!-- 登录状态检测 -->
 	[!script]
 
 	[~script]

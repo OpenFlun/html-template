@@ -1,0 +1,209 @@
+[extends base.html]
+
+[!title]html样式编辑器[~title]
+[!style]
+<link rel="stylesheet" href="/static/script.css">
+<!-- CodeMirror 核心库与主题 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css">
+<!-- 折叠、lint、自动补全样式 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css">
+[~style]
+
+[!my] [~my]
+[!header][~header]
+[!content]
+<!-- CSS编辑器模态框 <label for="code">代码编辑区：</label> -->
+<div class="modal">
+	<div id="cssEditor">
+		<div class="header">
+			<h2>编辑CSS样式</h2>
+			<span class="close-btn">&times;</span>
+		</div>
+		<h3 class="editor-info">
+			⚡ 编辑器功能: 颜色选择 · 编辑 · 自动补全 · 代码折叠 · 预览 · 保存应用· 取消
+		</h3>
+		<textarea id="cssContent" placeholder="CSS内容将在这里显示..." spellcheck="false"></textarea>
+		<div class="actions">
+			<button id="previewBtn" type="button">预览</button>
+			<button id="cancelPreviewBtn" type="button">取消预览</button>
+			<button id="saveBtn" type="button">保存并应用</button>
+			<button id="cancelBtn" type="button">取消</button>
+		</div>
+	</div>
+</div>
+
+<!-- 预览容器 -->
+<div id="preview" class="preview-container">
+	<iframe id="previewFrame" title="预览页面"></iframe>
+</div>
+
+<!-- 加载指示器 -->
+<div id="loader" class="loader">
+	<p>加载中...</p>
+</div>
+[~content]
+
+[!variables] [~variables]
+[!footer]
+© {{year}} 我的网站 | 编辑器页 | 样式编辑器
+[~footer]
+
+[!script]
+<!-- CodeMirror JS 与 CSS 模式 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/css/css.min.js"></script>
+
+<!-- 折叠功能 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/foldcode.min.js"></script>
+<script src="/static/utils/foldgutter.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/comment-fold.min.js"></script>
+
+<!-- 语法检查依赖：CodeMirror lint 核心 + CSSTree -->
+<script src="/static/utils/css-lint.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/css-tree@3.1.0/dist/csstree.min.js"></script>
+
+<!-- 自动补全 -->
+<script src="/static/utils/closebrackets.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"></script>
+<script src="/static/utils/custom-css-hint.js"></script>
+
+<!-- 高亮匹配选中词、活动行 -->
+<script src="/static/utils/match-highlighter.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/selection/active-line.min.js"></script>
+
+<!-- 库插件样式自定义 -->
+<style>
+	/* 增大折叠按钮 */
+	#cssEditor .CodeMirror .CodeMirror-foldgutter-open,
+	#cssEditor .CodeMirror .CodeMirror-foldgutter-folded,
+	#cssEditor .CodeMirror .CodeMirror-foldgutter-open::after,
+	#cssEditor .CodeMirror .CodeMirror-foldgutter-folded::after {
+		font-size: 25px;
+	}
+
+	/* 增加折叠 gutter 的宽度,避免按钮显示不全 */
+	#cssEditor .CodeMirror .CodeMirror-foldgutter {
+		width: 26px;
+	}
+
+	/* 强制 tooltip 显示的样式 */
+	.CodeMirror-lint-tooltip {
+		z-index: 10000;
+		background-color: #ffd;
+		border: 1px solid #000;
+		color: #000;
+		font-family: monospace;
+		font-size: 12px;
+		padding: 6px 10px;
+		max-width: 600px;
+		word-wrap: break-word;
+		white-space: pre-wrap;
+		line-height: 1.5;
+		transition: none;
+	}
+
+	/* 自动补全列表样式 */
+	.CodeMirror-hints {
+		background-color: #282a36;
+		border: 1px solid #6272a4;
+		border-radius: 4px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+		font-family: 'Consolas', 'Monaco', monospace;
+		font-size: 13px;
+		max-height: 250px;
+		overflow-y: auto;
+		z-index: 10000;
+	}
+
+	.CodeMirror-hint {
+		color: #f8f8f2;
+		padding: 4px 8px;
+		cursor: pointer;
+		white-space: pre;
+		border-bottom: 1px solid #44475a;
+	}
+
+	.CodeMirror-hint-active {
+		background-color: #44475a;
+		color: #50fa7b;
+	}
+
+	.CodeMirror-hint:hover {
+		background-color: #6272a4;
+		color: #f8f8f2;
+	}
+
+	/* 匹配括号高亮 */
+	.CodeMirror-matchingbracket {
+		background-color: rgba(124, 136, 126, 1) !important;
+		font-weight: bold;
+		text-decoration: none !important;
+	}
+
+	/* 自定义高亮 */
+	.custom-highlight {
+		background-color: rgba(255, 255, 0, 0.3) !important;
+	}
+</style>
+
+<script>
+	// 等待 DOM 加载完成后初始化编辑器
+	(function () {
+		function initEditor() {
+			const textarea = document.getElementById('cssContent');
+			if (!textarea) return;
+
+			window.cssEditor = CodeMirror.fromTextArea(textarea, {
+				lineNumbers: true,
+				mode: 'css',
+				theme: 'dracula',
+				lineWrapping: true,
+				indentUnit: 4,
+				autoCloseBrackets: true,
+				matchBrackets: true,
+				foldGutter: true,
+				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+				lint: {
+					getAnnotations: window.customCssLint,
+					async: true
+				},
+				styleActiveLine: true,
+				hintOptions: {
+					completeSingle: false,   // 即使只有一个匹配也显示列表
+					closeOnUnfocus: false
+				}
+			});
+
+			window.cssEditor.setSize('100%', '100%');
+
+			// ----- 输入时自动弹出补全 -----
+			window.cssEditor.on("inputRead", (cm, change) => {
+				// 如果输入内容包含冒号，立即触发补全（优先响应）
+				if (change.text.join('').includes(':')) {
+					clearTimeout(cm.autocompletionTimeout);
+					cm.autocompletionTimeout = setTimeout(() => cm.showHint({ completeSingle: false }), 0);
+					return;
+				}
+				// 其他输入（字母、数字、删除等）延迟触发
+				clearTimeout(cm.autocompletionTimeout);
+				cm.autocompletionTimeout = setTimeout(() => cm.showHint({ completeSingle: false }), 150);
+			});
+
+			attachCustomHighlight(window.cssEditor); // 高亮匹配选中词(自定义)
+			setTimeout(() => window.cssEditor.performLint(), 100);
+		}
+
+		if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initEditor);
+		else initEditor();
+	})();
+</script>
+
+<!-- 本地文件 -->
+<script src="/static/script.js"></script>
+[~script]

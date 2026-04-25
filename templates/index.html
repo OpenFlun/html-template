@@ -7,97 +7,11 @@
 [!title]首页 - 模板功能测试[~title]
 
 [!style]
-<style>
-	/* 内容区主样式 */
-	.ind_content_main {
-		margin: 40px auto 0;
-		padding: 30px;
-		background: linear-gradient(to bottom, var(--content-bg-from), var(--content-bg-to));
-		border-radius: 10px;
-		max-width: 800px;
-		border: 1px solid var(--content-border);
-		box-shadow: 0 4px 15px var(--content-shadow);
-	}
-
-	.ind_content_main h2 {
-		margin-top: 0;
-	}
-
-	/* 模板测试样式 */
-	.template-test {
-		background: #e8f4f8;
-		padding: 20px;
-		border-radius: 8px;
-		margin: 20px 0;
-		border-left: 4px solid #2196F3;
-	}
-
-	.template-test h3 {
-		color: #2196F3;
-		margin-top: 0;
-	}
-
-	.test-result {
-		background: rgb(98, 154, 92);
-		padding: 10px;
-		border-radius: 4px;
-		margin: 10px 0;
-	}
-
-	/* 用户功能测试样式 */
-	.user-function-test {
-		background: #f0e8f8;
-		padding: 20px;
-		border-radius: 8px;
-		margin: 20px 0;
-		border-left: 4px solid #9C27B0;
-	}
-
-	.user-function-test h3 {
-		color: #9C27B0;
-		margin-top: 0;
-	}
-
-	/* 路由测试样式 */
-	.route-test {
-		background: #e8f8e8;
-		padding: 20px;
-		border-radius: 8px;
-		margin: 20px 0;
-		border-left: 4px solid #4CAF50;
-	}
-
-	.route-test h3 {
-		color: #4CAF50;
-		margin-top: 0;
-	}
-
-	.test-button {
-		background: #4CAF50;
-		color: white;
-		border: none;
-		padding: 10px 15px;
-		border-radius: 4px;
-		cursor: pointer;
-		margin: 5px;
-	}
-
-	.test-button:hover {
-		background: #45a049;
-	}
-
-	.api-result {
-		background: rgb(77, 106, 155);
-		padding: 10px;
-		border-radius: 4px;
-		margin: 10px 0;
-		border: 1px solid #ddd;
-		font-family: monospace;
-	}
-</style>
+<link rel="stylesheet" href="/static/styling.css">
+<link rel="stylesheet" href="/static/index.css">
 [~style]
 
-[!header]<a href="about.html">跳转到关于我们</a>[~header]
+[!header]<a href="about.html" class="home-link">跳转到关于我们</a>[~header]
 
 [!content]
 [!test]<h1>欢迎来到首页 - 模板功能测试</h1>[~test]
@@ -168,7 +82,12 @@
 [~footer]
 
 [!script]
+<script src="/static/styling.js"></script>
 <script>
+	// 获取当前样式文件路径
+	window.getCurrentStyleFile = () => {
+		return '/static/index.css';
+	}
 	// 首页特定的模板测试脚本
 	console.log('首页模板测试完成');
 

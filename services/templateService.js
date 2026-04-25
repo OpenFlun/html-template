@@ -6,7 +6,7 @@
  *   2. 模板区块处理工具：区块解析和清理（忽略嵌套标签）
  *   3. 包含文件处理：文件包含与依赖追踪
  *   4. 用户自定义功能系统：路由/函数/变量加载
- *   5. 变量处理系统：动态替换、函数执行、条件判断和循环处理
+ *   5. 模板功能处理系统：变量动态替换、函数执行、条件判断和循环处理
  *   6. 模板结构验证：标签完整性检查
  *   7. 模板文件操作：路径获取
  *   8. 模板渲染引擎核心：模板合成,文件验证,渲染
@@ -15,8 +15,8 @@
 const fs = require('fs'), path = require('path'), vm = require('vm'), fsPromises = fs.promises,
 	// ==================== 1. 常量声明及工具函数====================
 	// 统一所有路径常量，其他文件从此导入
-	CWD = process.cwd(), pRes = path.resolve, templatesAbsDir = path.join(CWD, 'templates'),
-	staticDir = 'static', customizeDir = 'customize', defaultPort = 7296,
+	CWD = process.cwd(), pRes = path.resolve, templatesDir = 'templates', templatesAbsDir = path.join(CWD, 'templates'),
+	staticDir = 'static', customizeDir = 'customize', accountDir = 'account', defaultPort = 7296,
 	// 预编译所有高频正则表达式
 	includeRegex = /(\"|')\[include\s+([^\]]+)\](\"|')|\[include\s+([\S\s]+?)\]/gi, quotedVarRegex = /`\s*{{(.*?)}}\s*`/g,
 	userFuncRegex = /\{\{\s*user:\s*([^\s()]+?)\s*\(([^)]*)\)\s*\}\}/g, templateTagRegex = /\[!([^\]]*?)\]|\[\~([^\]]*?)\]/g,
@@ -212,7 +212,7 @@ async function processIncludes(content, currentFile = '', inclusionStack = new S
 		}
 
 		try {
-			let includedContent = await fs.promises.readFile(includePath, 'utf8');
+			let includedContent = await fsPromises.readFile(includePath, 'utf8');
 
 			if (isCompilationMode) includedFiles.add(relativeIncludePath); // 编译模式记录依赖
 			// 递归处理嵌套包含
@@ -293,7 +293,7 @@ async function loadUserFeatures(app = null, isCompileMode = false) {
 
 	userFeatures.variables = {}, userFeatures.functions = {};
 	try {
-		const files = await fsPromises.readdir(featuresDir), jsFiles = files.filter(file => file.endsWith('.js'));
+		const files = await fsPromises.readdir(featuresDir), jsFiles = files.filter(file => file.endsWith('.js')).sort();
 		console.log(`🔧 正在加载 (${jsFiles.length}个用户自定义功能文件):`);
 
 		for (const file of jsFiles) {
@@ -321,22 +321,7 @@ async function loadUserFeatures(app = null, isCompileMode = false) {
 	return userFeatures;
 }
 
-/**
- * 执行用户自定义函数
- * @param {string} funcName - 函数名称
- * @param {...any} args - 函数参数
- * @returns {any} 函数执行结果
- */
-function _executeUserFunction(funcName, ...args) {
-	try {
-		if (!userFeatures.functions[funcName]) throw new Error(`找不到函数: ${funcName}`);
-		return userFeatures.functions[funcName](...args);
-	} catch (error) {
-		console.error(`执行用户函数 ${funcName} 时出错:`, error.message);
-		return null;
-	}
-}
-// ==================== 5. 变量处理系统 ====================
+// ==================== 5. 模板功能处理系统 ====================
 /**
  * 检查模板内容中是否还有未处理的标签
  * @param {string} content - 模板内容
@@ -499,6 +484,22 @@ function _processConditionals(content, variables) {
 	}
 
 	return result;
+}
+
+/**
+ * 执行用户自定义函数
+ * @param {string} funcName - 函数名称
+ * @param {...any} args - 函数参数
+ * @returns {any} 函数执行结果
+ */
+function _executeUserFunction(funcName, ...args) {
+	try {
+		if (!userFeatures.functions[funcName]) throw new Error(`找不到函数: ${funcName}`);
+		return userFeatures.functions[funcName](...args);
+	} catch (error) {
+		console.error(`执行用户函数 ${funcName} 时出错:`, error.message);
+		return null;
+	}
 }
 
 /**
@@ -900,8 +901,8 @@ async function renderTemplate(templateFile) {
 
 // ==================== 9. 模块功能导出 ====================
 module.exports = {
-	path, fsPromises,
-	templatesAbsDir, staticDir, customizeDir, defaultPort, // 路径常量
+	path, fsPromises, CWD,
+	templatesAbsDir, templatesDir, staticDir, customizeDir, accountDir, defaultPort, // 路径常量
 	getAvailableTemplates, findEntryFile,				   // 模板文件操作
 	validateTemplateFile, renderTemplate,				   // 模板渲染引擎核心
 	processIncludes, setCompilationMode, getIncludedFiles, // 包含文件处理

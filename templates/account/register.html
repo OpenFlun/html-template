@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - CSS实时编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn:disabled {
+            background: #b0b0b0;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        .error,
+        .success {
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .error {
+            color: #e53e3e;
+        }
+
+        .success {
+            color: #38a169;
+        }
+
+        .links {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>注册</h2>
+        <form onsubmit="return false;">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" placeholder="请输入用户名" maxlength="50" autofocus autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" placeholder="请输入邮箱" maxlength="100" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">密码 (至少6位)</label>
+                <input type="password" id="password" placeholder="请输入密码" maxlength="72" autocomplete="current-password">
+            </div>
+            <button class="btn" id="registerBtn">注册</button>
+        </form>
+        <div id="message" class="error"></div>
+        <div id="manualLink" class="links hidden">
+            <a href="/login">已有账号？立即登录</a>
+        </div>
+    </div>
+
+    <script>
+        let pollInterval = null, registeredEmail = null;
+        const [usernameEl, emailEl, passwordEl, messageDiv, manualLink, registerBtn] = ['username', 'email', 'password',
+            'message', 'manualLink', 'registerBtn'].map(id => document.getElementById(id)),
+            handleError = msg => {
+                messageDiv.className = 'error', messageDiv.textContent = msg, registerBtn.disabled = false;
+            },
+            stopPolling = () => {
+                clearInterval(pollInterval), pollInterval = null;
+            },
+            startVerificationPolling = email => {
+                registeredEmail = email, stopPolling();
+                pollInterval = setInterval(async () => {
+                    try {
+                        const res = await fetch(`/api/check-email-verified?email=${encodeURIComponent(email)}`),
+                            data = await res.json();
+                        if (res.ok && data.verified) stopPolling(), window.location.href = '/login';
+                        else console.error('检查验证状态失败');
+                    } catch (err) {
+                        console.error('轮询检查邮箱验证状态失败', err);
+                    }
+                }, 2000);
+                setTimeout(() => {
+                    if (pollInterval) stopPolling(), console.log('邮箱验证轮询超时');
+                }, 900000);
+            };
+
+        registerBtn.addEventListener('click', async () => {
+            registerBtn.disabled = true, messageDiv.textContent = '', manualLink.classList.add('hidden');
+            const [username, email, password] = [usernameEl, emailEl, passwordEl].map(input => input.value.trim());
+            if (!username || !email || !password) return handleError('请填写所有字段');
+            if (password.length < 6) return handleError('密码至少6位');
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                }), data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.className = 'success', messageDiv.textContent = data.message;
+                    manualLink.classList.remove('hidden'), startVerificationPolling(email);
+                }
+                else handleError(data.message);
+            } catch (err) { handleError('网络错误,请稍后重试'); }
+        });
+
+        passwordEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') registerBtn.click();
+        });
+        [usernameEl, emailEl, passwordEl].forEach(el => el.addEventListener('input', () => messageDiv.textContent = ''));
+        window.addEventListener('beforeunload', stopPolling);
+    </script>
+</body>
+
+</html>

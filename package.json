@@ -9,6 +9,12 @@
 		"build": "node compile.js",
 		"postinstall": "node copy-files.js 2>&1 || echo \"复制文件失败\""
 	},
+	"keywords": [
+		"html",
+		"template",
+		"server",
+		"flun"
+	],
 	"files": [
 		"templates",
 		"services",
@@ -27,12 +33,10 @@
 		"f-CHANGELOG.md",
 		"LICENSE"
 	],
-	"keywords": [
-		"html",
-		"template",
-		"server",
-		"flun"
-	],
+	"type": "commonjs",
+	"exports": {
+		".": "./index.js"
+	},
 	"author": "flun <cn@flun.top>",
 	"repository": {
 		"type": "git",
@@ -43,12 +47,27 @@
 		"url": "https://github.com/flunGit/flun_html_template/issues"
 	},
 	"license": "ISC",
-	"type": "commonjs",
+	"engines": {
+		"node": ">=22.12.0",
+		"npm": ">=10.0.0"
+	},
 	"dependencies": {
+		"bcrypt": "^6.0.0",
 		"chokidar": "^5.0.0",
 		"express": "^5.2.1",
+		"express-rate-limit": "^8.3.2",
+		"express-session": "^1.19.0",
+		"flun-env": "^3.1.2",
+		"flun-mail": "^2.0.11",
+		"flun-webauthn-server": "^2.0.4",
 		"mysql2": "^3.20.0",
+		"otplib": "^13.4.0",
+		"qrcode": "^1.5.4",
+		"session-file-store": "^1.5.0",
 		"socket.io": "^4.8.3"
+	},
+	"overrides": {
+		"fast-xml-parser": "^5.3.4"
 	},
 	"devDependencies": {
 		"nodemon": "^3.1.11"
