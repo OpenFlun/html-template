@@ -1,6 +1,49 @@
+import {
+    path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, defaultPort,
+    writtenFilesToIgnore, getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes,
+    setCompilationMode, getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
+} from './services/templateService.js';
 import { runCopyFiles } from './copy-files.js';
 import { compileAllTemplates } from './compile.js';
 import { startServer } from './dev-server.js';
+
+// =================================== services/templateService.js ===================================
+/**
+ * ```js
+ * // 文件导出内容
+ *
+ * // 模块常量:
+ * path;                            // Node.js 路径处理模块
+ * const fsPromises;                // Node.js 异步文件系统操作 (fs.promises)
+ * const CWD;                       // 当前工作目录绝对路径
+ * const templatesDir;              // 模板目录名称 ("templates")
+ * const templatesAbsDir;           // 模板目录绝对路径
+ * const staticDir;                 // 静态资源目录名称 ("static")
+ * const customizeDir;              // 用户自定义功能目录名称 ("customize")
+ * const accountDir;                // 账户目录名称 ("account")
+ * const defaultPort;               // 默认服务端口 (7296)
+ * const writtenFilesToIgnore = []; // 热重载时需忽略的文件路径列表
+ *
+ * // 函数列表:
+ * getAvailableTemplates();         // 获取所有可用模板文件（排除 base.html）
+ * findEntryFile();                 // 动态识别入口文件('@entry' 标记 > 优先级列表 > 首字母排序)
+ * validateTemplateFile();          // 验证模板文件标签结构完整性
+ * renderTemplate();                // 核心模板渲染（处理 extends 继承与区块合并）
+ * processIncludes();               // 递归处理 [include] 包含指令
+ * setCompilationMode();            // 设置编译模式并清空依赖记录
+ * getIncludedFiles();              // 获取编译过程中记录的所有被包含文件
+ * processVariables();              // 模板变量替换、表达式求值与用户函数执行入口
+ * loadUserFeatures();              // 从 customize 目录加载用户路由、函数和变量
+ * monitorFileWrites();             // 启动文件写入监控（用于热重载排除）
+ * ```
+ * >查看定义:@see {@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
+ *{@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link getAvailableTemplates}、{@link findEntryFile}、
+ *{@link validateTemplateFile}、{@link renderTemplate}、{@link processIncludes}、{@link setCompilationMode}、{@link getIncludedFiles}、
+ *{@link processVariables}、{@link loadUserFeatures}、{@link monitorFileWrites}
+ */
+declare module './services/templateService.js' {
+    export * from './services/templateService.js';
+}
 /**
  * HTML开发服务器模块 主要功能：
  * ```js

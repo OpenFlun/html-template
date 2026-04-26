@@ -17,9 +17,15 @@ import path from 'path';
 import vm from 'vm';
 import { pathToFileURL } from 'url';
 // ==================== 1. 常量声明及工具函数====================
-// 统一所有路径常量，其他文件从此导入
+let isCompilationMode = false;
+/**
+ * 所有路径常量,其他文件从此导入
+ * >查看定义:@see {@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
+ * {@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link writtenFilesToIgnore}
+ */
 const fsPromises = fs.promises, CWD = process.cwd(), templatesDir = 'templates', templatesAbsDir = path.join(CWD, templatesDir),
 	pRes = path.resolve, staticDir = 'static', customizeDir = 'customize', accountDir = 'account', defaultPort = 7296,
+	userFeatures = {}, writtenFilesToIgnore = [], includedFiles = new Set(),
 	// 预编译所有高频正则表达式
 	includeRegex = /(\"|')\[include\s+([^\]]+)\](\"|')|\[include\s+([\S\s]+?)\]/gi, quotedVarRegex = /`\s*{{(.*?)}}\s*`/g,
 	userFuncRegex = /\{\{\s*user:\s*([^\s()]+?)\s*\(([^)]*)\)\s*\}\}/g, templateTagRegex = /\[!([^\]]*?)\]|\[\~([^\]]*?)\]/g,
@@ -147,9 +153,6 @@ const findEntryFile = async cachedPages => {
 	};
 
 // ==================== 3. 包含文件处理 ====================
-let isCompilationMode = false;
-const includedFiles = new Set(),
-
 /**
  * 设置编译模式并重置文件依赖记录
  * @param {boolean} mode - 是否为编译模式
@@ -231,8 +234,6 @@ const processIncludes = async (content, currentFile = '', inclusionStack = new S
 }
 
 // ==================== 4. 用户自定义功能系统 ====================
-const userFeatures = {}, writtenFilesToIgnore = [];
-
 /**
  * 运行时监控所有文件写入操作
  */
@@ -921,11 +922,7 @@ const renderTemplate = async templateFile => {
 
 // ==================== 9. 模块功能导出 ====================
 export {
-	path, fsPromises, CWD,
-	templatesAbsDir, templatesDir, staticDir, customizeDir, accountDir, defaultPort, // 路径常量
-	getAvailableTemplates, findEntryFile,				   	  // 模板文件操作
-	validateTemplateFile, renderTemplate,				   	  // 模板渲染引擎核心
-	processIncludes, setCompilationMode, getIncludedFiles, 	  // 包含文件处理
-	processVariables,									   	  // 变量处理系统
-	loadUserFeatures, monitorFileWrites, writtenFilesToIgnore // 用户功能系统,监听写入文件,热重载忽略文件
+	path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, defaultPort, writtenFilesToIgnore,
+	getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes, setCompilationMode,
+	getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
 };
