@@ -15,7 +15,7 @@
 import express from 'express';
 import { constants, existsSync } from 'fs';
 import http from 'http';
-import socketIo from 'socket.io';
+import { Server as socketIo } from 'socket.io';
 import chokidar from 'chokidar';
 import {
 	path, fsPromises, CWD, getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes,
@@ -35,7 +35,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	createServerWithSocket = (app, hotReload) => {
 		server = http.createServer(app);
 		if (hotReload) {
-			io = socketIo(server);
+			io = new socketIo(server);
 			io.engine.on("headers", headers => headers["Content-Type"] = "text/html; charset=utf-8");
 		}
 	},

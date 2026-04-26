@@ -27,7 +27,7 @@ import {
 	path, fsPromises, CWD, getAvailableTemplates, validateTemplateFile, renderTemplate, processIncludes, processVariables,
 	setCompilationMode, getIncludedFiles, loadUserFeatures, findEntryFile, templatesDir, staticDir, customizeDir, defaultPort
 } from './services/templateService.js';
-import PK from './package.json' assert { type: 'json' };
+import PK from './package.json' with { type: 'json' };
 import util from 'util';
 import { exec } from 'child_process';
 import { fileURLToPath } from 'url';
