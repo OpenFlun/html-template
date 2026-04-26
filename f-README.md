@@ -1,5 +1,12 @@
 # HTML模板工具包
-### 本包以 ESM 模块系统编写->未来趋势;只要你的 Node.js 版本大于22.12,可保留CJS `require()` 语法调用,否则请使用 `import` 语法;
+
+### 本包基于 ESM 模块系统编写，拥抱未来趋势
+
+- **推荐方式**：使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
+- **兼容方式**：Node.js ≥ 23.5.0 原生支持 `require(esm)`；22.12+ 需开启 `--experimental-require-module` 标志;
+- **重要**：本文档所有示例均采用 **ESM 标准**，请确保你的项目 `package.json` 中已设置 `"type": "module"`，或将脚本后缀改为 `.mjs`;
+
+---
 
 ## 架构概览
 
@@ -55,6 +62,9 @@ graph TB
 # 初始化项目（如果尚未初始化）
 npm init -y
 
+# 在 package.json 中添加 "type": "module"
+npm pkg set type=module
+
 # 本地安装（推荐）
 npm i flun-html-template # 简写
 # 或
@@ -69,7 +79,7 @@ npm i flun-webauthn-server  # 身份验证服务后端处理
 npm i flun-webauthn-browser # 身份验证前端处理
 # 所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
 ```
-> **重要提示**：初次使用最好在空项目中执行安装，安装过程会自动安装示例和必要文件到根目录
+> **重要提示**：初次使用最好在空项目中执行安装，安装过程会自动复制 ESM 示例和必要文件到根目录
 
 ---
 
@@ -87,6 +97,24 @@ npm i flun-webauthn-browser # 身份验证前端处理
     "restoreDefaults": "node restoreDefaults.js"
   }
 }
+```
+
+**dev.js（ESM）**
+```javascript
+import { startDevServer } from 'flun-html-template';
+startDevServer({ port: 7296, hotReload: true });
+```
+
+**build.js（ESM）**
+```javascript
+import { compile } from 'flun-html-template';
+compile({ outputDir: 'dist' });
+```
+
+**restoreDefaults.js（ESM）**
+```javascript
+import { initProject } from 'flun-html-template';
+initProject({ mode: 'overwrite', verbose: true });
 ```
 
 然后使用：
@@ -122,7 +150,7 @@ node build.js
 - **环境变量**：`PORT=8080 node dev.js`
 - **编程方式**：
   ```javascript
-  const { startDevServer } = require('flun-html-template');
+  import { startDevServer } from 'flun-html-template';
   startDevServer({ port: 8080 });
   ```
 
@@ -131,7 +159,7 @@ node build.js
 - **禁用**：`node dev.js --no-hot-reload`
 - **编程方式**：
 ```javascript
-  const { startDevServer } = require('flun-html-template');
+  import { startDevServer } from 'flun-html-template';
   startDevServer({ port: 7296, hotReload: true }); // 启用热重载(默认)
 ```
 ### 登录系统控制
@@ -139,13 +167,13 @@ node build.js
 - **禁用**（默认）：`node dev.js --no-account`
 - **编程方式**：
 ```javascript
-  const { startDevServer } = require('flun-html-template');
+  import { startDevServer } from 'flun-html-template';
   startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
 ```
 ### 自定义打包目录
 - **编程方式**（默认输出到`dist`目录）：
-```js
-const { compile } = require('flun-html-template');
+```javascript
+import { compile } from 'flun-html-template';
 compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
 ```
 
@@ -187,7 +215,7 @@ HBuilder自定义代码块配置(HTML和js)：
 npm update flun-html-template
 ```
 
-### 恢复初始文件
+### 恢复初始示例文件
 ```sh
 # 基本命令（跳过已存在目录）
 node ./node_modules/flun-html-template/copy-files.js
@@ -211,7 +239,7 @@ node ./node_modules/flun-html-template/copy-files.js --skip-files --verbose
 
 #### 编程方式
 ```javascript
-const { initProject } = require('flun-html-template');
+import { initProject } from 'flun-html-template';
 
 // 恢复初始文件的多种方式
 initProject();                                        // 使用默认设置（跳过已存在目录）
@@ -328,43 +356,49 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 
 ### 自定义函数
 ```javascript
-// 在 customize 目录中的文件
-exports.functions = {
-    formatCurrency: (amount, currency = '¥') => {
-        return `${currency}${amount.toFixed(2)}`;
-    },
-    getGreeting: (user) => {
-        const hour = new Date().getHours();
-        if (hour < 12) return `早上好, ${user.name}!`;
-        if (hour < 18) return `下午好, ${user.name}!`;
-        return `晚上好, ${user.name}!`;
+// 在 customize 目录中的文件 (ESM)
+export default {
+	functions: {
+        formatCurrency: (amount, currency = '¥') => {
+            return `${currency}${amount.toFixed(2)}`;
+        },
+        getGreeting: (user) => {
+            const hour = new Date().getHours();
+            if (hour < 12) return `早上好, ${user.name}!`;
+            if (hour < 18) return `下午好, ${user.name}!`;
+            return `晚上好, ${user.name}!`;
+        }
     }
-};
+}
 ```
 
 ### 自定义路由
 ```javascript
-exports.setupRoutes = (app) => {
-    app.get('/api/products', (req, res) => {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        res.json({ products: [], total: 0, page, limit });
-    });
+export default {
+	setupRoutes: app => {
+        app.get('/api/products', (req, res) => {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            res.json({ products: [], total: 0, page, limit });
+        });
 
-    // 自定义中间件
-    app.use((req, res, next) => {
-        console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-        next();
-    });
-};
+        // 自定义中间件
+        app.use((req, res, next) => {
+            console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+            next();
+        });
+    }
+}
 ```
 
 ### 全局变量
 ```javascript
-exports.variables = {
-    siteName: "我的网站",
-    copyrightYear: new Date().getFullYear()
-};
+export default {
+    variables: {
+        siteName: "我的网站",
+        copyrightYear: new Date().getFullYear()
+    };
+}
 ```
 
 # 安全机制说明
@@ -436,8 +470,9 @@ exports.variables = {
 1. **模板不生效**：确保子模板开头有 `[extends base.html]`
 2. **区块不显示**：检查开闭标签名称是否一致
 3. **热重载失效**：确认修改的是模板或静态目录中的文件
-4. **路由不工作**：检查是否正确定义了 `setupRoutes` 函数
-5. **找不到函数**: 1.检查函数名是否正确,2.文件名•函数名的文件名是否正确,3.文件是否在"customize"目录内
+4. **路由不工作**：检查是否正确定义了 `setupRoutes` 导出
+5. **找不到函数**: 1. 检查函数名是否正确，2. 确认文件在 `customize` 目录内，3. 确认使用了 `export const functions = {...}` 语法
+6. **ESM 相关错误**：检查 `package.json` 是否包含 `"type": "module"`，或启动文件是否具有 `.mjs` 扩展名。
 
 ### 获取帮助
 如果遇到问题，可以：
@@ -447,4 +482,4 @@ exports.variables = {
 
 ---
 
-此模板工具包提供了从开发到生产的完整解决方案,适合各种规模的Web项目开发;
+此模板工具包提供了从开发到生产的完整解决方案，适合各种规模的Web项目开发。

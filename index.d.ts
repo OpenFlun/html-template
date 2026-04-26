@@ -1,4 +1,6 @@
-// index.d.ts
+import { runCopyFiles } from './copy-files.js';
+import { compileAllTemplates } from './compile.js';
+import { startServer } from './dev-server.js';
 /**
  * HTML开发服务器模块 主要功能：
  * ```js
@@ -10,12 +12,12 @@
  *    -
  * ```js
  *  // 启动服务器示例
- *  const { startDevServer } = require('flun-html-template');
+ * import { startDevServer } from 'flun-html-template';
  *  startDevServer({ port: 7296, hotReload: true, account: false }); // 默认参数:开发服务器端口7296,启用热更新,不启用登录系统;
  *
  *  // -----------------------------------------------
- *  // 恢复文件示例
- *  const { initProject } = require('flun-html-template');
+ *  // 恢复包示例文件
+ *  import { initProject } from 'flun-html-template';
  *  initProject({
  *      mode: 'skip-dirs',  // 模式:跳过已存在的文件(默认)
  *      verbose: false,     // 禁用控制台详细输出(静默模式)
@@ -24,12 +26,12 @@
  *
  *  // -----------------------------------------------
  *  // 编译模板示例
- *  const { compile } = require('flun-html-template');
+ *  import { compile } from 'flun-html-template';
  *  compile({outputDir: 'my-dist'}); // 可选参数:指定输出目录,默认为'dist'
  * ```
  *    -
  */
-declare module 'flun-html-template' {
+declare module './index.js' {
     // ==================== 核心函数类型 ====================
 
     /**
@@ -42,7 +44,7 @@ declare module 'flun-html-template' {
      *
      * @example
      * ```javascript
-     * const { startDevServer } = require('flun-html-template');
+     * import { startDevServer } from 'flun-html-template';
      * // 方式1: 使用默认端口,热重载和登录系统设置
      *      startDevServer();
      *
@@ -93,7 +95,7 @@ declare module 'flun-html-template' {
      *
      * @example
      * ```javascript
-     * const { initProject } = require('flun-html-template');
+     * import { initProject } from 'flun-html-template';
      *
      * // 示例1: 使用默认设置（跳过已存在的目录）
      * initProject().then(() => {
@@ -133,13 +135,13 @@ declare module 'flun-html-template' {
 
     /**
      * 编译所有模板文件
-     * 将模板文件编译为最终的HTML文件，生成到dist目录中
+     * 将模板文件编译为最终的HTML文件,默认生成到dist目录中
      *
      * @returns Promise<void>
      *
      * @example
      * ```javascript
-     * const { compile } = require('flun-html-template');
+     * import { compile } from 'flun-html-template';
      *
      * // 示例1: 基础编译
      * compile().then(() => {

@@ -26,4 +26,7 @@ compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
 - 登录系统额外支持编辑器和预览容器拖动
 
 ### 重大重构:
-- 将包从 CJS 完全迁移至 ESM 模块系统,以适配未来发展趋势;只要你的 Node.js 版本大于22.12,可保留CJS `require()` 语法调用,否则请使用 `import` 语法;
+- 将包从 CJS 完全迁移至 ESM 模块系统，以适配未来发展趋势。
+  **推荐使用 `import` / `export` 语法**，并确保项目 `package.json` 已设置 `"type": "module"`（或脚本使用 `.mjs` 后缀）;
+  **如需保留 `require()` 调用**，请使用 Node.js ≥ 23.5.0（原生支持）,或 Node.js 22.12+ 并显式开启 `--experimental-require-module` 标志;
+  （本文档所有示例已统一采用 ESM 标准）
