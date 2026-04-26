@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "node dev-server.js",
 		"build": "node compile.js",
-		"postinstall": "node copy-files.js 2>&1 || echo \"复制文件失败\""
+		"postinstall": "node copy-files.js 2>&1"
 	},
 	"keywords": [
 		"html",

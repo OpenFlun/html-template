@@ -30,7 +30,7 @@ import {
 import PK from './package.json' with { type: 'json' };
 import util from 'util';
 import { exec } from 'child_process';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 let cachedPages = []; // 缓存模板列表
 const execPromise = util.promisify(exec),
@@ -73,9 +73,13 @@ const execPromise = util.promisify(exec),
 			const files = (await fsPromises.readdir(featuresDir)).filter(f => f.endsWith('.js'));
 			for (const file of files) {
 				try {
-					const mod = await import(path.join(featuresDir, file)), feature = mod.default?.setupRoutes ? mod.default : mod;
+					const modulePath = path.join(featuresDir, file), moduleUrl = pathToFileURL(modulePath);
+					moduleUrl.search = 'update=' + Date.now();
+					const mod = await import(moduleUrl.href), feature = mod.default?.setupRoutes ? mod.default : mod;
 					if (typeof feature.setupRoutes === 'function') return true;
-				} catch { }
+				} catch (e) {
+					console.warn(`⚠️ 检查路由文件 ${file} 失败:`, e.message);
+				}
 			}
 			return false;
 		} catch {
@@ -191,7 +195,7 @@ const execPromise = util.promisify(exec),
  			// 动态加载用户自定义路由
  			loadUserRoutes = async () => {
  			    const featuresDir = path.join(__dirname, '${customizeDir}');
- 			    if (!fs.existsSync(featuresDir)) return console.log(\`   ℹ️ \${featuresDir}目录不存在，跳过路由加载\`);
+ 			    if (!fs.existsSync(featuresDir)) return console.log(\`   ℹ️ \${featuresDir}目录不存在,跳过路由加载\`);
 
  			    const routeFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.js')).sort();
  			    for (const file of routeFiles) {
@@ -200,15 +204,12 @@ const execPromise = util.promisify(exec),
  			            const modulePath = path.join(featuresDir, file), moduleUrl = pathToFileURL(modulePath);
 						moduleUrl.search = 'update=' + Date.now();
 						const feature = await import(moduleUrl.href);
- 			            if (typeof feature.default?.setupRoutes === 'function') {
- 			                feature.default.setupRoutes(app);
- 			                console.log(\`   ✅ 路由加载文件: \${file}\`);
- 			            } else if (typeof feature.setupRoutes === 'function') {
- 			                feature.setupRoutes(app);
- 			                console.log(\`   ✅ 路由加载文件: \${file}\`);
- 			            }
+ 			            if (typeof feature.default?.setupRoutes === 'function')
+ 			                feature.default.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
+ 			            else if (typeof feature.setupRoutes === 'function')
+ 			                feature.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
  			        } catch (e) {
- 			            console.error(\`   ❌ 路由加载失败: \${file}\`, e.message);
+ 			            console.error(\`   \${file}文件未检测到路由\`, e.message);
  			        }
  			    }
  			};
@@ -275,16 +276,16 @@ const execPromise = util.promisify(exec),
 
 // ==================== 4.批量编译主流程 ====================
 /**
- * 全量模板编译与打包入口
- *
- * @param {string|Object} [options] - 配置项，可以是字符串（输出目录）或对象（支持 outputDir 字段）
+ * 全量模板编译与打包
+ * >查看定义:@see {@link compileAllTemplates}
+ * @param {string|Object} [options] - 配置项,可以是字符串（输出目录）或对象（支持 outputDir 字段）
  * @param {string} [options.outputDir='dist'] - 自定义打包输出目录
  *
  * 核心流程：
  * 1. 初始化编译环境（模式标识->缓存清理->验证模板->获取编译文件）
  * 2. 预加载用户自定义变量
  * 3. 创建打包目录,异步编译所有模板文件
- * 4. 路由检测，根据有无路由准备不同的依赖对象, 生成入口文件内容、原子写入文件
+ * 4. 路由检测,根据有无路由准备不同的依赖对象,生成入口文件内容、原子写入文件
  * 5. 复制资源、自动安装依赖、恢复非编译模式
  *
  * 特殊处理：

@@ -12,15 +12,15 @@ import { fromBuffer, toBuffer } from 'flun-webauthn-server/helpers';
 import { randomBytes } from 'crypto';
 import { hashSync, hash, compare } from 'bcrypt';
 import { toDataURL } from 'qrcode';
+import { EventEmitter } from 'events';
 import session from 'express-session';
-import sessionFileStoreFactory from 'session-file-store';
 import { rateLimit } from 'express-rate-limit';
 import { generateSecret, verify, generateURI } from 'otplib';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename), CWD = process.cwd(),
     pageDir = 'templates', accountDir = 'account', usersFile = path.join(__dirname, 'users.json'), pendingRegistrations = new Map(),
-    recentPasswordResets = new Map(), FileStore = sessionFileStoreFactory(session), mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    recentPasswordResets = new Map(), mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/, Store = session.Store;
 
 // 邮件发送配置检查
 if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PASS)
@@ -160,23 +160,76 @@ const transporter = createTransport({
 // ========== 路由设置 ==========
 export default {
     setupRoutes: app => {
-        // 1. 配置 session
+        // ========== 1. 配置 session ==========
+        class SimpleFileStore extends Store {
+            constructor(sessionsDir) {
+                super(), this.sessionsDir = sessionsDir;
+            }
+
+            get(sid, cb) {
+                const file = path.join(this.sessionsDir, `${sid}.json`);
+                try {
+                    if (fs.existsSync(file)) {
+                        const data = fs.readFileSync(file, 'utf8');
+                        cb(null, JSON.parse(data));
+                    }
+                    else cb(null, null);
+                } catch (e) { cb(e); }
+            }
+
+            set(sid, session, cb) {
+                const file = path.join(this.sessionsDir, `${sid}.json`);
+                try {
+                    fs.writeFileSync(file, JSON.stringify(session));
+                    cb(null);
+                } catch (e) { cb(e); }
+            }
+
+            destroy(sid, cb) {
+                const file = path.join(this.sessionsDir, `${sid}.json`);
+                try {
+                    if (fs.existsSync(file)) fs.unlinkSync(file);
+                    cb(null);
+                } catch (e) { cb(e); }
+            }
+
+            touch(sid, session, cb) {
+                const file = path.join(this.sessionsDir, `${sid}.json`);
+                try {
+                    if (fs.existsSync(file)) {
+                        const now = new Date();
+                        fs.utimesSync(file, now, now);
+                    }
+                    cb(null);
+                } catch (e) { cb(e); }
+            }
+        }
+
         const sessionsDir = path.join(CWD, 'sessions');
         if (!fs.existsSync(sessionsDir)) fs.mkdirSync(sessionsDir, { recursive: true });
-        const sessionStore = new FileStore({
-            path: sessionsDir, ttl: 30 * 24 * 3600, cleanupInterval: 3600,
-            logFn: (...args) => {
-                const message = args.map(arg => String(arg)).join(' ');
-                if (message.includes('ENOENT') || message.includes('no such file or directory')) return;
-            }, retry: 0
-        }), oneHour = 3600000, fifteenMin = 900000;
+
+        const sessionStore = new SimpleFileStore(sessionsDir), oneHour = 3600000, fifteenMin = 900000;
+
+        // 定期清理超过 30 天的 session 文件(每天执行一次)
+        setInterval(() => {
+            const now = Date.now();
+            fs.readdirSync(sessionsDir).forEach(f => {
+                if (!f.endsWith('.json')) return;
+                const p = path.join(sessionsDir, f);
+                try {
+                    if (now - fs.statSync(p).mtimeMs > 30 * 24 * oneHour) fs.unlinkSync(p);
+                } catch (_) { }
+            });
+        }, 24 * oneHour);
 
         app.use(session({
             secret: env.SESSION_SECRET || 'dev-secret-change-in-production',
             store: sessionStore,
-            resave: false, saveUninitialized: false,
+            resave: false,
+            saveUninitialized: false,
             cookie: { secure: false, httpOnly: true, sameSite: 'lax', maxAge: 30 * 24 * oneHour }
         }));
+
         app.use(express.json(), express.urlencoded({ extended: true })), initAdminUser();
 
         // 2. 全局登录保护中间件

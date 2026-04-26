@@ -3,8 +3,8 @@ import {
     writtenFilesToIgnore, getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes,
     setCompilationMode, getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
 } from './services/templateService.js';
-import { runCopyFiles } from './copy-files.js';
 import { compileAllTemplates } from './compile.js';
+import { runCopyFiles } from './copy-files.js';
 import { startServer } from './dev-server.js';
 
 // =================================== services/templateService.js ===================================
@@ -26,7 +26,7 @@ import { startServer } from './dev-server.js';
  *
  * // 函数列表:
  * getAvailableTemplates();         // 获取所有可用模板文件（排除 base.html）
- * findEntryFile();                 // 动态识别入口文件('@entry' 标记 > 优先级列表 > 首字母排序)
+ * findEntryFile();                 // 动态识别入口文件('@entry'标记 > 优先级列表 > 首字母排序)
  * validateTemplateFile();          // 验证模板文件标签结构完整性
  * renderTemplate();                // 核心模板渲染（处理 extends 继承与区块合并）
  * processIncludes();               // 递归处理 [include] 包含指令
@@ -36,14 +36,53 @@ import { startServer } from './dev-server.js';
  * loadUserFeatures();              // 从 customize 目录加载用户路由、函数和变量
  * monitorFileWrites();             // 启动文件写入监控（用于热重载排除）
  * ```
- * >查看定义:@see {@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
- *{@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link getAvailableTemplates}、{@link findEntryFile}、
- *{@link validateTemplateFile}、{@link renderTemplate}、{@link processIncludes}、{@link setCompilationMode}、{@link getIncludedFiles}、
- *{@link processVariables}、{@link loadUserFeatures}、{@link monitorFileWrites}
+ * >查看定义:@see
+ * - 常量:{@link path}、{@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
+ *{@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link writtenFilesToIgnore}
+ * - 函数:{@link getAvailableTemplates}、{@link findEntryFile}、{@link validateTemplateFile}、{@link renderTemplate}、
+ *{@link processIncludes}、{@link setCompilationMode}、{@link getIncludedFiles}、{@link processVariables}、
+ *{@link loadUserFeatures}、{@link monitorFileWrites}
  */
 declare module './services/templateService.js' {
     export * from './services/templateService.js';
 }
+
+// =================================== compile.js ===================================
+/**
+ * ```js
+ * // 文件导出内容
+ * compileAllTemplates(); // 全量模板编译与打包
+ * ```
+ * >查看定义:@see {@link compileAllTemplates}
+ */
+declare module './compile.js' {
+    export * from './compile.js';
+}
+
+// =================================== copy-files.js ===================================
+/**
+ * ```js
+ * // 文件导出内容
+ * runCopyFiles(); // 运行文件复制
+ * ```
+ * >查看定义:@see {@link runCopyFiles}
+ */
+declare module './copy-files.js' {
+    export * from './copy-files.js';
+}
+
+// =================================== dev-server.js ===================================
+/**
+ * ```js
+ * // 文件导出内容
+ * startServer(); // 启动开发服务器
+ * ```
+ * >查看定义:@see {@link startServer}
+ */
+declare module './dev-server.js' {
+    export * from './dev-server.js';
+}
+
 /**
  * HTML开发服务器模块 主要功能：
  * ```js

@@ -91,9 +91,10 @@ const fsPromises = fs.promises, CWD = process.cwd(), templatesDir = 'templates',
 
 /**
  * 动态识别入口文件（优先级策略）
- * 1. 查找包含<!-- @entry -->标记的文件
+ * 1. 查找包含\<!-- \@entry -->标记的文件
  * 2. 按优先级列表匹配(index.html > main.html > home.html)
  * 3. 返回首字母排序的第一个HTML文件
+ * >查看定义:@see {@link findEntryFile}
  * @param {string} cachedPages - 缓存模板列表
  * @returns {Promise<string>} 入口文件名
  */
@@ -155,6 +156,7 @@ const findEntryFile = async cachedPages => {
 // ==================== 3. 包含文件处理 ====================
 /**
  * 设置编译模式并重置文件依赖记录
+ * >查看定义:@see {@link setCompilationMode}
  * @param {boolean} mode - 是否为编译模式
  */
 const setCompilationMode = mode => {
@@ -164,6 +166,7 @@ const setCompilationMode = mode => {
 
 /**
  * 获取所有被包含的模板文件路径
+ * >查看定义:@see {@link getIncludedFiles}
  * @returns {Set<string>} 包含文件路径集合
  */
 const getIncludedFiles = () => {
@@ -172,9 +175,10 @@ const getIncludedFiles = () => {
 
 /**
  * 递归处理模板中的包含指令
+ * >查看定义:@see {@link processIncludes}
  * @param {string} content - 模板内容
- * @param {string} currentFile - 当前处理文件路径
- * @param {Set} inclusionStack - 包含栈，用于检测循环包含
+ * @param {string} [currentFile=''] - 当前处理文件路径
+ * @param {Set<string>} [inclusionStack] - 包含栈,用于检测循环包含
  * @returns {Promise<string>} 处理后的内容
  */
 const processIncludes = async (content, currentFile = '', inclusionStack = new Set()) => {
@@ -236,6 +240,8 @@ const processIncludes = async (content, currentFile = '', inclusionStack = new S
 // ==================== 4. 用户自定义功能系统 ====================
 /**
  * 运行时监控所有文件写入操作
+ * >查看定义:@see {@link monitorFileWrites}
+ * @returns {Function} 停止监控的函数
  */
 const monitorFileWrites = () => {
 	const sync = fs.writeFileSync, async = fs.writeFile, promise = fsPromises.writeFile, normalize = path.normalize,
@@ -252,13 +258,13 @@ const monitorFileWrites = () => {
 	};
 
 	fs.writeFile = (file, ...args) => {
-		const r = async.call(this, file, ...args);
+		const r = async.call(fs, file, ...args);
 		process.nextTick(track, file);
 		return r;
 	};
 
 	fsPromises.writeFile = (file, ...args) => {
-		const r = promise.call(this, file, ...args);
+		const r = promise.call(fsPromises, file, ...args);
 		process.nextTick(track, file);
 		return r;
 	};
@@ -268,13 +274,14 @@ const monitorFileWrites = () => {
 
 	/**
 	* 异步安全加载模块（兼容 ESM 和 CJS）
+	* 优先使用 default 导出（ESM 默认导出 / CJS module.exports）
+	* 仅当 default 导出存在且包含 setupRoutes / functions / variables 时才使用,否则使用整个模块
+	* @param {string} modulePath - 模块文件路径
 	*/
 	_safeImport = async modulePath => {
 		try {
-			const mod = await import(pathToFileURL(modulePath).href), { default: dft } = mod;
-			// 统一导出：优先使用 default 导出（ESM 默认导出 / CJS module.exports）
-			// 如果 default 存在且包含 setupRoutes / functions / variables,则用 default,否则用整个模块
-			const hasDefault = dft && typeof dft === 'object';
+			const mod = await import(pathToFileURL(modulePath).href), { default: dft } = mod,
+				hasDefault = dft && typeof dft === 'object';
 			if (hasDefault && (
 				typeof dft.setupRoutes === 'function' || typeof dft.functions === 'object' || typeof dft.variables === 'object'
 			)) return dft;
@@ -287,6 +294,7 @@ const monitorFileWrites = () => {
 
 /**
  * 加载用户自定义功能（路由/函数/变量）
+ * >查看定义:@see {@link loadUserFeatures}
  * @param {Object} app - Express应用实例（仅服务器模式需要）
  * @param {boolean} isCompileMode - 是否为编译模式
  * @returns {Promise<Object>} 用户功能集合
@@ -724,11 +732,12 @@ const loadUserFeatures = async (app = null, isCompileMode = false) => {
 	};
 
 /**
- * 迭代式变量处理主入口函数
- * 多次扫描模板内容，直到没有未处理的标签或达到最大迭代次数
+ * 迭代式变量处理主入口函数;
+ * 多次扫描模板内容,直到没有未处理的标签或达到最大迭代次数
+ * >查看定义:@see {@link processVariables}
  * @param {string} content - 待处理的模板内容
- * @param {Object} requestVariables - 请求级变量，与用户变量合并后使用
- * @returns {string} 处理后的内容，所有动态部分已被替换为实际值
+ * @param {Object} requestVariables - 请求级变量,与用户变量合并后使用
+ * @returns {string} 处理后的内容,所有动态部分已被替换为实际值
  */
 const processVariables = (content, requestVariables = {}) => {
 	const allVariables = { ...userFeatures.variables, ...requestVariables };
@@ -808,6 +817,7 @@ const processVariables = (content, requestVariables = {}) => {
 // ==================== 7. 模板文件操作 ====================
 /**
  * 获取模板目录下所有可用的HTML文件路径（排除base.html）
+ * >查看定义:@see {@link getAvailableTemplates}
  * @returns {Promise<string[]>} 过滤后HTML文件路径数组
  */
 const getAvailableTemplates = async () => {
@@ -873,6 +883,7 @@ const getAvailableTemplates = async () => {
 
 /**
  * 模板文件结构验证入口
+ * >查看定义:@see {@link validateTemplateFile}
  * @param {string} fileName - 目标文件
  * @param {boolean} [isDev=false] - 开发模式标识
  * @throws {Error} 校验失败时抛出异常
@@ -889,10 +900,10 @@ const validateTemplateFile = async (fileName, isDev = false) => {
 }
 
 /**
- * 模板渲染函数- 处理模板继承关系
+ * 模板渲染函数,处理模板继承关系
+ * >查看定义:@see {@link renderTemplate}
  * @param {string} templateFile - 模板文件名
  * @returns {Promise<string>} 渲染后的HTML内容（不包含变量替换）
- *
  * 核心流程：
  * 1. 检测[extends]指令
  * 2. 剥离继承指令行
