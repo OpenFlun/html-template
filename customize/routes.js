@@ -20,6 +20,11 @@ try {
 // 非认证路由：元素样式、CSS编辑、图片管理、自定义API等
 export default {
 	setupRoutes: app => {
+		if (!accountRouter) {
+			app.get('/api/user', (req, res) => {
+				res.json({ message: '登录功能未启用' });
+			});
+		}
 		accountRouter?.(app);
 		app.use(express.json(), express.urlencoded({ extended: true }));
 
@@ -119,7 +124,7 @@ export default {
 			res.json({ message: '你好！这是来自用户自定义路由的问候！' });
 		});
 
-		app.get('/api/user/:name', (req, res) => {
+		app.get('/api/hi/:name', (req, res) => {
 			res.json({
 				message: `你好, ${req.params.name}!`, timestamp: new Date().toLocaleString('zh-CN'),
 			});

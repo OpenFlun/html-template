@@ -65,7 +65,7 @@
 	<div class="test-result">
 		<h4>1. GET路由测试</h4>
 		<button class="test-button" type="button" onclick="testRoute('/api/greeting')">测试问候路由</button>
-		<button class="test-button" type="button" onclick="testRoute('/api/user/小明')">测试用户路由</button>
+		<button class="test-button" type="button" onclick="testRoute('/api/hi/小明')">测试用户路由</button>
 		<div id="get-result" class="api-result">点击按钮测试路由...</div>
 	</div>
 
@@ -82,7 +82,7 @@
 [~footer]
 
 [!script]
-<script src="/static/styling.js"></script>
+<script src="/static/styling.js" defer></script>
 <script>
 	// 获取当前样式文件路径
 	window.getCurrentStyleFile = () => {
