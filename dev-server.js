@@ -351,17 +351,10 @@ const startServer = async (options = {}) => {
 	restartServer = async () => {
 		try {
 			const port = server.address().port;
-
 			cleanupResources();
 			server.close(async () => {
-				// 清除模块缓存：动态重新导入 customize 目录的模块,并用时间戳绕过缓存
-				const modulePath = path.join(CWD, customizeDir),
-					freshModule = await import(`${pathToFileURL(modulePath).href}?t=${Date.now()}`);
-				// 重新执行加载用户功能（如果 freshModule 导出了 loadUserFeatures 函数）
-				if (typeof freshModule.loadUserFeatures === 'function') await freshModule.loadUserFeatures(app);
-				else if (typeof freshModule === 'function') await freshModule(app);
-				else await loadUserFeatures(app);
-				cachedPages = await getAvailableTemplates();
+				// ✅ 重新加载所有自定义功能(强制破坏缓存),重新获取模板列表,重建服务器并设置热重载
+				await loadUserFeatures(app, false, true), cachedPages = await getAvailableTemplates();
 				createServerWithSocket(app, true), server.listen(port, () => setupHotReload());
 			});
 		} catch (error) {

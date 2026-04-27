@@ -277,14 +277,16 @@ const monitorFileWrites = () => {
 	* 优先使用 default 导出（ESM 默认导出 / CJS module.exports）
 	* 仅当 default 导出存在且包含 setupRoutes / functions / variables 时才使用,否则使用整个模块
 	* @param {string} modulePath - 模块文件路径
+	* @param {boolean} forceReload - 是否强制重新加载（绕过缓存）
 	*/
-	_safeImport = async modulePath => {
+	_safeImport = async (modulePath, forceReload = false) => {
 		try {
-			const mod = await import(pathToFileURL(modulePath).href), { default: dft } = mod,
-				hasDefault = dft && typeof dft === 'object';
-			if (hasDefault && (
-				typeof dft.setupRoutes === 'function' || typeof dft.functions === 'object' || typeof dft.variables === 'object'
-			)) return dft;
+			let url = pathToFileURL(modulePath).href;
+			if (forceReload) url += `?t=${Date.now()}`;
+			const mod = await import(url), { default: d } = mod, hasUserFeature =
+				typeof d.setupRoutes === 'function' || typeof d.functions === 'object' || typeof d.variables === 'object';
+
+			if (d && typeof d === 'object' && hasUserFeature) return d;
 			return mod;
 		} catch (error) {
 			console.error(`加载模块失败: ${modulePath}`, error.message);
@@ -297,9 +299,10 @@ const monitorFileWrites = () => {
  * >查看定义:@see {@link loadUserFeatures}
  * @param {Object} app - Express应用实例（仅服务器模式需要）
  * @param {boolean} isCompileMode - 是否为编译模式
+ * @param {boolean} forceReload - 是否强制重新加载（绕过缓存）
  * @returns {Promise<Object>} 用户功能集合
  */
-const loadUserFeatures = async (app = null, isCompileMode = false) => {
+const loadUserFeatures = async (app = null, isCompileMode = false, forceReload = false) => {
 	const featuresDir = path.join(CWD, customizeDir);
 
 	// 检查并创建目录（如果是编译模式）
@@ -318,7 +321,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false) => {
 		console.log(`🔧 正在加载 (${jsFiles.length}个用户自定义功能文件):`);
 
 		for (const file of jsFiles) {
-			const featurePath = path.join(featuresDir, file), userFeature = await _safeImport(featurePath);
+			const featurePath = path.join(featuresDir, file), userFeature = await _safeImport(featurePath, forceReload);
 
 			if (!userFeature) {
 				console.log(` ❌ ${file} - 加载失败`);

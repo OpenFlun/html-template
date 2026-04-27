@@ -20,7 +20,7 @@ export default {
 		},
 
 		// 简单问候函数
-		greet: (name) => {
+		greet: name => {
 			return `你好, ${name}!`;
 		},
 
@@ -32,9 +32,7 @@ export default {
 		// 格式化日期
 		formatDate: date => {
 			// 处理无参数调用
-			if (arguments.length === 0) {
-				return new Date().toLocaleDateString('zh-CN');
-			}
+			if (date === undefined) return new Date().toLocaleDateString('zh-CN');
 
 			// 处理字符串输入
 			if (typeof date === 'string') {
