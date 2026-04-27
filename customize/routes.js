@@ -7,9 +7,20 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
 	dataFile = path.join(__dirname, 'data.json'), imgDir = path.join(__dirname, '../static/img');
 
+/** @type {(app: import('express').Express) => void} */
+let accountRouter;
+try {
+	/**
+	 * 尝试加载 account.js 中的 accountRouter 函数,如果文件不存在或没有导出该函数,则继续执行后续代码;
+	 * 当前的设计是为了兼容启用了登录模式的用户;只有启用登录模式才会创建 account.js;
+	 */
+	({ accountRouter } = await import('./account.js'));
+} catch { }
+
 // 非认证路由：元素样式、CSS编辑、图片管理、自定义API等
 export default {
 	setupRoutes: app => {
+		accountRouter?.(app);
 		app.use(express.json(), express.urlencoded({ extended: true }));
 
 		// ============ 元素样式 API ============

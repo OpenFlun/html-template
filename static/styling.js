@@ -1,3 +1,4 @@
+if (!account) return;   // 未登录则不执行任何长按功能
 // 长按设置背景色功能实现
 class LongPressBackground {
     constructor() {

@@ -1,5 +1,5 @@
 /**
- * 模板引擎服务模块
+ * 模板引擎服务
  *
  * 功能区块（按代码顺序）：
  *   1. 常量(路径和正则)及工具函数：高频正则预编译,路径安全检查,基础字符串处理,入口文件识别处理
@@ -244,32 +244,52 @@ const processIncludes = async (content, currentFile = '', inclusionStack = new S
  * @returns {Function} 停止监控的函数
  */
 const monitorFileWrites = () => {
-	const sync = fs.writeFileSync, async = fs.writeFile, promise = fsPromises.writeFile, normalize = path.normalize,
-		// 内联逻辑
+	const sWrite = fs.writeFileSync, fWrite = fs.writeFile, pWrite = fsPromises.writeFile, pNormalize = path.normalize,
+		ignoreTimers = new Map(),
+
+		// 内联记录逻辑（加入忽略列表 + 2 秒后自动移除）
 		track = path => {
-			if (typeof path === 'string') writtenFilesToIgnore.push(normalize(pRes(CWD, path)));
+			if (typeof path !== 'string') return;
+			const normalized = pNormalize(pRes(CWD, path));
+
+			if (ignoreTimers.has(normalized)) clearTimeout(ignoreTimers.get(normalized));
+			if (!writtenFilesToIgnore.includes(normalized)) writtenFilesToIgnore.push(normalized);
+			const timer = setTimeout(() => {
+				const idx = writtenFilesToIgnore.indexOf(normalized);
+				if (idx !== -1) writtenFilesToIgnore.splice(idx, 1);
+				ignoreTimers.delete(normalized);
+			}, 2000);
+
+			ignoreTimers.set(normalized, timer);
 		};
-	setInterval(() => writtenFilesToIgnore.length > 0 && writtenFilesToIgnore.shift(), 1500);
 
+	// 劫持同步写入
 	fs.writeFileSync = (file, ...args) => {
-		const r = sync.call(fs, file, ...args);
+		const r = sWrite.call(fs, file, ...args);
 		process.nextTick(track, file);
 		return r;
 	};
 
+	// 劫持异步写入（回调版）
 	fs.writeFile = (file, ...args) => {
-		const r = async.call(fs, file, ...args);
+		const r = fWrite.call(fs, file, ...args);
 		process.nextTick(track, file);
 		return r;
 	};
 
+	// 劫持 Promise 版写入
 	fsPromises.writeFile = (file, ...args) => {
-		const r = promise.call(fsPromises, file, ...args);
+		const r = pWrite.call(fsPromises, file, ...args);
 		process.nextTick(track, file);
 		return r;
 	};
 
-	return () => { fs.writeFileSync = sync, fs.writeFile = async, fsPromises.writeFile = promise; };
+	// 停止监控
+	return () => {
+		fs.writeFileSync = sWrite, fs.writeFile = fWrite, fsPromises.writeFile = pWrite;
+		for (const timer of ignoreTimers.values()) clearTimeout(timer);
+		ignoreTimers.clear(), writtenFilesToIgnore.length = 0;
+	};
 },
 
 	/**
@@ -284,7 +304,7 @@ const monitorFileWrites = () => {
 			let url = pathToFileURL(modulePath).href;
 			if (forceReload) url += `?t=${Date.now()}`;
 			const mod = await import(url), { default: d } = mod, hasUserFeature =
-				typeof d.setupRoutes === 'function' || typeof d.functions === 'object' || typeof d.variables === 'object';
+				typeof d?.setupRoutes === 'function' || typeof d?.functions === 'object' || typeof d?.variables === 'object';
 
 			if (d && typeof d === 'object' && hasUserFeature) return d;
 			return mod;
@@ -317,7 +337,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 
 	userFeatures.variables = {}, userFeatures.functions = {};
 	try {
-		const files = await fsPromises.readdir(featuresDir), jsFiles = files.filter(file => file.endsWith('.js')).sort();
+		const files = await fsPromises.readdir(featuresDir), jsFiles = files.filter(file => file.endsWith('.js'));
 		console.log(`🔧 正在加载 (${jsFiles.length}个用户自定义功能文件):`);
 
 		for (const file of jsFiles) {

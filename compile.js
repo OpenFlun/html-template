@@ -197,7 +197,7 @@ const execPromise = util.promisify(exec),
  			    const featuresDir = path.join(__dirname, '${customizeDir}');
  			    if (!fs.existsSync(featuresDir)) return console.log(\`   ℹ️ \${featuresDir}目录不存在,跳过路由加载\`);
 
- 			    const routeFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.js')).sort();
+ 			    const routeFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.js'));
  			    for (const file of routeFiles) {
  			        try {
  			            // 使用带时间戳的查询参数避免模块缓存,确保每次获取最新内容
@@ -206,7 +206,7 @@ const execPromise = util.promisify(exec),
 						const feature = await import(moduleUrl.href);
  			            if (typeof feature.default?.setupRoutes === 'function')
  			                feature.default.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
- 			            else if (typeof feature.setupRoutes === 'function')
+ 			            else if (typeof feature?.setupRoutes === 'function')
  			                feature.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
  			        } catch (e) {
  			            console.error(\`   \${file}文件未检测到路由\`, e.message);

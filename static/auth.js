@@ -1,4 +1,6 @@
 // /static/auth.js
+let account = false;   // 全局登录标记
+
 (function () {
     const userCenter = document.getElementById('userCenter');
     if (!userCenter) return;
@@ -12,7 +14,7 @@
 
             if (res.ok) {
                 const user = await res.json();
-                userCenter.style.display = 'flex'; // 登录成功:显示个人中心按钮,并可显示用户名
+                account = true, userCenter.style.display = 'flex';
                 const link = userCenter.querySelector('a');
                 if (link && user.username) link.innerHTML = `👤 ${user.username}`;
             }
@@ -23,7 +25,6 @@
         }
     }
 
-    // 页面加载完成后执行
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', checkLoginStatus);
     else checkLoginStatus();
 })();
