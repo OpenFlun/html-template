@@ -7,7 +7,7 @@
  * 3. 全局CORS中间件和静态资源配置(/static路径)
  * 4. 服务器生命周期管理(printAvailablePages, startServer)
  * 5. 请求页面路由处理(自动路由与模板渲染) —— 已在 startServer 内部动态添加
- * 6. 热重载功能实现(文件监听与WebSocket通信)
+ * 6. 热重载功能实现(文件监听、事件处理、服务器重启) —— setupHotReload, restartServer
  * 7. 导出接口与启动执行(module.exports , startServer)
  */
 
@@ -17,12 +17,13 @@ import { constants, existsSync } from 'fs';
 import http from 'http';
 import { Server as socketIo } from 'socket.io';
 import chokidar from 'chokidar';
+import { fileURLToPath, pathToFileURL } from 'url';
 import {
 	path, fsPromises, CWD, getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes,
 	processVariables, loadUserFeatures, writtenFilesToIgnore, templatesAbsDir, templatesDir, staticDir, customizeDir,
 	accountDir, defaultPort, monitorFileWrites
 } from './services/templateService.js';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { injectScript } from './customize/hotReloadInjector.js';
 
 let server, io, watcher, cachedPages = [], unmountMonitor = null;
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
@@ -98,7 +99,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 		try {
 			await fsPromises.access(userTemplatesAccount, constants.F_OK);
 		} catch {
-			console.log('检测到 account=true 但缺少 templates/account 目录，正在从包内复制...');
+			console.log('检测到 account=true 但缺少 templates/account 目录,正在从包内复制...');
 			const pkgTemplatesDir = path.join(__dirname, templatesDir),
 				defaultTemplatesAccount = path.join(pkgTemplatesDir, accountDir);
 			try {
@@ -253,7 +254,7 @@ const startServer = async (options = {}) => {
 					rendered = await processIncludes(rendered, templateFile);
 					rendered = processVariables(rendered, { currentUrl: decodedPath, query: req.query ? JSON.stringify(req.query) : '' });
 
-					if (io) rendered = injectHotReloadScript(rendered); // 如果启用了热重载，注入客户端脚本
+					if (io) rendered = injectScript(rendered); // 如果启用了热重载,注入客户端脚本
 					return res.type('html').send(rendered);
 				}
 
@@ -279,30 +280,6 @@ const startServer = async (options = {}) => {
 },
 
 	// ==================== 6.热重载功能实现 ====================
-	/**
-	 * 注入热重载客户端脚本到HTML
-	 * @param {string} html - 原始HTML内容
-	 * @returns {string} 注入脚本后的HTML
-	 */
-	injectHotReloadScript = html => {
-		if (/hot-reload-socket|socket\.io\.js/.test(html)) return html; // 避免重复注入
-		const socketScript = `
-       		<script src="/socket.io/socket.io.js"></script>
-       		<script>
-       		  (function() {
-       		    var socket = io();
-       		    socket.on('hot-reload', (delay) => {
-       		      console.log('[热重载] 检测到文件更改,' + delay + '毫秒后重新加载页面...');
-       		      setTimeout(() => window.location.reload(), delay);
-       		    });
-       		  })();
-       		</script>
-   		`;
-
-		if (html.includes('</body>')) return html.replace('</body>', `${socketScript}</body>`);
-		return html + socketScript;
-	},
-
 	/**
 	 * 设置文件监听和热重载功能
 	 */
@@ -346,7 +323,7 @@ const startServer = async (options = {}) => {
 	},
 
 	/**
-	 * 重启服务器（ESM 兼容：使用动态 import 替代 require.cache）
+	 * 重启服务器
 	 */
 	restartServer = async () => {
 		try {

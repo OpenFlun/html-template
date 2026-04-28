@@ -17,6 +17,7 @@ import session from 'express-session';
 import { rateLimit } from 'express-rate-limit';
 import { generateSecret, verify, generateURI } from 'otplib';
 import { fileURLToPath } from 'url';
+import { injectScript } from './hotReloadInjector.js';
 
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename), CWD = process.cwd(),
     pageDir = 'templates', accountDir = 'account', usersFile = path.join(__dirname, 'users.json'), pendingRegistrations = new Map(),
@@ -279,7 +280,14 @@ export const accountRouter = app => {
                 if (!reset || reset <= Date.now()) return res.redirect('/');
             }
 
-            res.sendFile(path.join(CWD, pageDir, accountDir, `.${page}.html`));
+            const filePath = path.join(CWD, pageDir, accountDir, `.${page}.html`);
+            try {
+                const html = fs.readFileSync(filePath, 'utf8'), injectedHtml = injectScript(html);
+                res.type('html').send(injectedHtml);
+            } catch (err) {
+                console.error(`读取页面文件失败: ${filePath}`, err);
+                res.status(500).send('服务器内部错误');
+            }
         });
     });
 

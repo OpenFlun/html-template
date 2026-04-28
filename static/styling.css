@@ -60,7 +60,7 @@ button {
 
 .mode-btn.active {
     background: #3498db;
-    color: white;
+    color: var(--text-color);
 }
 
 .mode-btn:hover:not(.active) {
@@ -94,7 +94,7 @@ button {
 .clearBorder {
     grid-column: 1 / -1;
     background: #e74c3c;
-    color: white;
+    color: var(--text-color);
     padding: 3px 6px;
     border: none;
     border-radius: 5px;
@@ -124,7 +124,7 @@ button {
     padding: 8px 12px;
     height: auto;
     background: #34db77;
-    color: white;
+    color: var(--text-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -187,7 +187,7 @@ input[type="file"] {
     padding: 0 10px;
     height: 30px;
     background: #3498db;
-    color: white;
+    color: var(--text-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -212,7 +212,7 @@ input[type="file"] {
     display: none;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-color);
     font-weight: bold;
     font-size: 12px;
     text-align: center;
@@ -250,7 +250,7 @@ input[type="file"] {
     width: 100%;
     padding: 8px 12px;
     background: #5f7284;
-    color: white;
+    color: var(--text-color);
     border: 1px solid #4a5b6b;
     text-align: left;
     display: flex;
@@ -305,7 +305,7 @@ input[type="file"] {
 
 .select-item.selected {
     background: #3498db;
-    color: white;
+    color: var(--text-color);
 }
 
 /* 确保列表中的字体正确显示 */
@@ -372,7 +372,7 @@ input[type="file"] {
 .selectImageBtn {
     padding: 10px 20px;
     background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
+    color: var(--text-color);
     border: none;
     border-radius: 8px;
     font-size: 15px;
@@ -466,7 +466,7 @@ input[type="file"] {
 .image-picker-title {
     font-size: 24px;
     font-weight: bold;
-    color: white;
+    color: var(--text-color);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -474,7 +474,7 @@ input[type="file"] {
 .close-image-btn {
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    color: white;
+    color: var(--text-color);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -506,7 +506,7 @@ input[type="file"] {
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    color: white;
+    color: var(--text-color);
     font-size: 16px;
     outline: none;
     transition: all 0.3s;
@@ -612,7 +612,7 @@ input[type="file"] {
     top: 10px;
     right: 10px;
     background: #3498db;
-    color: white;
+    color: var(--text-color);
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -651,7 +651,7 @@ input[type="file"] {
 
 .cancel-image-btn {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: var(--text-color);
 }
 
 .cancel-image-btn:hover {
@@ -660,7 +660,7 @@ input[type="file"] {
 
 .apply-image-btn {
     background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
+    color: var(--text-color);
     min-width: 140px;
 }
 
@@ -740,14 +740,14 @@ input[type="file"] {
 
 .preview-header h3 {
     margin: 0;
-    color: white;
+    color: var(--text-color);
     font-size: 20px;
 }
 
 .close-preview {
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    color: white;
+    color: var(--text-color);
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -794,7 +794,7 @@ input[type="file"] {
 
 .use-this-image {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
-    color: white;
+    color: var(--text-color);
 }
 
 .use-this-image:hover {
@@ -805,7 +805,7 @@ input[type="file"] {
 
 .close-preview-btn {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: var(--text-color);
 }
 
 .close-preview-btn:hover {

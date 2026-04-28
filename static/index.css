@@ -64,7 +64,7 @@
 
 .test-button {
   background: #4CAF50;
-  color: white;
+  color: var(--text-color);
   border: none;
   padding: 10px 15px;
   border-radius: 4px;

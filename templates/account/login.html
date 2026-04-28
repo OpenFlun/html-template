@@ -7,38 +7,43 @@
     <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico" />
     <title>登录页</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
+    <!-- 引入公共主题变量与全局样式 -->
+    <link rel="stylesheet" href="/static/constants.css" /> <!-- 样式常量 -->
+    <link rel="stylesheet" href="/static/public.css" /> <!-- 公共样式 -->
+    <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
+    <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
+
+    <style>
+        /* body 布局调整：居中卡片 */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background: var(--body-bg);
+            background-color: var(--bg-color);
+            min-height: 100vh;
         }
 
+        /* 卡片容器 */
         .card {
-            background: white;
+            background: var(--container-bg);
             border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px var(--content-shadow);
             width: 100%;
             max-width: 400px;
             padding: 40px 30px;
+            transition: background 0.5s ease, box-shadow 0.5s ease;
         }
 
         .card h2 {
-            color: #333;
+            color: var(--h1-color);
             margin-bottom: 30px;
             text-align: center;
             font-weight: 600;
             font-size: 28px;
+            border-bottom: none;
         }
 
         .form-group {
@@ -48,46 +53,52 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #555;
+            color: var(--text-color);
             font-weight: 500;
             font-size: 14px;
+            opacity: 0.85;
         }
 
         .form-group input {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--content-border);
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.2s;
+            background: var(--li-bg);
+            color: var(--text-color);
+            transition: border-color 0.2s, background 0.5s ease, color 0.5s ease;
         }
 
         .form-group input:focus {
+            border-color: var(--link-color);
             outline: none;
-            border-color: #667eea;
         }
 
         .btn {
             width: 100%;
             padding: 14px;
-            background: #667eea;
-            color: white;
+            background: var(--btn-bg);
+            color: var(--text-color);
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 4px 12px var(--content-shadow);
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
         .btn:hover {
-            background: #5a6fd8;
+            background: var(--btn-hover);
+            transform: translateY(-2px);
         }
 
         .btn:disabled {
             background: #b0b0b0;
             cursor: not-allowed;
             opacity: 0.65;
+            transform: none;
         }
 
         .error {
@@ -102,21 +113,21 @@
             margin-top: 25px;
             text-align: center;
             font-size: 14px;
+            color: var(--text-color);
         }
 
         .links a {
-            color: #667eea;
+            color: var(--link-color);
             text-decoration: none;
             margin: 0 10px;
+            transition: color 0.2s;
         }
 
         .links a:hover {
+            color: var(--link-hover);
             text-decoration: underline;
         }
     </style>
-    <!-- 引入 SimpleWebAuthn 浏览器库 -->
-    <!-- <script src="https://unpkg.com/@simplewebauthn/browser@13.3.0/dist/bundle/index.umd.min.js"></script> -->
-    <script src="/static/utils/browser13.js"></script>
 </head>
 
 <body>
@@ -141,6 +152,12 @@
         </div>
     </div>
 
+    <!-- 公共逻辑 -->
+    <script src="/static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
+    <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
+    <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
+    <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
+    <script src="/static/utils/browser13.js"></script>
     <script>
         const [usernameEl, passwordEl, messageDiv, loginBtn] = ['username', 'password', 'message', 'loginBtn']
             .map(id => document.getElementById(id)),

@@ -135,7 +135,7 @@
 
 .cm-color-swatch:hover {
     transform: scale(1.2);
-    border-color: white;
+    border-color: var(--text-color);
 }
 
 .cm-color-text {
@@ -161,7 +161,7 @@
 
 #previewBtn {
     background: #3498db;
-    color: white;
+    color: var(--text-color);
     padding: 12px 24px;
     border: none;
     border-radius: 5px;
@@ -179,7 +179,7 @@
 #cancelPreviewBtn {
     display: none;
     background: #d94bec;
-    color: white;
+    color: var(--text-color);
     padding: 12px 24px;
     border: none;
     border-radius: 5px;
@@ -196,7 +196,7 @@
 
 #saveBtn {
     background: #0ca55e;
-    color: white;
+    color: var(--text-color);
     padding: 12px 24px;
     border: none;
     border-radius: 5px;
@@ -208,7 +208,7 @@
 
 #cancelBtn {
     background: #bdb330;
-    color: white;
+    color: var(--text-color);
     padding: 12px 24px;
     border: none;
     border-radius: 5px;
@@ -276,7 +276,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.8);
-    color: white;
+    color: var(--text-color);
     padding: 20px 30px;
     border-radius: 8px;
     z-index: 1005;

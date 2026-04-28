@@ -6,6 +6,7 @@ import {
 import { compileAllTemplates } from './compile.js';
 import { runCopyFiles } from './copy-files.js';
 import { startServer } from './dev-server.js';
+import { injectScript } from './customize/hotReloadInjector.js';
 
 // =================================== services/templateService.js ===================================
 /**
@@ -83,6 +84,19 @@ declare module './dev-server.js' {
     export * from './dev-server.js';
 }
 
+// =================================== customize/hotReloadInjector.js ===================================
+/**
+ * ```js
+ * // 文件导出内容
+ * injectScript(); // 注入热重载脚本
+ * ```
+ * >查看定义:@see {@link injectScript}
+ */
+declare module './customize/hotReloadInjector.js' {
+    export * from './customize/hotReloadInjector.js';
+}
+
+// =================================== 模块导出入口 ===================================
 /**
  * HTML开发服务器模块 主要功能：
  * ```js

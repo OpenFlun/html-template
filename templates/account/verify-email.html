@@ -4,36 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>邮箱验证 - CSS实时编辑器</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <title>邮箱验证页</title>
 
+    <!-- 引入公共主题变量与全局样式 -->
+    <link rel="stylesheet" href="/static/constants.css" /> <!-- 样式常量 -->
+    <link rel="stylesheet" href="/static/public.css" /> <!-- 公共样式 -->
+    <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
+    <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
+    <style>
+        /* 覆盖 body 布局：居中卡片,背景由变量接管 */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background: var(--body-bg);
+            background-color: var(--bg-color);
         }
 
+        /* 卡片容器 */
         .card {
-            background: white;
+            background: var(--container-bg);
             border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px var(--content-shadow);
             width: 80%;
             min-width: 400px;
             padding: 40px 30px;
             text-align: center;
+            transition: background 0.5s ease, box-shadow 0.5s ease;
         }
 
         .card h2 {
-            color: #333;
+            color: var(--h2-color);
             margin-bottom: 20px;
             font-weight: 600;
             font-size: 28px;
@@ -42,7 +44,7 @@
         .message {
             font-size: 16px;
             margin: 20px 0;
-            color: #666;
+            color: var(--p-color);
         }
 
         .success {
@@ -59,13 +61,14 @@
             margin: 40px 0;
             line-height: 1.4;
             white-space: pre-line;
+            color: #38a169;
         }
 
         .btn {
             display: inline-block;
             padding: 12px 24px;
-            background: #667eea;
-            color: white;
+            background: var(--btn-bg);
+            color: var(--text-color);
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -74,20 +77,28 @@
             cursor: pointer;
             transition: background 0.2s;
             margin-top: 20px;
+            box-shadow: 0 4px 12px var(--content-shadow);
         }
 
         .btn:hover {
-            background: #5a6fd8;
+            background: var(--btn-hover);
+            transform: translateY(-2px);
         }
 
         .link {
             margin-top: 15px;
             font-size: 14px;
+            color: var(--text-color);
         }
 
         .link a {
-            color: #667eea;
+            color: var(--link-color);
             text-decoration: none;
+        }
+
+        .link a:hover {
+            color: var(--link-hover);
+            text-decoration: underline;
         }
 
         .hidden {
@@ -103,6 +114,11 @@
         <div id="action" style="display:none;"></div>
     </div>
 
+    <!-- 公共逻辑 -->
+    <script src="/static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
+    <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
+    <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
+    <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
     <script>
         (async () => {
             const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token'),
