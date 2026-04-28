@@ -24,148 +24,115 @@ function getStyle(element, api = null) {
  */
 function mouseOrTouch(element, onClick = null, api = null, isEndShow = false) {
     let dragStartX, dragStartY, initialX, initialY, isDragging = false, hasDragged = false, touchStartTime = 0, touchIdentifier = null;
-    const originalZIndex = element.style.zIndex || getComputedStyle(element).zIndex; // 保存原始z-index
+    const originalZIndex = element.style.zIndex || getComputedStyle(element).zIndex;
 
-    setupEventBubbleBlocking(); // 阻止body子元素事件冒泡
-    element.onclick = (e) => {
+    setupEventBubbleBlocking();
+    element.onclick = e => {
         if (hasDragged) return e.preventDefault();
         if (onClick) onClick();
     };
 
-    // 监听元素事件
-    element.addEventListener('contextmenu', (e) => e.preventDefault());
+    element.addEventListener('contextmenu', e => e.preventDefault());
     element.addEventListener('mousedown', startDrag);
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
 
-    // 文档事件
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
-    // 阻止特定元素的事件冒泡
+    // ==================== 内部函数 ====================
     function setupEventBubbleBlocking() {
         const interactiveSelectors = ['textarea', 'input', 'select', 'a'];
-
         interactiveSelectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.dataset.bubbleBlocked) return; // 已设置过则跳过
-                const stopPropagation = (e) => e.stopPropagation();
-                element.addEventListener('mousedown', stopPropagation), element.dataset.bubbleBlocked = true;
-                element.addEventListener('touchstart', stopPropagation, { passive: true });
+            document.querySelectorAll(selector).forEach(el => {
+                if (el.dataset.bubbleBlocked) return;
+                const stop = e => e.stopPropagation();
+                el.addEventListener('mousedown', stop);
+                el.addEventListener('touchstart', stop, { passive: true });
+                el.dataset.bubbleBlocked = true;
             });
         });
     }
-    /**
-     * 处理触摸开始事件
-     * @param {TouchEvent} e - 触摸事件对象
-     */
+
     function handleTouchStart(e) {
         touchStartTime = Date.now(), touchIdentifier = e.touches[0].identifier, startDrag(e);
     }
 
-    /**
-     * 处理触摸移动事件
-     * @param {TouchEvent} e - 触摸事件对象
-     */
     function handleTouchMove(e) {
-        // 只处理与开始触摸相同标识符的事件
-        if (touchIdentifier !== null && Array.from(e.touches).some(touch => touch.identifier === touchIdentifier)) drag(e);
+        if (touchIdentifier === null) return;
+        if (Array.from(e.touches).some(touch => touch.identifier === touchIdentifier)) {
+            if (isDragging) e.preventDefault();
+            drag(e);
+        }
     }
 
-    /**
-     * 处理触摸结束事件
-     * @param {TouchEvent} e - 触摸事件对象
-     */
     function handleTouchEnd(e) {
-        // 检查是否是对应的触摸结束
-        if (touchIdentifier !== null && Array.from(e.changedTouches).some(touch => touch.identifier === touchIdentifier)) {
-            const touchDuration = Date.now() - touchStartTime, touch = e.changedTouches[0];
+        if (touchIdentifier === null) return;
+        const changed = Array.from(e.changedTouches);
+        if (changed.some(touch => touch.identifier === touchIdentifier)) {
+            const touchDuration = Date.now() - touchStartTime, touch = changed[0];
             if (onClick && !hasDragged && touchDuration < 250) {
-                // 创建模拟的点击事件
                 const clickEvent = new MouseEvent('click', {
                     bubbles: true, cancelable: true, clientX: touch.clientX, clientY: touch.clientY
                 });
                 element.dispatchEvent(clickEvent), onClick();
             }
-
-            endDrag(), touchIdentifier = null; // 重置触摸标识符
+            endDrag(), touchIdentifier = null;
         }
     }
 
-    /**
-     * 开始拖拽操作
-     * @param {MouseEvent|TouchEvent} e - 鼠标或触摸事件对象
-     */
     function startDrag(e) {
-        e.preventDefault();
-        isDragging = true, hasDragged = false, preventPageScroll(true); // 阻止页面滚动
+        e.preventDefault(), isDragging = true, hasDragged = false;
 
         const rect = element.getBoundingClientRect();
-        initialX = rect.left, initialY = rect.top, element.style.zIndex = zIndex++; // 提升z-index到最前;
+        initialX = rect.left, initialY = rect.top, element.style.zIndex = zIndex++;
 
-        if (e.type === 'mousedown' || e.type === 'touchstart') {
-            const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX,
-                clientY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+        const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX,
+            clientY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
 
-            dragStartX = clientX, dragStartY = clientY;
-        }
-
+        dragStartX = clientX, dragStartY = clientY;
         element.style.transition = 'none', element.style.cursor = 'grabbing';
     }
 
-    /**
-     * 处理拖拽移动
-     * @param {MouseEvent|TouchEvent} e - 鼠标或触摸事件对象
-     */
     function drag(e) {
         if (!isDragging) return;
 
         let clientX, clientY;
         if (e.type === 'mousemove') e.preventDefault(), clientX = e.clientX, clientY = e.clientY;
         else {
-            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier); // 找到对应的触摸点
+            const touch = Array.from(e.touches).find(t => t.identifier === touchIdentifier);
             if (!touch) return;
             clientX = touch.clientX, clientY = touch.clientY;
         }
 
-        const deltaX = clientX - dragStartX, deltaY = clientY - dragStartY, newX = initialX + deltaX, newY = initialY + deltaY,
-            minX = -element.offsetWidth + 20, maxX = window.innerWidth - 20, minY = -element.offsetHeight + 20,
-            maxY = window.innerHeight - 20;  // 允许大部分内容拖出屏幕外，只保留20像素在屏幕内
-
+        const deltaX = clientX - dragStartX, deltaY = clientY - dragStartY;
         if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) hasDragged = true;
-        element.style.left = `${Math.min(Math.max(minX, newX), maxX)}px`, element.style.right = 'auto';
-        element.style.top = `${Math.min(Math.max(minY, newY), maxY)}px`, element.style.bottom = 'auto';
+
+        const newX = initialX + deltaX, newY = initialY + deltaY, minX = -element.offsetWidth + 20,
+            maxX = window.innerWidth - 20, minY = -element.offsetHeight + 20, maxY = window.innerHeight - 20;
+
+        element.style.left = `${Math.min(Math.max(minX, newX), maxX)}px`;
+        element.style.right = 'auto';
+        element.style.top = `${Math.min(Math.max(minY, newY), maxY)}px`;
+        element.style.bottom = 'auto';
     }
 
-    /**
-     * 结束拖拽操作
-     */
     function endDrag() {
         if (!isDragging) return;
-        const { left, top, right, bottom } = element.style,
-            finalPosition = { [devViewSize]: { style: { left, top, right, bottom } } }; // 创建带设备标识的样式对象
+        const { left, top, right, bottom } = element.style, finalPosition = { [devViewSize]: { style: { left, top, right, bottom } } };
 
-        isDragging = false, element.style.transition = '', element.style.cursor = '', preventPageScroll(false); // 恢复页面滚动;
+        isDragging = false, element.style.transition = '', element.style.cursor = '';
         if (isEndShow) element.classList.add('show');
-
-        // 更新元素样式(位置)到后端
         if (api && hasDragged) {
-            fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(finalPosition) })
+            fetch(api, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPosition)
+            })
                 .then(res => res.ok ? res.json() : Promise.reject(`Network error:${element}`))
                 .catch(error => console.error(`更新${devViewSize}储存样式数据失败:`, error));
         }
-        element.style.zIndex = originalZIndex, setTimeout(() => hasDragged = false, 100); // 短暂延迟后重置拖动标记，允许下次点击
-    }
 
-    /**
-     * 阻止或恢复页面滚动
-     * @param {boolean} prevent - 是否阻止滚动
-     */
-    function preventPageScroll(prevent) {
-        if (prevent) document.body.style.overflow = 'hidden', document.body.style.touchAction = 'none';
-        else document.body.style.overflow = '', document.body.style.touchAction = '';
+        element.style.zIndex = originalZIndex, setTimeout(() => hasDragged = false, 100);
     }
 }
 /**

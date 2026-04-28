@@ -12,11 +12,11 @@
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	-webkit-tap-highlight-color: transparent;
 	/* 移动端禁用文本选择 */
-	-webkit-user-select: none;
+	/* -webkit-user-select: none; */
 	/* IE/Edge禁用文本选择 */
-	-ms-user-select: none;
+	/* -ms-user-select: none; */
 	/* 标准属性禁用文本选择 */
-	user-select: none;
+	/* user-select: none; */
 }
 
 /* 页面主体样式 */
