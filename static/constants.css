@@ -15,11 +15,21 @@
     --header-bg: linear-gradient(to right, #f8f9fa, #e8f4fc);
     /* 头部文字颜色 */
     --header-text: #3498db;
+    /* 头部阴影 */
+    --header-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* 头部链接半透明背景 */
+    --header-link-bg: rgba(255, 255, 255, 0.2);
+    /* 头部链接悬停半透明背景 */
+    --header-link-hover-bg: rgba(255, 255, 255, 0.15);
+    /* 用户中心链接阴影 */
+    --link-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
     /* 内容容器背景色 */
     --container-bg: white;
+    /* 容器阴影 */
+    --container-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     /* 页脚背景色 */
-    --footer-bg: #2c3e50;
+    --footer-bg: #a3c3e2;
 
     /* 一级标题颜色 */
     --h1-color: #2c3e50;
@@ -34,6 +44,8 @@
     --li-bg: #f8f9fa;
     /* 列表项悬停背景色 */
     --li-hover: #e8f4fc;
+    /* 列表项阴影 */
+    --item-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
     /* 链接颜色 */
     --link-color: #3498db;
@@ -44,13 +56,17 @@
     --btn-bg: linear-gradient(to right, #3498db, #2980b9);
     /* 按钮悬停渐变背景 */
     --btn-hover: linear-gradient(to right, #2980b9, #2573a7);
+    /* 按钮阴影 */
+    --btn-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    /* 按钮悬停阴影 */
+    --btn-shadow-hover: 0 6px 12px rgba(52, 152, 219, 0.4);
 
     /* 内容区域渐变起始色 */
     --content-bg-from: #ffffff;
     /* 内容区域渐变结束色 */
     --content-bg-to: #f8f9fa;
     /* 内容区域边框色 */
-    --content-border: #eef2f7;
+    --content-border: #5c738f;
     /* 内容区域阴影颜色 */
     --content-shadow: rgba(0, 0, 0, 0.05);
 }
@@ -68,9 +84,17 @@
     --header-bg: linear-gradient(to right, #1e1e2e, #1e1e28);
     /* 深色模式头部文字颜色 */
     --header-text: #e0e0e0;
+    /* 深色模式头部阴影（更暗） */
+    --header-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* 深色模式头部链接半透明背景（降低透明度） */
+    --header-link-bg: rgba(255, 255, 255, 0.1);
+    --header-link-hover-bg: rgba(255, 255, 255, 0.15);
+    --link-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
     /* 深色模式内容容器背景 */
-    --container-bg: #1e1e2e;
+    --container-bg: #222236;
+    /* 深色模式容器阴影 */
+    --container-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     /* 深色模式页脚背景 */
     --footer-bg: #3a3a4a;
 
@@ -87,6 +111,8 @@
     --li-bg: #2d2d3a;
     /* 深色模式列表项悬停背景 */
     --li-hover: #3a3a4a;
+    /* 深色模式列表项阴影 */
+    --item-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
     /* 深色模式链接颜色 */
     --link-color: #bb86fc;
@@ -97,13 +123,16 @@
     --btn-bg: linear-gradient(to right, #6200ea, #3700b3);
     /* 深色模式按钮悬停渐变背景 */
     --btn-hover: linear-gradient(to right, #3700b3, #1a006e);
+    /* 深色模式按钮阴影（匹配紫色系） */
+    --btn-shadow: 0 4px 8px rgba(98, 0, 234, 0.3);
+    --btn-shadow-hover: 0 6px 12px rgba(98, 0, 234, 0.4);
 
     /* 深色模式内容区域渐变起始色 */
     --content-bg-from: #252536;
     /* 深色模式内容区域渐变结束色 */
     --content-bg-to: #1d1d2c;
     /* 深色模式内容区域边框色 */
-    --content-border: #333346;
+    --content-border: #353589;
     /* 深色模式内容区域阴影颜色 */
     --content-shadow: rgba(0, 0, 0, 0.2);
 }
