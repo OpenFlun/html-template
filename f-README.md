@@ -1,6 +1,6 @@
 # HTML模板工具包
 
-### 本包基于 ESM 模块系统编写，拥抱未来趋势
+### 本包基于 ESM 模块系统编写->拥抱未来趋势
 
 - **推荐方式**：使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
 - **兼容方式**：Node.js ≥ 23.5.0 原生支持 `require(esm)`；22.12+ 需开启 `--experimental-require-module` 标志;

@@ -1,7 +1,4 @@
 // index.js - 统一导出接口
-import { compileAllTemplates } from './compile.js';
-import { runCopyFiles } from './copy-files.js';
-import { startServer } from './dev-server.js';
-
-const compile = compileAllTemplates, initProject = (options = {}) => runCopyFiles(options), startDevServer = startServer;
-export { compile, initProject, startDevServer };
+export { compileAllTemplates as compile } from './compile.js';
+export { runCopyFiles as initProject } from './copy-files.js';
+export { startServer as startDevServer } from './dev-server.js';
