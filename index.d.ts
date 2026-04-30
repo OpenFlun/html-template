@@ -109,12 +109,12 @@ declare module './customize/hotReloadInjector.js' {
  * >
  * @example
  *  // 启动服务器示例
- * import { startDevServer } from 'flun-html-template';
+ * import { startDevServer } from '@flun/html-template';
  *  startDevServer({ port: 7296, hotReload: true, account: false }); // 默认参数:开发服务器端口7296,启用热更新,不启用登录系统;
  *
  *  // -----------------------------------------------
  *  // 恢复包示例文件
- *  import { initProject } from 'flun-html-template';
+ *  import { initProject } from '@flun/html-template';
  *  initProject({
  *      mode: 'skip-dirs',  // 模式:跳过已存在的文件(默认)
  *      verbose: false,     // 禁用控制台详细输出(静默模式)
@@ -123,7 +123,7 @@ declare module './customize/hotReloadInjector.js' {
  *
  *  // -----------------------------------------------
  *  // 编译模板示例
- *  import { compile } from 'flun-html-template';
+ *  import { compile } from '@flun/html-template';
  *  compile({outputDir: 'my-dist'}); // 可选参数:指定输出目录,默认为'dist'
  */
 declare module './index.js' {

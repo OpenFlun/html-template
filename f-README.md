@@ -66,17 +66,17 @@ npm init -y
 npm pkg set type=module
 
 # 本地安装（推荐）
-npm i flun-html-template # 简写
+npm i @flun/html-template # 简写
 # 或
 # 全局安装
-npm i -g flun-html-template # 简写
+npm i -g @flun/html-template # 简写
 
 # flun其它npm家族安装包:
-npm i flun-env              # .env 文件的环境变量调用
-npm i flun-mail             # 邮件发送
-npm i flun-windows          # Window服务安装和管理
-npm i flun-webauthn-server  # 身份验证服务后端处理
-npm i flun-webauthn-browser # 身份验证前端处理
+npm i @flun/env              # .env 文件的环境变量调用
+npm i @flun/mailer           # 邮件发送
+npm i @flun/windows          # Window服务安装和管理
+npm i @flun/webauthn-server  # 身份验证服务后端处理
+npm i @flun/webauthn-browser # 身份验证前端处理
 # 所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
 ```
 > **重要提示**：初次使用最好在空项目中执行安装，安装过程会自动复制 ESM 示例和必要文件到根目录
@@ -101,19 +101,19 @@ npm i flun-webauthn-browser # 身份验证前端处理
 
 **dev.js（ESM）**
 ```javascript
-import { startDevServer } from 'flun-html-template';
+import { startDevServer } from '@flun/html-template';
 startDevServer({ port: 7296, hotReload: true });
 ```
 
 **build.js（ESM）**
 ```javascript
-import { compile } from 'flun-html-template';
+import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' });
 ```
 
 **restoreDefaults.js（ESM）**
 ```javascript
-import { initProject } from 'flun-html-template';
+import { initProject } from '@flun/html-template';
 initProject({ mode: 'overwrite', verbose: true });
 ```
 
@@ -150,7 +150,7 @@ node build.js
 - **环境变量**：`PORT=8080 node dev.js`
 - **编程方式**：
   ```javascript
-  import { startDevServer } from 'flun-html-template';
+  import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 8080 });
   ```
 
@@ -159,7 +159,7 @@ node build.js
 - **禁用**：`node dev.js --no-hot-reload`
 - **编程方式**：
 ```javascript
-  import { startDevServer } from 'flun-html-template';
+  import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 7296, hotReload: true }); // 启用热重载(默认)
 ```
 ### 登录系统控制
@@ -167,13 +167,13 @@ node build.js
 - **禁用**（默认）：`node dev.js --no-account`
 - **编程方式**：
 ```javascript
-  import { startDevServer } from 'flun-html-template';
+  import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
 ```
 ### 自定义打包目录
 - **编程方式**（默认输出到`dist`目录）：
 ```javascript
-import { compile } from 'flun-html-template';
+import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
 ```
 
@@ -212,16 +212,16 @@ HBuilder自定义代码块配置(HTML和js)：
 
 ### 更新版本
 ```sh
-npm update flun-html-template
+npm update @flun/html-template
 ```
 
 ### 恢复初始示例文件
 ```sh
 # 基本命令（跳过已存在目录）
-node ./node_modules/flun-html-template/copy-files.js
+node ./node_modules/@flun/html-template/copy-files.js
 
 # 常用选项：
-node ./node_modules/flun-html-template/copy-files.js --skip-files --verbose
+node ./node_modules/@flun/html-template/copy-files.js --skip-files --verbose
 ```
 **主参数(三选一)**：
 - `--overwrite` - 覆盖已存在的文件和目录
@@ -239,7 +239,7 @@ node ./node_modules/flun-html-template/copy-files.js --skip-files --verbose
 
 #### 编程方式
 ```javascript
-import { initProject } from 'flun-html-template';
+import { initProject } from '@flun/html-template';
 
 // 恢复初始文件的多种方式
 initProject();                                        // 使用默认设置（跳过已存在目录）

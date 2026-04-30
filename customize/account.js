@@ -3,12 +3,12 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import { env } from 'flun-env';
-import { createTransport } from 'flun-mail';
+import { env } from '@flun/env';
+import { createTransport } from '@flun/mail';
 import {
     generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse
-} from 'flun-webauthn-server';
-import { fromBuffer, toBuffer } from 'flun-webauthn-server/helpers';
+} from '@flun/webauthn-server';
+import { fromBuffer, toBuffer } from '@flun/webauthn-server/helpers';
 import { randomBytes } from 'crypto';
 import { hashSync, hash, compare } from 'bcrypt';
 import { toDataURL } from 'qrcode';

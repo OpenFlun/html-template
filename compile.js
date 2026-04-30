@@ -102,7 +102,7 @@ const execPromise = util.promisify(exec),
 		} catch (err) { }
 
 		if (hasUserRoutes) {
-			const templateDeps = PK.dependencies || {}, excludeList = ['chokidar', 'socket.io', 'flun-html-template'];
+			const templateDeps = PK.dependencies || {}, excludeList = ['chokidar', 'socket.io', '@flun/html-template'];
 			mergedDeps = { ...templateDeps, ...userDeps };
 			for (const pkg of excludeList) delete mergedDeps[pkg];
 		}

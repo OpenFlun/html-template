@@ -1,4 +1,4 @@
-import { initProject } from 'flun-html-template';
+import { initProject } from '@flun/html-template';
 
 // 恢复文件(默认参数)
 initProject({
