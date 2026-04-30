@@ -261,7 +261,7 @@ const execPromise = util.promisify(exec),
 				rendered = await processIncludes(rendered, templateFile);
 				rendered = processVariables(rendered, { currentUrl: `/${templateFile}`, query: {} });
 
-				const includedFiles = getIncludedFiles(); // 获取所有包含文件
+				const includedFiles = getIncludedFiles();      // 获取所有包含文件
 				if (includedFiles.has(templateFile)) continue; // 跳过被包含的文件
 
 				const outputPath = path.join(CWD, outputDir, templatesDir, templateFile);

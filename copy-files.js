@@ -148,7 +148,7 @@ const runCopyFiles = async (options = {}) => {
         account: options.account ?? false,
         packageDir: __dirname                        // 包所在目录,用于路径判断
     },
-        targetDir = path.resolve(__dirname, '../..'); // 目标目录（项目根目录）
+        targetDir = path.resolve(__dirname, '../../..'); // 目标目录（项目根目录）
 
     console.log('✅ 开始复制文件'); // 关键消息总是显示
     if (config.verbose) {
