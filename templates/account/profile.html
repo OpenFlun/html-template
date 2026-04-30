@@ -276,7 +276,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            gap: 8px;
+            padding: 10px 5px;
             border-bottom: 1px solid var(--content-border);
         }
 
@@ -368,9 +369,9 @@
                 <span class="info-value" id="createdAt">-</span>
             </div>
             <div class="action-buttons">
-                <button class="btn btn-outline" id="editProfileBtn">编辑资料</button>
-                <button class="btn btn-outline" id="showChangePasswordBtn">修改密码</button>
-                <button class="btn btn-secondary" id="logoutBtn">退出登录</button>
+                <button type="button" class="btn btn-outline" id="editProfileBtn">编辑资料</button>
+                <button type="button" class="btn btn-outline" id="showChangePasswordBtn">修改密码</button>
+                <button type="button" class="btn btn-secondary" id="logoutBtn">退出登录</button>
             </div>
         </div>
 
@@ -389,8 +390,8 @@
                         autocomplete="off">
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn" id="updateProfileBtn">保存修改</button>
-                    <button class="btn btn-secondary" id="cancelEditBtn">取消</button>
+                    <button type="button" class="btn" id="updateProfileBtn">保存修改</button>
+                    <button type="button" class="btn btn-danger" id="cancelEditBtn">取消</button>
                 </div>
                 <div id="updateProfileMessage" class="message"></div>
             </form>
@@ -410,8 +411,8 @@
                     <input type="password" id="confirmPassword" placeholder="确认新密码" maxlength="72" autocomplete="off">
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn" id="changePasswordBtn">确认提交</button>
-                    <button class="btn btn-secondary" id="cancelChangePasswordBtn">取消</button>
+                    <button type="button" class="btn" id="changePasswordBtn">确认提交</button>
+                    <button type="button" class="btn btn-secondary" id="cancelChangePasswordBtn">取消</button>
                 </div>
                 <div id="changePasswordMessage" class="message"></div>
             </form>
@@ -423,7 +424,7 @@
                 <span class="title-text">
                     双因素认证 (2FA) <span id="twofaCheckmark" class="twofa-checkmark"></span>
                 </span>
-                <button class="btn" id="toggle2faBtn">启用2FA</button>
+                <button type="button" class="btn" id="toggle2faBtn">启用2FA</button>
             </h2>
 
             <div id="enable2faPanel" hidden style="margin-top: 16px;">
@@ -436,22 +437,22 @@
                     <input type="text" id="verifyToken" placeholder="输入6位验证码" maxlength="6"
                         style="width: 100%; padding: 8px; margin: 12px 0;" autocomplete="off">
                     <div class="flex-buttons">
-                        <button class="btn" id="confirm2faBtn">验证并启用</button>
-                        <button class="btn btn-secondary" id="cancelEnable2faBtn">取消</button>
+                        <button type="button" class="btn" id="confirm2faBtn">验证并启用</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEnable2faBtn">取消</button>
                     </div>
                     <div id="confirmMessage" class="message" hidden></div>
                 </form>
             </div>
 
             <div id="manage2faPanel" hidden style="margin-top: 16px;">
-                <button class="btn btn-warning" id="showBackupBtn">生成新的备份码</button>
+                <button type="button" class="btn btn-warning" id="showBackupBtn">生成新的备份码</button>
                 <div id="backupManageMessage" class="message" hidden></div>
                 <div id="backupCodesPanel" hidden style="margin-top: 15px;">
                     <p class="info">备用码（仅显示一次，请妥善保存）：</p>
                     <div id="backupCodesList" class="backup-codes"></div>
                     <div class="backup-actions">
-                        <button class="btn btn-outline" id="saveBackupFileBtn">💾 保存到文件</button>
-                        <button class="btn btn-outline" id="printBackupCodesBtn">🖨️ 打印备份码</button>
+                        <button type="button" class="btn btn-outline" id="saveBackupFileBtn">💾 保存到文件</button>
+                        <button type="button" class="btn btn-outline" id="printBackupCodesBtn">🖨️ 打印备份码</button>
                     </div>
                 </div>
             </div>
@@ -463,7 +464,7 @@
                 <span class="title-text">
                     硬件验证（指纹/人脸等） <span id="webauthnStatusIcon"></span>
                 </span>
-                <button class="btn" id="toggleWebAuthnBtn">启用硬件验证</button>
+                <button type="button" class="btn" id="toggleWebAuthnBtn">启用硬件验证</button>
             </h2>
 
             <div id="webauthnMessage" class="message" hidden></div>
@@ -472,10 +473,10 @@
                 <ul id="webauthnDeviceList" class="device-list"></ul>
                 <li id="deviceItemExample" class="device-item" style="display: none;">
                     <span class="device-name"></span>
-                    <button class="btn btn-secondary btn-small">删除</button>
+                    <button type="button" class="btn btn-danger btn-small">删除</button>
                 </li>
                 <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" id="manageAddDeviceBtn">➕ 添加新设备</button>
+                    <button type="button" class="btn btn-outline" id="manageAddDeviceBtn">➕ 添加新设备</button>
                 </div>
                 <div id="webauthnManageMessage" class="message" hidden></div>
             </div>
@@ -487,7 +488,7 @@
                 <span class="title-text">
                     注销账户 <span style="color:#e53e3e;font-size: 1rem;">(警告:此操作数据无法恢复)</span>
                 </span>
-                <button class="btn btn-danger" id="showDeleteAccountBtn">注销</button>
+                <button type="button" class="btn btn-danger" id="showDeleteAccountBtn">注销</button>
             </h2>
             <div id="deleteAccountForm" hidden style="margin-top:15px;">
                 <form onsubmit="return false;">
@@ -496,8 +497,8 @@
                             autocomplete="off">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-danger" id="deleteAccountBtn">永久注销账户</button>
-                        <button class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
+                        <button type="button" class="btn btn-danger" id="deleteAccountBtn">永久注销账户</button>
+                        <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
                     </div>
                     <div id="deleteAccountMessage" class="message"></div>
                 </form>
@@ -511,7 +512,7 @@
     <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
     <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
     <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
-    <script src="/static/utils/browser13.js"></script>
+    <script src="/static/utils/browser.js"></script> <!-- 引入@flun前端硬件验证模块 -->
     <script>
         // ==================== 全局变量 ====================
         let currentUser = null, targetEmail = null, emailCheckInterval = null, isEmailPollingActive = false,
@@ -757,7 +758,7 @@
                 if (enable2faPanel.hidden) await showEnable2faPanel();
                 else hideEnable2faPanel();
             } else {
-                if (!confirm('确定关闭双因素认证吗？关闭后账户安全性将降低。')) return;
+                if (!confirm('确定关闭双因素认证吗？关闭后账户安全性将降低;')) return;
                 const { ok, data } = await requestApi('/api/disable-2fa', { method: 'POST' }, null, toggle2faBtn);
                 if (ok) await loadUser();
                 else alert(data.message);

@@ -143,7 +143,7 @@
                 <label for="password">密码</label>
                 <input type="password" id="password" placeholder="请输入密码" maxlength="72" autocomplete="current-password">
             </div>
-            <button class="btn" id="loginBtn">登录</button>
+            <button type="button" class="btn" id="loginBtn">登录</button>
         </form>
         <div class="error" id="message"></div>
         <div class="links">
@@ -157,7 +157,7 @@
     <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
     <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
     <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
-    <script src="/static/utils/browser13.js"></script>
+    <script src="/static/utils/browser.js"></script> <!-- 引入@flun前端硬件验证模块 -->
     <script>
         const [usernameEl, passwordEl, messageDiv, loginBtn] = ['username', 'password', 'message', 'loginBtn']
             .map(id => document.getElementById(id)),
