@@ -4,7 +4,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { env } from '@flun/env';
-import { createTransport } from '@flun/mail';
+import { createTransport } from '@flun/mailer';
 import {
     generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse
 } from '@flun/webauthn-server';
