@@ -19,13 +19,31 @@ import { pathToFileURL } from 'url';
 // ==================== 1. 常量声明及工具函数====================
 let isCompilationMode = false;
 /**
- * 所有路径常量,其他文件从此导入
- * >查看定义:@see {@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
- * {@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link writtenFilesToIgnore}
+ * fs模块的Promise版本,用于异步文件操作
+ * >查看定义:@see {@link fsPromises}
  */
-const fsPromises = fs.promises, CWD = process.cwd(), templatesDir = 'templates', templatesAbsDir = path.join(CWD, templatesDir),
-	pRes = path.resolve, staticDir = 'static', customizeDir = 'customize', accountDir = 'account', defaultPort = 7296,
-	userFeatures = {}, writtenFilesToIgnore = [], includedFiles = new Set(),
+const fsPromises = fs.promises;
+/**
+ * 当前工作目录
+ * >查看定义:@see {@link CWD}、{@link templatesDir}、{@link staticDir}、{@link customizeDir}、{@link accountDir}、{@link defaultPort}
+ */
+const CWD = process.cwd(), templatesDir = 'templates', staticDir = 'static', customizeDir = 'customize',
+	accountDir = 'account', defaultPort = 7296;
+/**
+ * 模板文件绝对路径
+ * >查看定义:@see {@link templatesAbsDir}
+ */
+const templatesAbsDir = path.join(CWD, templatesDir);
+/**
+ * 路径解析函数
+ * >查看定义:@see {@link pRes}
+ */
+const pRes = path.resolve;
+/**
+ * 已写入文件忽略列表（监控文件写入时使用,防止编译器误触发重新编译）
+ * >查看定义:@see {@link writtenFilesToIgnore}
+ */
+const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 	// 预编译所有高频正则表达式
 	includeRegex = /(\"|')\[include\s+([^\]]+)\](\"|')|\[include\s+([\S\s]+?)\]/gi, quotedVarRegex = /`\s*{{(.*?)}}\s*`/g,
 	userFuncRegex = /\{\{\s*user:\s*([^\s()]+?)\s*\(([^)]*)\)\s*\}\}/g, templateTagRegex = /\[!([^\]]*?)\]|\[\~([^\]]*?)\]/g,
