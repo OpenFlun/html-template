@@ -3,7 +3,7 @@ config.json
 package-lock.json
 .git/
 .gitignore
-publish.ps1
+*.ps1
 .npmrc
 .github/
 *.log
