@@ -24,15 +24,15 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
     recentPasswordResets = new Map(), mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/, Store = session.Store;
 
 // 邮件发送配置检查
-if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PASS)
-    console.error('❌ 邮件服务未配置,请在根目录env文件中正确配置 MAIL_HOST、MAIL_USER、MAIL_PASS 后重新启动!'), process.exit(1);
+if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PWD)
+    console.error('❌ 邮件服务未配置,请在根目录env文件中正确配置 MAIL_HOST、MAIL_USER、MAIL_PWD 后重新启动!'), process.exit(1);
 
 // 邮件发送配置
 const transporter = createTransport({
     host: env.MAIL_HOST,
     port: env.MAIL_PORT,
     secure: true,
-    auth: { user: env.MAIL_USER, pass: env.MAIL_PASS }
+    auth: { user: env.MAIL_USER, pass: env.MAIL_PWD }
 }),
     // ========== 辅助函数 ==========
     readUsers = () => {

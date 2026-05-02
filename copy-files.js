@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,8 +5,8 @@ import { fileURLToPath } from 'url';
 // 获取 __dirname (仅用于迁移)
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
     // 常量定义(直接覆盖文件列表和复制列表)
-    alwaysOverwriteFiles = ['f-README.md', 'f-CHANGELOG.md'], filesToCopy = ['templates', 'customize', 'static', '.env',
-        'dev.js', 'build.js', 'restoreDefaults.js', 'f-README.md', 'f-CHANGELOG.md'],
+    alwaysOverwriteFiles = ['f-README.md', 'f-CHANGELOG.md'], filesToCopy = ['templates', 'customize', 'static', 'dev.js',
+        'build.js', 'restoreDefaults.js', 'f-README.md', 'f-CHANGELOG.md'],
 
     // 日志函数
     log = (message, config, isErrorLog = false) => {

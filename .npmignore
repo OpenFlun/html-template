@@ -3,6 +3,7 @@
 .github/
 .vscode/
 .npmrc
+.env
 
 node_modules/
 logs

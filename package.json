@@ -16,7 +16,6 @@
     "services",
     "static",
     "customize",
-    ".env",
     "dev-server.js",
     "dev.js",
     "compile.js",
