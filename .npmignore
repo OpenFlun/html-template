@@ -4,10 +4,10 @@ dist/
 .gitignore
 .github/
 .vscode/
-*.ps1
 .npmrc
-*.log
 logs
+*.ps1
+*.log
 
 *.bak
 *.backup

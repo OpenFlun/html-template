@@ -8,7 +8,8 @@
     "html",
     "template",
     "server",
-    "flun"
+    "website",
+    "template-engine"
   ],
   "files": [
     "templates",
