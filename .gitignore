@@ -1,17 +1,16 @@
-node_modules/
+.vscode/
 .env
 *.key
-.vscode/
 *.ps1
 .npmrc
 
+node_modules/
 customize/user.json
 sessions/
 dist/
 package-lock.json
-*.log
 logs
-
+*.log
 *.bak
 *.backup
 *.tgz
