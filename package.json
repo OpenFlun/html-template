@@ -38,11 +38,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flunGit/html-template.git"
+    "url": "git+https://github.com/OpenFlun/html-template.git"
   },
   "homepage": "https://www.npmjs.com/package/@flun/html-template#readme",
   "bugs": {
-    "url": "https://github.com/flunGit/html-template/issues"
+    "url": "https://github.com/OpenFlun/html-template/issues"
   },
   "license": "ISC",
   "engines": {
