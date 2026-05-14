@@ -1,6 +1,10 @@
 {
     "workbench.colorTheme": "Custom Tags Theme",
-    "editor.quickSuggestions": false,
+    "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+    },
     "editor.suggestOnTriggerCharacters": false,
     "editor.wordBasedSuggestions": "off"
 }
