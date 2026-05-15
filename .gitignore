@@ -1,4 +1,5 @@
 .vscode/
+.vs/
 .env
 *.key
 *.ps1
