@@ -1,7 +1,7 @@
 import {
-    path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, defaultPort,
-    writtenFilesToIgnore, getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes,
-    setCompilationMode, getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
+    path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, writtenFilesToIgnore,
+    getAvailableTemplates, parseServerConfig, generateUrls, findEntryFile, validateTemplateFile, renderTemplate,
+    processIncludes, setCompilationMode, getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
 } from './services/templateService.js';
 import { compileAllTemplates } from './compile.js';
 import { runCopyFiles } from './copy-files.js';
@@ -27,6 +27,8 @@ import { injectScript } from './customize/hotReloadInjector.js';
  *
  * // 函数列表:
  * getAvailableTemplates();         // 获取所有可用模板文件（排除 base.html）
+ * parseServerConfig();             // 解析服务器配置参数
+ * generateUrls();                  // 生成服务器访问URL列表
  * findEntryFile();                 // 动态识别入口文件('@entry'标记 > 优先级列表 > 首字母排序)
  * validateTemplateFile();          // 验证模板文件标签结构完整性
  * renderTemplate();                // 核心模板渲染（处理 extends 继承与区块合并）
@@ -40,7 +42,7 @@ import { injectScript } from './customize/hotReloadInjector.js';
  * >查看定义:@see
  * - 常量:{@link path}、{@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
  *{@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link writtenFilesToIgnore}
- * - 函数:{@link getAvailableTemplates}、{@link findEntryFile}、{@link validateTemplateFile}、{@link renderTemplate}、
+ * - 函数:{@link getAvailableTemplates}、{@link parseServerConfig}、{@link generateUrls}、{@link findEntryFile}、{@link validateTemplateFile}、{@link renderTemplate}、
  *{@link processIncludes}、{@link setCompilationMode}、{@link getIncludedFiles}、{@link processVariables}、
  *{@link loadUserFeatures}、{@link monitorFileWrites}
  */
@@ -109,8 +111,23 @@ declare module './customize/hotReloadInjector.js' {
  * >
  * @example
  *  // 启动服务器示例
- * import { startDevServer } from '@flun/html-template';
- *  startDevServer({ port: 7296, hotReload: true, account: false }); // 默认参数:开发服务器端口7296,启用热更新,不启用登录系统;
+ *  import { startDevServer } from '@flun/html-template';
+ *
+ *  // 如果需要启用 https，请先安装 `@flun/dns-auto-ssl`,并在生成的示例文件 (DnsAutoSSL.js) 中配置相关参数，
+ *  // 然后将下面导入部分注释取消并使用这些配置项,或使用自己已有的证书路径和域名配置项进行替换。
+ *
+ *  // import { domains, certPath, keyPath } from './DnsAutoSSL.js';
+ *
+ *  // 启动开发服务器
+ *  startDevServer({
+ *      port: 7296,
+ *      hotReload: true,
+ *      account: false,   // 默认参数：不启用登录系统
+ *      // https: true,
+ *      // httpsKey: keyPath,
+ *      // httpsCert: certPath,
+ *      // host: domains[0],
+ *  });
  *
  *  // -----------------------------------------------
  *  // 恢复包示例文件
@@ -124,7 +141,7 @@ declare module './customize/hotReloadInjector.js' {
  *  // -----------------------------------------------
  *  // 编译模板示例
  *  import { compile } from '@flun/html-template';
- *  compile({outputDir: 'my-dist'}); // 可选参数:指定输出目录,默认为'dist'
+ *  compile({ outputDir: 'my-dist' }); // 可选参数:指定输出目录,默认为'dist'
  */
 declare module './index.js' {
     export { compileAllTemplates as compile } from './compile.js';

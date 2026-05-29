@@ -13,7 +13,7 @@
             if (data?.username) {
                 userCenter.style.display = 'flex';
                 const link = userCenter.querySelector('a');
-                if (link) link.innerHTML = `👤 ${data.username}`;
+                if (link) link.innerHTML = `👽 ${data.username}`;
                 document.dispatchEvent(new CustomEvent('userCenterReady')); // 创建并派发自定义事件,通知用户中心已准备好
             }
             else userCenter.style.display = 'none';

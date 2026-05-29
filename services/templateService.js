@@ -105,7 +105,151 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 		}
 
 		return String(value);
+	},
+
+	/**
+	 * 解析并验证端口值
+	 * @param {string|number} portValue - 端口值
+	 * @param {string} source - 来源描述（用于错误消息）
+	 * @returns {number} 有效的端口号或默认值
+	 */
+	_parseAndValidatePort = (portValue, source) => {
+		const portNum = parseInt(portValue);
+		if (!isNaN(portNum) && portNum > 0 && portNum < 65536) return portNum;
+		console.warn(`警告: ${source} "${portValue}" 无效，已启用默认端口:${defaultPort}`);
+		return defaultPort;
 	};
+
+/**
+ * 统一服务器配置解析函数（与 dev-server.js 完全一致）
+ *
+ * 配置解析优先级：
+ *  端口：
+ *    1. 命令行参数 (--port 或 -p)
+ *    2. 函数参数 (options.port)
+ *    3. 环境变量 (process.env.PORT)
+ *    4. 默认值 (常量 defaultPort)
+ *
+ *  主机名：
+ *    1. 命令行参数 (--host 或 -H)
+ *    2. 函数参数 (options.host)
+ *    3. 环境变量 (process.env.HOST)
+ *    4. 默认值 ("localhost")
+ *
+ *  热重载：
+ *    1. 命令行参数 (--hot-reload/--no-hot-reload)
+ *    2. 函数参数 (options.hotReload)
+ *    3. 环境变量 (process.env.HOTRELOAD)
+ *    4. 默认值 (true)
+ *
+ *  登录模式：
+ *    1. 命令行参数 (--account/--no-account)
+ *    2. 函数参数 (options.account)
+ *    3. 环境变量 (process.env.ACCOUNT)
+ *    4. 默认值 (false)
+ *
+ *  HTTPS：
+ *    1. 命令行参数 (--https/--no-https)
+ *    2. 函数参数 (options.https)
+ *    3. 环境变量 (process.env.HTTPS === 'true')
+ *    4. 默认值 (false)
+ *
+ *  HTTPS证书路径（仅在启用HTTPS时必须提供）：
+ *    1. 命令行参数 (--https-key, --https-cert)
+ *    2. 函数参数 (options.httpsKey, options.httpsCert)
+ *    3. 环境变量 (process.env.HTTPS_KEY, process.env.HTTPS_CERT)
+ *    4. 若仍未提供，启动时抛出错误
+ */
+const parseServerConfig = (options = {}, defaults = {}) => {
+	let port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath;
+
+	const args = process.argv.slice(2),
+		portArgIndex = args.findIndex(arg => arg === '--port' || arg === '-p'),
+		portArgValue = portArgIndex !== -1 ? args[portArgIndex + 1] : null,
+		hostArgIndex = args.findIndex(arg => arg === '--host' || arg === '-H'),
+		hostArgValue = hostArgIndex !== -1 ? args[hostArgIndex + 1] : null,
+		{ port: P, host: H, hotReload: Hot, account: Acc, https: Https, httpsKey: Key, httpsCert: Cert } = options;
+
+	// 解析端口
+	if (portArgValue) port = _parseAndValidatePort(portArgValue, '命令行参数');
+	else if (P !== undefined) port = _parseAndValidatePort(P, '函数参数');
+	else if (process.env.PORT) port = _parseAndValidatePort(process.env.PORT, '环境变量 PORT');
+	else if (defaults.port !== undefined) port = _parseAndValidatePort(defaults.port, '持久化配置');
+	else port = defaultPort;
+
+	// 解析主机名
+	if (hostArgValue) host = hostArgValue;
+	else if (H !== undefined) host = H;
+	else if (process.env.HOST) host = process.env.HOST;
+	else if (defaults.host !== undefined) host = defaults.host;
+	else host = 'localhost';
+
+	// 解析热重载
+	if (args.includes('--hot-reload')) hotReload = true;
+	else if (args.includes('--no-hot-reload')) hotReload = false;
+	else if (Hot !== undefined) hotReload = Hot;
+	else if (process.env.HOTRELOAD) hotReload = process.env.HOTRELOAD === 'true';
+	else if (defaults.hotReload !== undefined) hotReload = defaults.hotReload;
+	else hotReload = true;
+
+	// 解析登录模式
+	if (args.includes('--account')) account = true;
+	else if (args.includes('--no-account')) account = false;
+	else if (Acc !== undefined) account = Acc;
+	else if (process.env.ACCOUNT) account = process.env.ACCOUNT === 'true';
+	else if (defaults.account !== undefined) account = defaults.account;
+	else account = false;
+
+	// 解析HTTPS
+	if (args.includes('--https')) httpsEnabled = true;
+	else if (args.includes('--no-https')) httpsEnabled = false;
+	else if (Https !== undefined) httpsEnabled = Https;
+	else if (process.env.HTTPS) httpsEnabled = process.env.HTTPS === 'true';
+	else if (defaults.https !== undefined) httpsEnabled = defaults.https;
+	else httpsEnabled = false;
+
+	// 解析HTTPS证书路径（只有在 httpsEnabled 为 true 时才需要）
+	if (httpsEnabled) {
+		const keyArgIndex = args.findIndex(arg => arg === '--https-key');
+		if (keyArgIndex !== -1 && args[keyArgIndex + 1]) httpsKeyPath = args[keyArgIndex + 1];
+		else if (Key) httpsKeyPath = Key;
+		else if (process.env.HTTPS_KEY) httpsKeyPath = process.env.HTTPS_KEY;
+		else if (defaults.httpsKey) httpsKeyPath = defaults.httpsKey;
+
+		const certArgIndex = args.findIndex(arg => arg === '--https-cert');
+		if (certArgIndex !== -1 && args[certArgIndex + 1]) httpsCertPath = args[certArgIndex + 1];
+		else if (Cert) httpsCertPath = Cert;
+		else if (process.env.HTTPS_CERT) httpsCertPath = process.env.HTTPS_CERT;
+		else if (defaults.httpsCert) httpsCertPath = defaults.httpsCert;
+
+		if (!httpsKeyPath || !httpsCertPath) {
+			console.error('❌ 启用HTTPS时必须同时提供证书私钥路径和证书文件路径！');
+			console.error('   请通过以下方式之一指定：');
+			console.error('   1. 命令行: --https-key <path> --https-cert <path>');
+			console.error('   2. 环境变量: HTTPS_KEY=<path> HTTPS_CERT=<path>');
+			console.error('   3. 函数参数: { httpsKey: "...", httpsCert: "..." }');
+			console.error('   4. 持久化配置文件 (.last-dev-config.json)');
+			process.exit(1);
+		}
+	}
+
+	return { port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath };
+};
+
+/**
+ * 生成页面URL（支持HTTP/HTTPS和自定义主机名）
+ * @param {string} page - 页面文件名
+ * @param {number} port - 端口号
+ * @param {boolean} useHttps - 是否使用HTTPS
+ * @param {string} host - 主机名
+ * @returns {object} { url, encodedUrl, needsEncoding }
+ */
+const generateUrls = (page, port, useHttps, host) => {
+	const protocol = useHttps ? 'https' : 'http', baseUrl = `${protocol}://${host}:${port}`,
+		url = `${baseUrl}/${page}`, needsEncoding = !/^[a-zA-Z0-9\-_.~/]+$/.test(page);
+
+	return { url, encodedUrl: `${baseUrl}/${encodeURI(page)}`, needsEncoding };
+};
 
 /**
  * 动态识别入口文件（优先级策略）
@@ -974,7 +1118,7 @@ const renderTemplate = async templateFile => {
 
 // ==================== 9. 模块功能导出 ====================
 export {
-	path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, defaultPort, writtenFilesToIgnore,
-	getAvailableTemplates, findEntryFile, validateTemplateFile, renderTemplate, processIncludes, setCompilationMode,
-	getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
+	path, fsPromises, CWD, templatesDir, templatesAbsDir, staticDir, customizeDir, accountDir, writtenFilesToIgnore,
+	getAvailableTemplates, parseServerConfig, generateUrls, findEntryFile, validateTemplateFile, renderTemplate,
+	processIncludes, setCompilationMode, getIncludedFiles, processVariables, loadUserFeatures, monitorFileWrites
 };
