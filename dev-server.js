@@ -50,7 +50,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				if (!existsSync(certPath)) throw new Error(`证书文件不存在: ${certPath}`);
 				const key = readFileSync(keyPath, 'utf8'), cert = readFileSync(certPath, 'utf8');
 				serverInstance = https.createServer({ key, cert }, app);
-				console.log(`🔒 HTTPS已启用，证书加载自: ${keyPath} 和 ${certPath}`);
+				console.log(`🔒 证书加载成功,HTTPS已启用`);
 			} catch (err) {
 				console.error(`❌ HTTPS证书加载失败: ${err.message}`);
 				process.exit(1);
