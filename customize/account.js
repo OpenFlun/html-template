@@ -241,16 +241,28 @@ export const accountRouter = app => {
         if (publicPaths.some(p => req.path.startsWith(p))) return next();
         if (!req.session.userId) {
             if (req.path.startsWith('/api/')) return res.status(401).json({ message: '请先登录' });
-            return req.session.returnTo = req.originalUrl, res.redirect('/login');
+            req.session.returnTo = req.originalUrl;
+            return res.redirect('/login');
         }
 
+        const currentUser = getCurrentUser(req);
+        if (!currentUser) {
+            req.session.destroy(() => {
+                if (req.path.startsWith('/api/')) return res.status(401).json({ message: '用户不存在或已失效' });
+                return res.redirect('/login');
+            });
+            return;
+        }
+
+        const { user } = currentUser;
         // 检查密码是否在本次登录后被修改
-        const { user } = getCurrentUser(req);
         if (user?.passwordChangedAt) {
             const sessionLoginTime = req.session.loginTime || 0;
             if (user.passwordChangedAt > sessionLoginTime) {
                 req.session.destroy(() => {
-                    if (req.path.startsWith('/api/')) return res.status(401).json({ message: '密码已修改,请重新登录' });
+                    if (req.path.startsWith('/api/')) {
+                        return res.status(401).json({ message: '密码已修改,请重新登录' });
+                    }
                     return res.redirect('/login');
                 });
                 return;
