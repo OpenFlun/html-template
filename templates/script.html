@@ -13,10 +13,22 @@
 [~style]
 
 [!my] [~my]
-[!header][~header]
+[!header]
+<!-- 布局工具栏 -->
+<div class="layout-toolbar">
+	<button data-layout="left" class="layout-btn" type="button">◀ 左边预览</button>
+	<button data-layout="right" class="layout-btn" type="button">右边预览 ▶</button>
+	<button data-layout="top" class="layout-btn" type="button">▲ 上边预览</button>
+	<button data-layout="bottom" class="layout-btn" type="button">下边预览 ▼</button>
+	<button data-layout="single" class="layout-btn" type="button">📺 单页预览</button>
+	<button id="cancelPreviewBtn" class="layout-btn" type="button">✖ 取消预览</button>
+</div>
+[~header]
+
 [!content]
-<!-- CSS编辑器模态框 <label for="code">代码编辑区：</label> -->
-<div class="modal">
+<!-- 主工作区 -->
+<div id="workspace" class="workspace">
+	<!-- 编辑器面板 -->
 	<div id="cssEditor">
 		<div class="header">
 			<h2>编辑CSS样式</h2>
@@ -27,17 +39,20 @@
 		</h3>
 		<textarea id="cssContent" placeholder="CSS内容将在这里显示..." spellcheck="false"></textarea>
 		<div class="actions">
-			<button id="previewBtn" type="button">预览</button>
-			<button id="cancelPreviewBtn" type="button">取消预览</button>
+			<!-- 只保留保存和取消按钮，预览按钮已移除 -->
 			<button id="saveBtn" type="button">保存并应用</button>
 			<button id="cancelBtn" type="button">取消</button>
 		</div>
 	</div>
-</div>
 
-<!-- 预览容器 -->
-<div id="preview" class="preview-container">
-	<iframe id="previewFrame" title="预览页面"></iframe>
+	<!-- 预览容器 -->
+	<div id="preview" class="preview-container">
+		<div class="preview-header">
+			<span>预览页面</span>
+			<span id="previewUrlHint"></span>
+		</div>
+		<iframe id="previewFrame" title="预览页面"></iframe>
+	</div>
 </div>
 
 <!-- 加载指示器 -->
@@ -62,7 +77,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/comment-fold.min.js"></script>
 
-<!-- 语法检查依赖：CodeMirror lint 核心 + CSSTree -->
+<!-- 语法检查依赖 -->
 <script src="/static/utils/css-lint.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/lint/lint.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/css-tree@3.1.0/dist/csstree.min.js"></script>
@@ -77,9 +92,8 @@
 <script src="/static/utils/match-highlighter.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/selection/active-line.min.js"></script>
 
-<!-- 库插件样式自定义 -->
 <style>
-	/* 增大折叠按钮 */
+	/* 折叠按钮增大 */
 	#cssEditor .CodeMirror .CodeMirror-foldgutter-open,
 	#cssEditor .CodeMirror .CodeMirror-foldgutter-folded,
 	#cssEditor .CodeMirror .CodeMirror-foldgutter-open::after,
@@ -87,17 +101,16 @@
 		font-size: 25px;
 	}
 
-	/* 增加折叠 gutter 的宽度,避免按钮显示不全 */
 	#cssEditor .CodeMirror .CodeMirror-foldgutter {
 		width: 26px;
 	}
 
-	/* 强制 tooltip 显示的样式 */
+	/* ========== CodeMirror 扩展样式（提示、校验等） ========== */
 	.CodeMirror-lint-tooltip {
 		z-index: 10000;
 		background-color: #ffd;
 		border: 1px solid #000;
-		color: #000;
+		color: var(--text-color);
 		font-family: monospace;
 		font-size: 12px;
 		padding: 6px 10px;
@@ -105,10 +118,8 @@
 		word-wrap: break-word;
 		white-space: pre-wrap;
 		line-height: 1.5;
-		transition: none;
 	}
 
-	/* 自动补全列表样式 */
 	.CodeMirror-hints {
 		background-color: #282a36;
 		border: 1px solid #6272a4;
@@ -122,7 +133,7 @@
 	}
 
 	.CodeMirror-hint {
-		color: #f8f8f2;
+		color: var(--text-color);
 		padding: 4px 8px;
 		cursor: pointer;
 		white-space: pre;
@@ -139,26 +150,26 @@
 		color: #f8f8f2;
 	}
 
-	/* 匹配括号高亮 */
 	.CodeMirror-matchingbracket {
 		background-color: rgba(124, 136, 126, 1) !important;
 		font-weight: bold;
 		text-decoration: none !important;
 	}
 
-	/* 自定义高亮 */
 	.custom-highlight {
 		background-color: rgba(255, 255, 0, 0.3) !important;
+	}
+
+	.CodeMirror-linenumber {
+		text-align: right !important;
 	}
 </style>
 
 <script>
-	// 等待 DOM 加载完成后初始化编辑器
 	(function () {
 		function initEditor() {
 			const textarea = document.getElementById('cssContent');
 			if (!textarea) return;
-
 			window.cssEditor = CodeMirror.fromTextArea(textarea, {
 				lineNumbers: true,
 				mode: 'css',
@@ -169,41 +180,27 @@
 				matchBrackets: true,
 				foldGutter: true,
 				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
-				lint: {
-					getAnnotations: window.customCssLint,
-					async: true
-				},
+				lint: { getAnnotations: window.customCssLint, async: true },
 				styleActiveLine: true,
-				hintOptions: {
-					completeSingle: false,   // 即使只有一个匹配也显示列表
-					closeOnUnfocus: false
-				}
+				hintOptions: { completeSingle: false, closeOnUnfocus: false }
 			});
-
 			window.cssEditor.setSize('100%', '100%');
-
-			// ----- 输入时自动弹出补全 -----
 			window.cssEditor.on("inputRead", (cm, change) => {
-				// 如果输入内容包含冒号，立即触发补全（优先响应）
 				if (change.text.join('').includes(':')) {
 					clearTimeout(cm.autocompletionTimeout);
 					cm.autocompletionTimeout = setTimeout(() => cm.showHint({ completeSingle: false }), 0);
 					return;
 				}
-				// 其他输入（字母、数字、删除等）延迟触发
 				clearTimeout(cm.autocompletionTimeout);
 				cm.autocompletionTimeout = setTimeout(() => cm.showHint({ completeSingle: false }), 150);
 			});
-
-			attachCustomHighlight(window.cssEditor); // 高亮匹配选中词(自定义)
+			attachCustomHighlight(window.cssEditor);
 			setTimeout(() => window.cssEditor.performLint(), 100);
 		}
-
 		if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initEditor);
 		else initEditor();
 	})();
 </script>
 
-<!-- 本地文件 -->
 <script src="/static/script.js"></script>
 [~script]

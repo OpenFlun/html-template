@@ -1,4 +1,10 @@
-/* script.css */
+/* ========== 全局与容器样式 ========== */
+.container {
+    max-width: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -7,32 +13,106 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 1000;
+    display: none;
 }
 
+/* ========== 布局工具栏 ========== */
+.layout-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: #2c2e3e;
+    border-bottom: 1px solid #44475a;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1000;
+    flex-wrap: wrap;
+}
+
+.layout-btn {
+    background: #44475a;
+    color: var(--text-color);
+    border: none;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.layout-btn.active {
+    background: #14712a;
+}
+
+.layout-btn:hover {
+    background: #6272a4;
+    transform: translateY(-1px);
+}
+
+#cancelPreviewBtn {
+    display: none;
+    background: #d94bec;
+}
+
+#cancelPreviewBtn:hover {
+    background-color: #821d90;
+}
+
+/* ========== 主工作区 ========== */
+.workspace {
+    display: flex;
+    flex: 1;
+    gap: 5px;
+    overflow: hidden;
+    background: #282a36;
+    transition: all 0.2s ease;
+    width: 100%;
+    height: calc(100vh - 50px);
+}
+
+.workspace > #cssEditor,
+.workspace > #preview {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.workspace.single-preview #cssEditor {
+    display: none;
+}
+
+.workspace.single-preview #preview {
+    width: 100%;
+    flex: 1;
+}
+
+/* ========== 编辑器面板 #cssEditor ========== */
 #cssEditor {
     display: flex;
     flex-direction: column;
     background: rgb(175, 63, 63);
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 700px;
-    height: 800px;
-    min-width: 300px;
-    min-height: 200px;
-    overflow: auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    cursor: grab;
+    padding: 0;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
-    resize: none;
-    z-index: 1001;
+    overflow: auto;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    max-width: none;
+    box-shadow: none;
+    cursor: default;
+    z-index: auto;
 }
 
 #cssEditor:active {
-    cursor: grabbing;
+    cursor: default;
 }
 
 #cssEditor .header {
@@ -40,17 +120,18 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    padding-bottom: 10px;
+    padding: 15px 20px 10px 20px;
     border-bottom: 1px solid #eee;
-    cursor: grab;
+    cursor: default;
+    background: inherit;
 }
 
 #cssEditor .header:active {
-    cursor: grabbing;
+    cursor: default;
 }
 
 #cssEditor h2 {
-    margin-bottom: 8px;
+    margin: 0;
     color: #2c3e50;
 }
 
@@ -67,30 +148,28 @@
 
 .editor-info {
     background: #069d57;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
+    padding: 8px 20px;
+    margin: 0;
     font-size: 14px;
     color: #333aa6;
 }
 
-/* 隐藏原始 textarea */
 #cssContent {
     display: none;
 }
 
-/* CodeMirror 容器 */
+/* CodeMirror 基础样式 */
 #cssEditor .CodeMirror {
     flex: 1;
     width: 100%;
     height: auto;
     min-height: 200px;
-    border: 1px solid #444;
-    border-radius: 5px;
+    border: none;
+    border-radius: 0;
     font-family: 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.6;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     background: #282a36;
 }
 
@@ -103,12 +182,11 @@
     color: #6272a4;
 }
 
-/* 注释颜色 */
 .CodeMirror .cm-comment {
     color: #3b9e3b !important;
 }
 
-/* ---------- 颜色色块组件样式 ---------- */
+/* 颜色部件样式 */
 .cm-color-widget {
     display: inline-flex;
     align-items: center;
@@ -139,7 +217,7 @@
 }
 
 .cm-color-text {
-    color: #f8f8f2;
+    color: var(--text-color);
     background: rgba(0, 0, 0, 0.2);
     padding: 0 4px;
     border-radius: 2px;
@@ -150,64 +228,17 @@
     cursor: text;
 }
 
-/* -------------------------------------- */
-
+/* 按钮区域 */
 #cssEditor .actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 10px;
-}
-
-#previewBtn {
-    background: #3498db;
-    color: var(--text-color);
-    padding: 12px 24px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    min-width: 120px;
-}
-
-#previewBtn:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
-
-#cancelPreviewBtn {
-    display: none;
-    background: #d94bec;
-    color: var(--text-color);
-    padding: 12px 24px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    min-width: 120px;
-}
-
-#cancelPreviewBtn:hover {
-    background-color: #821d90;
-    transform: translateY(-2px);
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #saveBtn {
     background: #0ca55e;
-    color: var(--text-color);
-    padding: 12px 24px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    min-width: 120px;
-}
-
-#cancelBtn {
-    background: #bdb330;
     color: var(--text-color);
     padding: 12px 24px;
     border: none;
@@ -223,48 +254,64 @@
     transform: translateY(-2px);
 }
 
+#cancelBtn {
+    background: #bdb330;
+    color: var(--text-color);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
 #cancelBtn:hover {
     background-color: #566214;
     transform: translateY(-2px);
 }
 
+/* 编辑器附加强制左对齐 */
+#cssEditor .CodeMirror,
+#cssEditor .CodeMirror *,
+.CodeMirror pre,
+.CodeMirror-lines,
+.CodeMirror-line {
+    text-align: left !important;
+}
+
+/* ========== 预览容器 #preview ========== */
 #preview {
     display: none;
-    position: fixed;
-    width: 800px;
-    height: 600px;
-    top: 40px;
-    left: 20px;
+    flex-direction: column;
     background: #181f3a;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-    z-index: 1001;
+    border-radius: 0;
     overflow: hidden;
-    transition: opacity 0.3s ease;
-}
-
-#preview::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1002;
-    background: transparent;
-    cursor: grab;
+    position: relative;
+    box-shadow: none;
+    z-index: auto;
 }
 
-#preview:active::before {
-    cursor: grabbing;
+.preview-header {
+    padding: 8px 16px;
+    background: #2c2e3e;
+    color: #8be9fd;
+    font-size: 13px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
 }
 
 #previewFrame {
     width: 100%;
     height: 100%;
     border: none;
+    flex: 1;
 }
 
+/* ========== 加载指示器 ========== */
 #loader {
     display: none;
 }
@@ -283,22 +330,8 @@
     text-align: center;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
+/* ========== 响应式布局 ========== */
 @media (max-width: 768px) {
-    #cssEditor {
-        width: 95%;
-        height: 100%;
-    }
-
     #cssEditor .actions {
         flex-wrap: wrap;
     }
@@ -307,7 +340,6 @@
         font-size: 18px;
     }
 
-    #previewBtn,
     #cancelPreviewBtn,
     #saveBtn,
     #cancelBtn {
