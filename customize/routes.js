@@ -36,7 +36,7 @@ export default {
 			data = {};
 		}
 
-		const elements = ['topImg', 'themeImg', 'longPic', 'cssEditor', 'preview'],
+		const elements = ['topImg', 'themeImg', 'longPic'],
 			getElementStyle = (elementKey) => {
 				return (req, res) => {
 					try {
