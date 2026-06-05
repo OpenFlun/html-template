@@ -104,6 +104,60 @@
         .hidden {
             display: none;
         }
+
+        /* ==================== 移动端样式适配 (≤640px) ==================== */
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .card {
+                width: 100%;
+                min-width: auto;
+                padding: 28px 20px;
+                border-radius: 16px;
+            }
+
+            .card h2 {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+
+            .message {
+                font-size: 14px;
+                margin: 16px 0;
+            }
+
+            .big-success {
+                font-size: 24px;
+                margin: 30px 0;
+                white-space: normal;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+
+            .link {
+                font-size: 13px;
+            }
+        }
+
+        /* 极小屏幕 (≤480px) 微调 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px 16px;
+            }
+
+            .card h2 {
+                font-size: 22px;
+            }
+
+            .big-success {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 

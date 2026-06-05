@@ -127,6 +127,70 @@
             color: var(--link-hover);
             text-decoration: underline;
         }
+
+        /* ==================== 移动端样式适配 (≤640px) ==================== */
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .card {
+                max-width: 100%;
+                padding: 28px 20px;
+                border-radius: 16px;
+            }
+
+            .card h2 {
+                font-size: 24px;
+                margin-bottom: 24px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .form-group input {
+                font-size: 16px;
+                /* 防止iOS缩放 */
+                padding: 12px 14px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .links {
+                margin-top: 20px;
+                font-size: 13px;
+            }
+
+            .links a {
+                margin: 0 8px;
+            }
+        }
+
+        /* 极小屏幕 (≤480px) 微调 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px 16px;
+            }
+
+            .card h2 {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+
+            .links a {
+                display: inline-block;
+                margin: 4px 6px;
+            }
+        }
     </style>
 </head>
 

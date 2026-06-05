@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>个人资料 - 安全账户中心</title>
 
     <!-- 引入公共主题变量与全局样式 -->
@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
 
     <style>
+        /* ========== 基础移动优先增强 ========== */
         body {
             background: var(--body-bg);
             background-color: var(--bg-color);
@@ -82,6 +83,7 @@
         .info-value {
             flex: 1;
             color: var(--text-color);
+            word-break: break-word;
         }
 
         /* 通用按钮 */
@@ -96,6 +98,11 @@
             cursor: pointer;
             transition: background 0.2s, opacity 0.2s;
             margin-right: 10px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .btn:hover {
@@ -215,6 +222,7 @@
             background: var(--li-bg);
             color: var(--text-color);
             transition: border-color 0.2s, background 0.5s ease, color 0.5s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -285,6 +293,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            word-break: break-word;
         }
 
         .btn-small {
@@ -345,6 +354,235 @@
                 margin-top: 20px;
                 font-size: 12px;
                 color: #666;
+            }
+        }
+
+        /* ==================== 移动端样式适配 (≤640px) ==================== */
+        @media (max-width: 640px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .card {
+                padding: 20px 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .card h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+                gap: 8px;
+            }
+
+            .card h2 .btn {
+                font-size: 12px;
+                padding: 6px 12px;
+                white-space: nowrap;
+            }
+
+            /* 信息行改为垂直布局，更易阅读 */
+            .info-row {
+                flex-direction: column;
+                padding: 12px 0;
+            }
+
+            .info-label {
+                width: auto;
+                margin-bottom: 6px;
+                font-weight: 600;
+                opacity: 0.8;
+            }
+
+            .info-value {
+                width: 100%;
+                font-size: 15px;
+            }
+
+            /* 主要操作按钮组 垂直排列 */
+            .action-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                margin-right: 0;
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+
+            /* 所有内联 flex 按钮组（修改资料/修改密码/删除账户）强制垂直 + 全宽 */
+            #editProfileCard>form>div:first-of-type,
+            #changePasswordCard>form>div:first-of-type,
+            #deleteAccountForm>div:first-of-type {
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100%;
+            }
+
+            #editProfileCard>form>div:first-of-type .btn,
+            #changePasswordCard>form>div:first-of-type .btn,
+            #deleteAccountForm>div:first-of-type .btn {
+                width: 100% !important;
+                margin-right: 0 !important;
+                margin-left: 0 !important;
+                box-sizing: border-box;
+            }
+
+            /* 双因素启用面板的按钮组 (flex-buttons) */
+            .flex-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .flex-buttons .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            /* 备用码管理面板按钮组垂直排列 */
+            .backup-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .backup-actions .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            /* 硬件验证设备列表 手机端改为垂直紧凑 */
+            .device-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 6px;
+            }
+
+            .device-name {
+                width: 100%;
+                font-size: 14px;
+            }
+
+            .device-item .btn-small {
+                align-self: flex-start;
+                margin-top: 4px;
+                min-width: 80px;
+            }
+
+            /* 二维码适配移动屏幕 */
+            .qr-placeholder img {
+                max-width: 160px;
+                width: 100%;
+                height: auto;
+            }
+
+            /* 备用码列表展示优化 */
+            .backup-codes {
+                padding: 12px;
+                text-align: center;
+            }
+
+            .code-item {
+                display: inline-block;
+                font-size: 14px;
+                padding: 6px 10px;
+                margin: 6px 4px;
+                letter-spacing: 0.5px;
+            }
+
+            /* 表单输入框提升字体 ≥16px 避免 IOS 缩放 */
+            .form-group input,
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                font-size: 16px;
+                padding: 12px 12px;
+            }
+
+            /* 加宽可点击区域 */
+            .btn {
+                min-height: 44px;
+                padding: 10px 16px;
+            }
+
+            /* 双因素认证 h2 内部按钮优化宽度 */
+            #twofaCard h2 .btn {
+                white-space: normal;
+                word-break: keep-all;
+            }
+
+            /* 管理面板内添加设备按钮自适应 */
+            #manageAddDeviceBtn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* 注销账户区块调整间距 */
+            #deleteAccountForm {
+                margin-top: 4px;
+            }
+
+            /* 硬件验证消息容器内边距 */
+            .webauthn-panel {
+                margin-top: 12px;
+            }
+
+            /* 备用码生成区域文案 */
+            #backupCodesPanel p.info {
+                font-size: 13px;
+            }
+
+            /* secret 密钥区域长文本换行 */
+            code#secretCode {
+                word-break: break-all;
+                display: inline-block;
+                max-width: 100%;
+            }
+        }
+
+        /* 针对极小屏幕 (≤480px) 微调边距 */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 10px;
+            }
+
+            .card {
+                padding: 16px 14px;
+            }
+
+            .card h2 {
+                font-size: 18px;
+                gap: 6px;
+            }
+
+            .info-label {
+                font-size: 13px;
+            }
+
+            .info-value {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .code-item {
+                font-size: 13px;
+                padding: 5px 8px;
+            }
+
+            .qr-placeholder img {
+                max-width: 140px;
             }
         }
     </style>
