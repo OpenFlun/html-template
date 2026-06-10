@@ -5,28 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>双因素验证处理页</title>
-    <!-- 引入公共主题变量与全局样式 -->
-    <link rel="stylesheet" href="/static/constants.css" /> <!-- 样式常量 -->
-    <link rel="stylesheet" href="/static/public.css" /> <!-- 公共样式 -->
-    <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
-    <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
-
+    <link rel="stylesheet" href="/static/constants.css" />
+    <link rel="stylesheet" href="/static/public.css" />
+    <link rel="stylesheet" href="/static/themeImg.css" />
+    <link rel="stylesheet" href="/static/topImg.css" />
     <style>
-        /* 覆盖 body 布局：本页需要居中卡片，而非默认的纵向弹性布局 */
         body {
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            /* 背景由公共变量接管,自动适配深浅色 */
             background-color: var(--bg-color);
             background-image: var(--body-bg);
         }
 
-        /* 卡片容器 */
         .card {
             background: var(--container-bg);
             border-radius: 12px;
+            border: 1px solid #2e3135;
             box-shadow: 0 20px 40px var(--content-shadow);
             width: 100%;
             max-width: 400px;
@@ -34,7 +30,6 @@
             transition: background 0.5s ease, box-shadow 0.5s ease;
         }
 
-        /* 卡片标题 */
         .card h2 {
             color: var(--h2-color);
             margin-bottom: 20px;
@@ -43,18 +38,10 @@
             font-size: 28px;
         }
 
-        /* 提示文字 */
-        .card p {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--p-color);
-        }
-
         .form-group {
             margin-bottom: 20px;
         }
 
-        /* 验证码输入框 */
         .form-group input {
             width: 100%;
             padding: 12px 16px;
@@ -62,20 +49,20 @@
             border-radius: 8px;
             font-size: 16px;
             text-align: center;
-            letter-spacing: 4px;
             background: var(--li-bg);
             color: var(--text-color);
-            transition: border-color 0.3s ease, background 0.5s ease, color 0.5s ease;
         }
 
         .form-group input:focus {
             border-color: var(--link-color);
         }
 
-        /* 验证按钮 */
+        .totp-input {
+            letter-spacing: 4px;
+        }
+
         .btn {
             width: 100%;
-            display: block;
             padding: 14px;
             background: var(--btn-bg);
             color: var(--text-color);
@@ -84,7 +71,6 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 0;
             box-shadow: 0 4px 12px var(--content-shadow);
             transition: background 0.3s ease, transform 0.2s ease;
         }
@@ -101,7 +87,15 @@
             transform: none;
         }
 
-        /* 消息提示 */
+        .btn-secondary {
+            background: var(--btn-secondary-bg, #6c757d);
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--btn-secondary-hover, #5a6268);
+        }
+
         .error {
             color: #e53e3e;
             font-size: 14px;
@@ -109,76 +103,34 @@
             text-align: center;
         }
 
-        /* 备用码区域 */
-        .backup-link {
+        .backup-panel {
             margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--content-border);
+        }
+
+        .hardware-loader {
             text-align: center;
-            font-size: 14px;
+            margin: 20px 0;
             color: var(--text-color);
         }
 
-        .backup-link a {
-            color: var(--link-color);
-            text-decoration: none;
+        [hidden] {
+            display: none !important;
         }
 
-        .backup-link a:hover {
-            color: var(--link-hover);
-            text-decoration: underline;
-        }
-
-        /* ==================== 移动端样式适配 (≤640px) ==================== */
         @media (max-width: 640px) {
-            body {
-                padding: 16px;
-            }
-
             .card {
-                max-width: 100%;
                 padding: 28px 20px;
-                border-radius: 16px;
             }
 
             .card h2 {
                 font-size: 24px;
-                margin-bottom: 16px;
-            }
-
-            .card p {
-                font-size: 14px;
-                margin-bottom: 16px;
             }
 
             .form-group input {
                 font-size: 16px;
-                /* 防止iOS缩放 */
-                padding: 12px 12px;
-                letter-spacing: 2px;
-            }
-
-            .btn {
                 padding: 12px;
-                font-size: 16px;
-            }
-
-            .backup-link {
-                font-size: 13px;
-                margin-top: 18px;
-            }
-        }
-
-        /* 极小屏幕 (≤480px) 进一步微调 */
-        @media (max-width: 480px) {
-            .card {
-                padding: 24px 16px;
-            }
-
-            .card h2 {
-                font-size: 22px;
-            }
-
-            .form-group input {
-                padding: 10px 10px;
             }
         }
     </style>
@@ -187,52 +139,187 @@
 <body>
     <div class="card">
         <h2>双因素验证</h2>
-        <form onsubmit="return false;">
-            <p style="text-align:center; margin-bottom:20px; color:#666;">请输入身份验证器中的6位数字验证码</p>
+
+        <!-- TOTP 模式区域 -->
+        <div id="totpSection">
+            <p id="promptText">请输入身份验证器中的6位数字验证码</p>
             <div class="form-group">
-                <input type="text" id="token" placeholder="在此输入6位验证码" maxlength="6" autofocus
-                    autocomplete="one-time-code">
+                <input type="text" id="tokenInput" placeholder="6位验证码" maxlength="6" autofocus
+                    autocomplete="one-time-code" class="totp-input">
             </div>
-            <button type="button" class="btn" id="verifyBtn">验证</button>
-        </form>
-        <div class="error" id="message"></div>
-        <div class="backup-link">
-            <a href="#" id="useBackup">使用备用码</a>
+            <button type="button" class="btn" id="verifyTotpBtn">验证</button>
         </div>
+
+        <!-- 硬件验证专用区域 -->
+        <div id="webauthnSection" hidden>
+            <p>正在请求硬件验证,请按提示操作...</p>
+            <div class="hardware-loader">
+                <button type="button" class="btn btn-secondary" id="retryHardwareBtn">重新尝试硬件验证</button>
+            </div>
+        </div>
+
+        <!-- 备份码面板（异常时动态显示） -->
+        <div id="backupPanel" class="backup-panel" hidden>
+            <div class="form-group">
+                <input type="text" id="backupCodeInput" placeholder="请输入10位备用码" maxlength="10" autocomplete="off">
+            </div>
+            <button type="button" class="btn" id="submitBackupBtn">登录</button>
+        </div>
+
+        <div class="error" id="message"></div>
     </div>
 
-    <!-- 公共逻辑 -->
-    <script src="/static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
-    <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
-    <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
-    <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
+    <!-- 公共脚本 -->
+    <script src="/static/themeModule.js" defer></script>
+    <script src="/static/mouseOrTouch.js" defer></script>
+    <script src="/static/themeImg.js" defer></script>
+    <script src="/static/topImg.js" defer></script>
+    <script src="/static/utils/browser.js"></script>
     <script>
-        const [verifyBtn, tokenEl, messageDiv, useBackup] = ['verifyBtn', 'token', 'message', 'useBackup']
-            .map(id => document.getElementById(id)),
-            handleError = msg => {
-                messageDiv.textContent = msg, tokenEl.value = '', verifyBtn.disabled = false, tokenEl.focus();
+        const [totpSection, webauthnSection, backupPanel, messageDiv, tokenInput, verifyTotpBtn, backupCodeInput, submitBackupBtn,
+            retryHardwareBtn] = ['totpSection', 'webauthnSection', 'backupPanel', 'message', 'tokenInput',
+                'verifyTotpBtn', 'backupCodeInput', 'submitBackupBtn', 'retryHardwareBtn']
+                .map(id => document.getElementById(id)),
+            urlParams = new URLSearchParams(window.location.search), method = urlParams.get('method'),
+            urlUsername = urlParams.get('username') || '', maxNum = 3; // 失败次数达到3次时显示备用码面板
+
+        let hardwareRunning = false, currentUsername = urlUsername;
+        const setMessage = msg => messageDiv.textContent = msg, clearMessage = () => messageDiv.textContent = '',
+            // 禁用/启用表单控件
+            setFormDisabled = disabled => {
+                const inputs = [tokenInput, backupCodeInput, verifyTotpBtn, submitBackupBtn, retryHardwareBtn];
+                inputs.forEach(el => { if (el) el.disabled = disabled; });
             },
-            verify = async () => {
-                verifyBtn.disabled = true; messageDiv.textContent = '';
-                const token = tokenEl.value.trim();
-                if (!token) return handleError('请输入验证码');
+            // 显示备份码面板
+            showBackupPanel = optionalMsg => {
+                if (optionalMsg) setMessage(optionalMsg);
+                totpSection.hidden = true, webauthnSection.hidden = true, backupPanel.hidden = false;
+                backupCodeInput.value = '', backupCodeInput.focus();
+            },
+            // 统一处理验证响应（TOTP 和备份码共用）
+            handleVerifyResponse = async input => {
+                if (!input) {
+                    setMessage('请输入验证码/备用码');
+                    return false;
+                }
+                const isToken = input.length === 6, isBackup = input.length === 10;
+                if (!isToken && !isBackup) {
+                    setMessage('验证码必须为6位数字,备用码为10位');
+                    return false;
+                }
+
+                // 临时禁用提交按钮防止重复请求
+                const activeBtn = isToken ? verifyTotpBtn : submitBackupBtn;
+                activeBtn.disabled = true, clearMessage();
+
                 try {
                     const response = await fetch('/api/verify-2fa', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token })
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ input })
                     }), data = await response.json();
-                    if (response.ok) tokenEl.value = '', window.location.href = '/';
-                    else handleError(data.message);
-                } catch (err) { handleError('网络错误，请稍后重试') }
-            }
-        verifyBtn.addEventListener('click', verify);
-        useBackup.addEventListener('click', e => {
-            e.preventDefault(), tokenEl.placeholder = '请输入10位备用码', tokenEl.maxLength = 10, tokenEl.value = '';
-            useBackup.style.display = 'none'; tokenEl.focus();
-        });
-        tokenEl.addEventListener('keypress', e => {
-            if (e.key === 'Enter') verify();
-        });
-        tokenEl.addEventListener('input', () => messageDiv.textContent = '');
+
+                    if (response.ok) {
+                        window.location.href = '/';
+                        return true;
+                    }
+
+                    // 处理锁定情况
+                    if (data.locked) {
+                        setMessage(data.message), setFormDisabled(true);
+                        return false;
+                    }
+
+                    // 处理普通失败（包含 remainingAttempts）
+                    if (data.remainingAttempts !== undefined) {
+                        const failuresSoFar = 9 - data.remainingAttempts;
+                        setMessage(`${data.message} (已失败 ${failuresSoFar} 次)`);
+                        if (failuresSoFar >= maxNum && isToken) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
+                    }
+                    else setMessage(data.message);
+
+                    // 清空输入框,准备下次尝试
+                    tokenInput?.value = '', backupCodeInput?.value = '', activeBtn.disabled = false;
+
+                    // 判断焦点归属
+                    if (isBackup) backupCodeInput.focus();
+                    else if (isToken) tokenInput.focus();
+                    return false;
+                } catch (err) {
+                    setMessage(err.message), activeBtn.disabled = false;
+                    return false;
+                }
+            },
+            // TOTP验证和备份码提交入口
+            performTotpVerification = () => handleVerifyResponse(tokenInput.value.trim()),
+            submitBackupCode = () => handleVerifyResponse(backupCodeInput.value.trim()),
+            // 硬件验证核心
+            performHardwareVerification = async () => {
+                if (!window.PublicKeyCredential) {
+                    showBackupPanel('当前浏览器不支持硬件安全验证,请使用备用码登录');
+                    return false;
+                }
+                if (!currentUsername) {
+                    showBackupPanel('无法获取用户身份,请使用备用码登录');
+                    return false;
+                }
+                if (retryHardwareBtn && !retryHardwareBtn.hasListener)
+                    retryHardwareBtn.addEventListener('click', () => performHardwareVerification()), retryHardwareBtn.hasListener = true;
+                if (hardwareRunning) return false;
+
+                hardwareRunning = true, clearMessage();
+                try {
+                    let platformAvailable = false;
+                    if (window.PublicKeyCredential) {
+                        try {
+                            platformAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                        } catch (err) { console.warn(err); }
+                    }
+                    if (!platformAvailable) throw new Error('当前环境不支持平台硬件验证');
+
+                    const beginRes = await fetch('/api/webauthn/login/begin', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: currentUsername })
+                    }), options = await beginRes.json();
+
+                    if (!beginRes.ok) throw new Error(options.message);
+                    const assertionResp = await flunWebAuthnBrowser.startAuthentication(options),
+                        completeRes = await fetch('/api/webauthn/login/complete', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ assertionResponse: assertionResp })
+                        }), completeData = await completeRes.json();
+
+                    if (completeRes.ok) {
+                        window.location.href = '/';
+                        return true;
+                    }
+                    else throw new Error(completeData.message);
+                } catch (err) {
+                    let errorMsg = err.message;
+                    if (err.name === 'NotAllowedError') errorMsg = '硬件验证已取消';
+                    showBackupPanel(`${errorMsg},请使用备用码登录`);
+                    return false;
+                } finally { hardwareRunning = false }
+            },
+            // 页面初始化
+            initPage = () => {
+                backupPanel.hidden = true;
+                if (method === 'webauthn')
+                    totpSection.hidden = true, webauthnSection.hidden = false, performHardwareVerification().catch(e => console.warn(e));
+                else totpSection.hidden = false, webauthnSection.hidden = true, tokenInput.maxLength = 6, tokenInput.focus();
+
+                // 事件监听
+                submitBackupBtn.addEventListener('click', submitBackupCode);
+                verifyTotpBtn.addEventListener('click', performTotpVerification);
+                backupCodeInput.addEventListener('keypress', e => {
+                    if (e.key === 'Enter') submitBackupCode();
+                });
+                tokenInput.addEventListener('keypress', e => {
+                    if (e.key === 'Enter') performTotpVerification();
+                });
+                [backupCodeInput, tokenInput].forEach(el => el.addEventListener('input', clearMessage));
+            };
+
+        initPage();
     </script>
 </body>
 

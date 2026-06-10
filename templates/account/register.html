@@ -27,6 +27,7 @@
         .card {
             background: var(--container-bg);
             border-radius: 12px;
+            border: 1px solid #2e3135;
             box-shadow: 0 20px 40px var(--content-shadow);
             width: 100%;
             max-width: 400px;
@@ -130,8 +131,8 @@
             text-decoration: underline;
         }
 
-        .hidden {
-            display: none;
+        [hidden] {
+            display: none !important;
         }
 
         /* ==================== 移动端样式适配 (≤640px) ==================== */

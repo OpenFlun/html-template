@@ -30,6 +30,7 @@
         .card {
             background: var(--container-bg);
             border-radius: 12px;
+            border: 1px solid #2e3135;
             box-shadow: 0 20px 40px var(--content-shadow);
             width: 100%;
             max-width: 400px;
@@ -156,7 +157,6 @@
 
             .form-group input {
                 font-size: 16px;
-                /* 防止iOS缩放 */
                 padding: 12px 14px;
             }
 
@@ -175,7 +175,6 @@
             }
         }
 
-        /* 极小屏幕 (≤480px) 微调 */
         @media (max-width: 480px) {
             .card {
                 padding: 24px 16px;
@@ -217,77 +216,44 @@
     </div>
 
     <!-- 公共逻辑 -->
-    <script src="/static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
-    <script src="/static/mouseOrTouch.js" defer></script><!-- 引入鼠标或触摸操作 -->
-    <script src="/static/themeImg.js" defer></script> <!-- 引入主题图标模块 -->
-    <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
-    <script src="/static/utils/browser.js"></script> <!-- 引入@flun前端硬件验证模块 -->
+    <script src="/static/themeModule.js" defer></script>
+    <script src="/static/mouseOrTouch.js" defer></script>
+    <script src="/static/themeImg.js" defer></script>
+    <script src="/static/topImg.js" defer></script>
     <script>
-        const [usernameEl, passwordEl, messageDiv, loginBtn] = ['username', 'password', 'message', 'loginBtn']
+        const [usernameEl, passwordEl, messageDiv, loginBtn,] = ['username', 'password', 'message', 'loginBtn',]
             .map(id => document.getElementById(id)),
             handleError = msg => {
                 messageDiv.textContent = msg, loginBtn.disabled = false;
             };
 
+        // 登录主逻辑(统一跳转到2fa页面,携带对应验证方式)
         loginBtn.addEventListener('click', async () => {
             loginBtn.disabled = true, messageDiv.textContent = '';
+
             const [username, password] = [usernameEl, passwordEl].map(input => input.value.trim());
             if (!username || !password) return handleError('请输入用户名和密码');
-
             try {
-                // 密码验证
                 const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 }), data = await response.json();
 
                 if (!response.ok) return handleError(data.message);
-                // 硬件验证
-                if (data.requireWebAuthn) {
-                    let platformAvailable = false;
-                    if (window.PublicKeyCredential) {
-                        try {
-                            platformAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                        } catch (err) { console.warn(err) };
-                    }
-                    if (!platformAvailable)
-                        return handleError('当前环境不支持硬件验证,请使用HTTPS或localhost访问,并确保浏览器支持指纹/人脸功能;');
-                    try {
-                        // 获取 WebAuthn 登录选项
-                        const beginRes = await fetch('/api/webauthn/login/begin', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username })
-                        }), options = await beginRes.json();
-                        if (!beginRes.ok) return handleError(options.message);
-
-                        // 调用浏览器硬件验证
-                        const assertionResp = await flunWebAuthnBrowser.startAuthentication(options),
-                            completeRes = await fetch('/api/webauthn/login/complete', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ assertionResponse: assertionResp })
-                            }), completeData = await completeRes.json();
-
-                        if (completeRes.ok) window.location.href = '/';
-                        else return handleError(completeData.message);
-                    } catch (webauthnErr) {
-                        let msg = webauthnErr.message;
-                        if (webauthnErr.name === 'NotAllowedError') msg = '认证操作已取消';
-                        handleError(msg);
-                    }
-                }
-                else if (data.require2FA) window.location.href = '/2fa';
-                else if (data.success) window.location.href = '/';
+                if (data.requireWebAuthn)
+                    window.location.href = `/2fa?method=webauthn&username=${encodeURIComponent(username)}`;
+                else if (data.require2FA)
+                    window.location.href = `/2fa?method=totp&username=${encodeURIComponent(username)}`;
+                else if (data.success) window.location.href = '/'; // 无二次验证,直接进入首页
                 else handleError(data.message);
-            } catch (err) { handleError('网络错误,请稍后重试') }
+            } catch (err) { handleError(err.message) }
         });
 
+        // 输入时清除错误消息
+        [usernameEl, passwordEl].forEach(el => el.addEventListener('input', () => messageDiv.textContent = ''));
         passwordEl.addEventListener('keypress', e => {
             if (e.key === 'Enter') loginBtn.click();
         });
-        [usernameEl, passwordEl].forEach(el => el.addEventListener('input', () => messageDiv.textContent = ''));
     </script>
 </body>
 

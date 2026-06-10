@@ -29,6 +29,7 @@
         .card {
             background: var(--container-bg);
             border-radius: 12px;
+            border: 1px solid #2e3135;
             box-shadow: 0 2px 10px var(--content-shadow);
             padding: 30px;
             margin-bottom: 20px;
@@ -69,22 +70,27 @@
         /* 信息行 */
         .info-row {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             padding: 12px 0;
             border-bottom: 1px solid var(--content-border);
         }
 
         .info-label {
-            width: 120px;
-            color: var(--text-color);
-            opacity: 0.75;
+            margin-bottom: 6px;
+            font-size: 13px;
             font-weight: 500;
+            opacity: 0.65;
+            color: var(--text-color);
         }
 
         .info-value {
-            flex: 1;
-            color: var(--text-color);
-            word-break: break-word;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
         }
+
 
         /* 通用按钮 */
         .btn {
@@ -109,7 +115,6 @@
             background: var(--btn-hover);
         }
 
-        /* 功能按钮颜色保留原语义（不随主题变化） */
         .btn-danger {
             background: #e53e3e;
         }
@@ -181,7 +186,6 @@
             color: var(--text-color);
         }
 
-        /* 消息提示（语义色保留） */
         .message {
             margin-top: 15px;
             padding: 10px;
@@ -198,9 +202,54 @@
             color: #742a2a;
         }
 
-        .info {
-            background: #bee3f8;
-            color: #2c5282;
+        #backupCodesPanel .info.info-border-flow {
+            margin-top: 15px;
+            border-style: dashed !important;
+            border-width: 1px !important;
+            border-top-color: #ff4d4d;
+            border-right-color: #4caf50;
+            border-bottom-color: #2196f3;
+            border-left-color: #9c27b0;
+            animation: borderColorFlow 4s linear infinite;
+            background-color: #6e523b;
+            border-radius: 6px;
+        }
+
+        @keyframes borderColorFlow {
+            0% {
+                border-top-color: #ff4d4d;
+                border-right-color: #4caf50;
+                border-bottom-color: #2196f3;
+                border-left-color: #9c27b0;
+            }
+
+            25% {
+                border-top-color: #9c27b0;
+                border-right-color: #ff4d4d;
+                border-bottom-color: #4caf50;
+                border-left-color: #2196f3;
+            }
+
+            50% {
+                border-top-color: #2196f3;
+                border-right-color: #9c27b0;
+                border-bottom-color: #ff4d4d;
+                border-left-color: #4caf50;
+            }
+
+            75% {
+                border-top-color: #4caf50;
+                border-right-color: #2196f3;
+                border-bottom-color: #9c27b0;
+                border-left-color: #ff4d4d;
+            }
+
+            100% {
+                border-top-color: #ff4d4d;
+                border-right-color: #4caf50;
+                border-bottom-color: #2196f3;
+                border-left-color: #9c27b0;
+            }
         }
 
         .warning {
@@ -208,7 +257,6 @@
             color: #7b341e;
         }
 
-        /* 表单 */
         .form-group {
             margin-bottom: 15px;
         }
@@ -230,26 +278,14 @@
             outline: none;
         }
 
-        /* 操作按钮组 */
         .action-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .backup-actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 12px;
-            justify-content: flex-start;
-        }
-
-        .backup-actions .btn {
-            margin-right: 0;
-        }
-
-        /* 二维码 */
         .qr-placeholder {
             text-align: center;
             margin: 15px 0;
@@ -263,11 +299,11 @@
             background: var(--container-bg);
         }
 
-        /* 其他辅助样式 */
         .flex-buttons {
             display: flex;
             gap: 10px;
             margin-top: 8px;
+            justify-content: center;
         }
 
         .webauthn-panel {
@@ -305,18 +341,14 @@
             display: none !important;
         }
 
-        #printBackupContainer {
-            display: none;
-        }
-
         @media print {
             body> :not(#printBackupContainer) {
                 display: none !important;
             }
 
             #printBackupContainer {
-                position: static !important;
                 display: block !important;
+                position: static !important;
                 margin: 20px;
             }
 
@@ -386,25 +418,21 @@
                 white-space: nowrap;
             }
 
-            /* 信息行改为垂直布局，更易阅读 */
             .info-row {
-                flex-direction: column;
-                padding: 12px 0;
+                align-items: flex-start;
+                text-align: left;
+                padding: 14px 0;
             }
 
             .info-label {
-                width: auto;
+                font-size: 12px;
                 margin-bottom: 6px;
-                font-weight: 600;
-                opacity: 0.8;
             }
 
             .info-value {
-                width: 100%;
                 font-size: 15px;
             }
 
-            /* 主要操作按钮组 垂直排列 */
             .action-buttons {
                 flex-direction: column;
                 gap: 12px;
@@ -418,7 +446,6 @@
                 font-size: 15px;
             }
 
-            /* 所有内联 flex 按钮组（修改资料/修改密码/删除账户）强制垂直 + 全宽 */
             #editProfileCard>form>div:first-of-type,
             #changePasswordCard>form>div:first-of-type,
             #deleteAccountForm>div:first-of-type {
@@ -436,7 +463,6 @@
                 box-sizing: border-box;
             }
 
-            /* 双因素启用面板的按钮组 (flex-buttons) */
             .flex-buttons {
                 flex-direction: column;
                 gap: 12px;
@@ -447,18 +473,6 @@
                 margin-right: 0;
             }
 
-            /* 备用码管理面板按钮组垂直排列 */
-            .backup-actions {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .backup-actions .btn {
-                width: 100%;
-                margin-right: 0;
-            }
-
-            /* 硬件验证设备列表 手机端改为垂直紧凑 */
             .device-item {
                 flex-direction: column;
                 align-items: flex-start;
@@ -477,14 +491,12 @@
                 min-width: 80px;
             }
 
-            /* 二维码适配移动屏幕 */
             .qr-placeholder img {
                 max-width: 160px;
                 width: 100%;
                 height: auto;
             }
 
-            /* 备用码列表展示优化 */
             .backup-codes {
                 padding: 12px;
                 text-align: center;
@@ -498,7 +510,6 @@
                 letter-spacing: 0.5px;
             }
 
-            /* 表单输入框提升字体 ≥16px 避免 IOS 缩放 */
             .form-group input,
             input[type="text"],
             input[type="email"],
@@ -507,40 +518,33 @@
                 padding: 12px 12px;
             }
 
-            /* 加宽可点击区域 */
             .btn {
                 min-height: 44px;
                 padding: 10px 16px;
             }
 
-            /* 双因素认证 h2 内部按钮优化宽度 */
             #twofaCard h2 .btn {
                 white-space: normal;
                 word-break: keep-all;
             }
 
-            /* 管理面板内添加设备按钮自适应 */
             #manageAddDeviceBtn {
                 width: 100%;
                 justify-content: center;
             }
 
-            /* 注销账户区块调整间距 */
             #deleteAccountForm {
                 margin-top: 4px;
             }
 
-            /* 硬件验证消息容器内边距 */
             .webauthn-panel {
                 margin-top: 12px;
             }
 
-            /* 备用码生成区域文案 */
             #backupCodesPanel p.info {
                 font-size: 13px;
             }
 
-            /* secret 密钥区域长文本换行 */
             code#secretCode {
                 word-break: break-all;
                 display: inline-block;
@@ -604,7 +608,7 @@
                 </span>
             </div>
             <div class="info-row"><span class="info-label">注册时间</span>
-                <span class="info-value" id="createdAt">-</span>
+                <span class="info-value" id="createdAt">加载中...</span>
             </div>
             <div class="action-buttons">
                 <button type="button" class="btn btn-outline" id="editProfileBtn">编辑资料</button>
@@ -627,7 +631,7 @@
                     <input type="password" id="profileCurrentPassword" placeholder="请输入密码" maxlength="72"
                         autocomplete="off">
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div class="flex-buttons">
                     <button type="button" class="btn" id="updateProfileBtn">保存修改</button>
                     <button type="button" class="btn btn-danger" id="cancelEditBtn">取消</button>
                 </div>
@@ -646,9 +650,9 @@
                     <input type="password" id="newPassword" placeholder="新密码(至少6位)" maxlength="72" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="confirmPassword" placeholder="确认新密码" maxlength="72" autocomplete="off">
+                    <input type="password" id="confirmPassword" placeholder="再次输入新密码" maxlength="72" autocomplete="off">
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div class="flex-buttons">
                     <button type="button" class="btn" id="changePasswordBtn">确认提交</button>
                     <button type="button" class="btn btn-secondary" id="cancelChangePasswordBtn">取消</button>
                 </div>
@@ -656,7 +660,24 @@
             </form>
         </div>
 
-        <!-- 双因素认证区域 -->
+        <!-- 备份码卡片 -->
+        <div class="card" id="manage2faPanel" hidden>
+            <div id="backupManageMessage" class="message" hidden></div>
+            <div id="backupCodesPanel" hidden>
+                <p class="info">备份码已生成,请选择你喜欢的保存方式;<br>注意:备用码只显示一次,共10组,每组不可二次使用,请务必妥善保管;</p>
+                <div class="flex-buttons">
+                    <button type="button" class="btn btn-outline" id="saveBackupFileBtn">💾 保存到文件</button>
+                    <button type="button" class="btn btn-outline" id="printBackupCodesBtn">🖨️ 打印备份码</button>
+                </div>
+                <div id="backupCodesList" class="backup-codes"></div>
+            </div>
+            <div class="flex-buttons">
+                <button type="button" class="btn btn-warning" id="toggleBackupPanelBtn">🔄 生成新的备份码</button>
+                <button type="button" class="btn btn-danger" id="deleteBackupCodesBtn" hidden>🗑️ 删除所有备份码</button>
+            </div>
+        </div>
+
+        <!-- 2FA认证卡片 -->
         <div class="card" id="twofaCard">
             <h2>
                 <span class="title-text">
@@ -666,14 +687,13 @@
             </h2>
 
             <div id="enable2faPanel" hidden style="margin-top: 16px;">
-                <form onsubmit="return false;">
+                <form onsubmit="return false;" class="form-group">
                     <p>请使用 Google Authenticator 或类似应用扫描二维码添加认证：</p>
                     <div class="qr-placeholder">
                         <img id="qrCodeImg" alt="2FA QR Code">
                     </div>
-                    <p>或手动输入密钥：<code id="secretCode">-</code></p>
-                    <input type="text" id="verifyToken" placeholder="输入6位验证码" maxlength="6"
-                        style="width: 100%; padding: 8px; margin: 12px 0;" autocomplete="off">
+                    <p>或在应用中手动输入下方密钥：<code id="secretCode">-</code></p>
+                    <input type="text" id="verifyToken" placeholder="请输入6位验证码" maxlength="6" autocomplete="off">
                     <div class="flex-buttons">
                         <button type="button" class="btn" id="confirm2faBtn">验证并启用</button>
                         <button type="button" class="btn btn-secondary" id="cancelEnable2faBtn">取消</button>
@@ -681,42 +701,25 @@
                     <div id="confirmMessage" class="message" hidden></div>
                 </form>
             </div>
-
-            <div id="manage2faPanel" hidden style="margin-top: 16px;">
-                <button type="button" class="btn btn-warning" id="showBackupBtn">生成新的备份码</button>
-                <div id="backupManageMessage" class="message" hidden></div>
-                <div id="backupCodesPanel" hidden style="margin-top: 15px;">
-                    <p class="info">备用码（仅显示一次，请妥善保存）：</p>
-                    <div id="backupCodesList" class="backup-codes"></div>
-                    <div class="backup-actions">
-                        <button type="button" class="btn btn-outline" id="saveBackupFileBtn">💾 保存到文件</button>
-                        <button type="button" class="btn btn-outline" id="printBackupCodesBtn">🖨️ 打印备份码</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <!-- 硬件验证卡片 -->
+        <!-- 硬件认证卡片 -->
         <div class="card" id="webauthnCard">
             <h2>
                 <span class="title-text">
-                    硬件验证（指纹/人脸等） <span id="webauthnStatusIcon"></span>
+                    硬件认证（指纹/人脸等） <span id="webauthnStatusIcon"></span>
                 </span>
-                <button type="button" class="btn" id="toggleWebAuthnBtn">启用硬件验证</button>
+                <button type="button" class="btn" id="toggleWebAuthnBtn">启用硬件认证</button>
             </h2>
 
             <div id="webauthnMessage" class="message" hidden></div>
             <div id="manageWebAuthnPanel" class="webauthn-panel" hidden>
-                <p id="noDeviceMsg" style="color: #666;">暂无硬件设备,点击上方「添加新设备」按钮添加</p>
                 <ul id="webauthnDeviceList" class="device-list"></ul>
-                <li id="deviceItemExample" class="device-item" style="display: none;">
+                <li id="deviceItemExample" class="device-item" hidden>
                     <span class="device-name"></span>
                     <button type="button" class="btn btn-danger btn-small">删除</button>
                 </li>
-                <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
-                    <button type="button" class="btn btn-outline" id="manageAddDeviceBtn">➕ 添加新设备</button>
-                </div>
-                <div id="webauthnManageMessage" class="message" hidden></div>
+                <button type="button" class="btn btn-outline" id="manageAddDeviceBtn">➕ 添加新设备</button>
             </div>
         </div>
 
@@ -731,10 +734,10 @@
             <div id="deleteAccountForm" hidden style="margin-top:15px;">
                 <form onsubmit="return false;">
                     <div class="form-group">
-                        <input type="password" id="deleteAccountPassword" placeholder="输入当前密码以确认" maxlength="72"
+                        <input type="password" id="deleteAccountPassword" placeholder="请输入登录密码" maxlength="72"
                             autocomplete="off">
                     </div>
-                    <div style="display: flex; gap: 10px;">
+                    <div class="flex-buttons">
                         <button type="button" class="btn btn-danger" id="deleteAccountBtn">永久注销账户</button>
                         <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
                     </div>
@@ -743,7 +746,7 @@
             </div>
         </div>
     </div>
-    <div id="printBackupContainer"></div>
+    <div id="printBackupContainer" hidden></div>
 
     <!-- 公共逻辑 -->
     <script src="/static/themeModule.js" defer></script><!-- 引入主题自适应模块 -->
@@ -752,46 +755,44 @@
     <script src="/static/topImg.js" defer></script> <!-- 引入返回顶部图标模块 -->
     <script src="/static/utils/browser.js"></script> <!-- 引入@flun前端硬件验证模块 -->
     <script>
-        // ==================== 全局变量 ====================
+        // 全局变量
         let currentUser = null, targetEmail = null, emailCheckInterval = null, isEmailPollingActive = false,
             latestBackupCodes = [], currentWebAuthnCredentials = [];
 
-        // ==================== DOM 元素获取 ====================
-        const [
-            usernameEl, emailEl, createdAtEl,
+        // DOM 元素常量
+        const [usernameEl, emailEl, emailVerifiedBadge, createdAtEl, editProfileBtn, showChangePasswordBtn, logoutBtn,
             editProfileCard, newUsernameInput, newEmailInput, profileCurrentPasswordInput,
-            updateProfileMessage, editProfileBtn, cancelEditBtn, updateProfileBtn,
+            updateProfileBtn, cancelEditBtn, updateProfileMessage,
             changePasswordCard, currentPasswordInput, newPasswordInput, confirmPasswordInput,
-            changePasswordMessage, showChangePasswordBtn, cancelChangePasswordBtn, changePasswordBtn,
-            twofaCheckmark, toggle2faBtn, enable2faPanel, manage2faPanel, printBackupContainer,
-            qrCodeImg, secretCode, verifyTokenInput, confirm2faBtn, confirmMessage, cancelEnable2faBtn,
-            showBackupBtn, backupCodesPanel, backupCodesList, saveBackupFileBtn, printBackupCodesBtn,
-            showDeleteAccountBtn, deleteAccountForm, deleteAccountPassword, deleteAccountMessage, cancelDeleteBtn,
-            deleteAccountBtn, logoutBtn,
-            webauthnStatusIcon, toggleWebAuthnBtn, manageWebAuthnPanel,
-            webauthnMessage, webauthnManageMessage, manageAddDeviceBtn,
-            noDeviceMsg, webauthnDeviceList, deviceItemExample,
-            backupManageMessage, emailVerifiedBadge
+            changePasswordBtn, cancelChangePasswordBtn, changePasswordMessage,
+            manage2faPanel, toggleBackupPanelBtn, backupManageMessage, backupCodesPanel,
+            backupCodesList, saveBackupFileBtn, printBackupCodesBtn, deleteBackupCodesBtn,
+            twofaCheckmark, toggle2faBtn, enable2faPanel,
+            qrCodeImg, secretCode, verifyTokenInput, confirm2faBtn, cancelEnable2faBtn, confirmMessage,
+            webauthnStatusIcon, toggleWebAuthnBtn, webauthnMessage, manageWebAuthnPanel,
+            webauthnDeviceList, deviceItemExample, manageAddDeviceBtn,
+            showDeleteAccountBtn, deleteAccountForm, deleteAccountPassword,
+            deleteAccountBtn, cancelDeleteBtn, deleteAccountMessage, printBackupContainer
         ] = [
-            'username', 'email', 'createdAt',
+            'username', 'email', 'emailVerifiedBadge', 'createdAt', 'editProfileBtn', 'showChangePasswordBtn', 'logoutBtn',
             'editProfileCard', 'newUsername', 'newEmail', 'profileCurrentPassword',
-            'updateProfileMessage', 'editProfileBtn', 'cancelEditBtn', 'updateProfileBtn',
+            'updateProfileBtn', 'cancelEditBtn', 'updateProfileMessage',
             'changePasswordCard', 'currentPassword', 'newPassword', 'confirmPassword',
-            'changePasswordMessage', 'showChangePasswordBtn', 'cancelChangePasswordBtn', 'changePasswordBtn',
-            'twofaCheckmark', 'toggle2faBtn', 'enable2faPanel', 'manage2faPanel', 'printBackupContainer',
-            'qrCodeImg', 'secretCode', 'verifyToken', 'confirm2faBtn', 'confirmMessage', 'cancelEnable2faBtn',
-            'showBackupBtn', 'backupCodesPanel', 'backupCodesList', 'saveBackupFileBtn', 'printBackupCodesBtn',
-            'showDeleteAccountBtn', 'deleteAccountForm', 'deleteAccountPassword', 'deleteAccountMessage',
-            'cancelDeleteBtn', 'deleteAccountBtn', 'logoutBtn',
-            'webauthnStatusIcon', 'toggleWebAuthnBtn', 'manageWebAuthnPanel',
-            'webauthnMessage', 'webauthnManageMessage', 'manageAddDeviceBtn',
-            'noDeviceMsg', 'webauthnDeviceList', 'deviceItemExample',
-            'backupManageMessage', 'emailVerifiedBadge'
+            'changePasswordBtn', 'cancelChangePasswordBtn', 'changePasswordMessage',
+            'manage2faPanel', 'toggleBackupPanelBtn', 'backupManageMessage', 'backupCodesPanel',
+            'backupCodesList', 'saveBackupFileBtn', 'printBackupCodesBtn', 'deleteBackupCodesBtn',
+            'twofaCheckmark', 'toggle2faBtn', 'enable2faPanel',
+            'qrCodeImg', 'secretCode', 'verifyToken', 'confirm2faBtn', 'cancelEnable2faBtn', 'confirmMessage',
+            'webauthnStatusIcon', 'toggleWebAuthnBtn', 'webauthnMessage', 'manageWebAuthnPanel',
+            'webauthnDeviceList', 'deviceItemExample', 'manageAddDeviceBtn',
+            'showDeleteAccountBtn', 'deleteAccountForm', 'deleteAccountPassword',
+            'deleteAccountBtn', 'cancelDeleteBtn', 'deleteAccountMessage', 'printBackupContainer'
         ].map(id => document.getElementById(id)),
-            // ==================== 通用辅助函数 ====================
+            // 基础工具
             showMessage = (element, type, text) => {
                 element.className = `message ${type}`, element.textContent = text, element.hidden = false;
-            }, hideMessage = element => element.hidden = true,
+            },
+            hideMessage = element => (element.hidden = true, element.textContent = '', element.className = 'message'),
             requestApi = async (url, options, msgElement = null, btnElement = null, suppressSuccessMsg = false) => {
                 if (btnElement && typeof btnElement === 'boolean') suppressSuccessMsg = btnElement, btnElement = null;
                 if (btnElement) btnElement.disabled = true;
@@ -829,12 +830,123 @@
                     if (isEmailPollingActive) stopEmailPolling(), timeoutCallback?.();
                 }, 900000);
             },
+
+            // 全局 UI
+            refreshMFAUI = () => {
+                const is2faEnabled = currentUser?.twoFactorEnabled, isWebAuthnEnabled = currentUser?.webauthnEnabled;
+                twofaCheckmark.innerHTML = is2faEnabled ? '✅' : '';
+                toggle2faBtn.textContent = is2faEnabled ? '关闭2FA' : '启用2FA';
+                toggle2faBtn.classList.toggle('btn-danger', is2faEnabled);
+                webauthnStatusIcon.innerHTML = isWebAuthnEnabled ? '✅' : '';
+                toggleWebAuthnBtn.textContent = isWebAuthnEnabled ? '关闭硬件验证' : '启用硬件验证';
+                toggleWebAuthnBtn.classList.toggle('btn-danger', isWebAuthnEnabled);
+                const hasAnyMFA = is2faEnabled || isWebAuthnEnabled;
+                if (hasAnyMFA) manage2faPanel.hidden = false;
+                else {
+                    manage2faPanel.hidden = true;
+                    if (!backupCodesPanel.hidden && latestBackupCodes.length === 0) hideBackupPanel();
+                }
+            },
+            updateDeleteBackupButton = () => {
+                if (currentUser?.hasBackupCodes) deleteBackupCodesBtn.hidden = false;
+                else deleteBackupCodesBtn.hidden = true;
+            },
+            syncBackupButtonState = () => {
+                const isPanelVisible = !backupCodesPanel.hidden;
+                toggleBackupPanelBtn.disabled = false;
+                if (isPanelVisible) {
+                    toggleBackupPanelBtn.textContent = '📴 关闭备份码显示', toggleBackupPanelBtn.classList.remove('btn-warning');
+                    toggleBackupPanelBtn.classList.add('btn-secondary');
+                } else {
+                    toggleBackupPanelBtn.textContent = '🔄 生成新的备份码', toggleBackupPanelBtn.classList.remove('btn-secondary');
+                    toggleBackupPanelBtn.classList.add('btn-warning');
+                }
+            },
+            hideBackupPanel = () => {
+                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', latestBackupCodes = [], syncBackupButtonState();
+                const infoPara = document.querySelector('#backupCodesPanel .info');
+                if (infoPara) infoPara.classList.remove('info-border-flow');
+            },
+
+            // 页面入口
+            loadUser = async () => {
+                try {
+                    const { ok, data } = await requestApi('/api/user', { method: 'GET' }, null, null, true);
+                    if (!ok || [401, 404].includes(data?.status ?? data?.code)) return window.location.href = '/login';
+                    currentUser = data;
+                    const { username, email, emailVerified, createdAt } = currentUser;
+                    usernameEl.textContent = username;
+                    emailEl.textContent = email ?? '未设置';
+                    emailVerifiedBadge.textContent = emailVerified ? '✅' : '';
+                    createdAtEl.textContent = new Date(createdAt).toLocaleString();
+                    await Promise.all([refreshMFAUI(), loadWebAuthnData()]), updateDeleteBackupButton();
+                } catch (err) {
+                    alert('加载用户信息失败,请刷新页面重试');
+                }
+            },
+
+            // 个人资料模块
             resetEditProfileForm = () => {
                 profileCurrentPasswordInput.value = '', newUsernameInput.value = currentUser?.username;
                 newEmailInput.value = currentUser?.email;
             },
+            closeEditProfileCard = () => {
+                if (!editProfileCard.hidden) {
+                    if (isEmailPollingActive) stopEmailPolling();
+                    editProfileCard.hidden = true, updateProfileBtn.disabled = false, editProfileBtn.disabled = false;
+                    updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage), resetEditProfileForm();
+                }
+            },
+            openEditProfileCard = () => {
+                closeChangePasswordCard(), editProfileCard.hidden = false;
+                if (currentUser) newUsernameInput.value = currentUser.username, newEmailInput.value = currentUser.email;
+                if (isEmailPollingActive) stopEmailPolling();
+                profileCurrentPasswordInput.value = '', editProfileBtn.disabled = true, newUsernameInput.focus();
+                updateProfileBtn.disabled = false, updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage);
+            },
+
+            // 密码修改模块
             resetPasswordForm = () => {
                 currentPasswordInput.value = '', newPasswordInput.value = '', confirmPasswordInput.value = '';
+            },
+            closeChangePasswordCard = () => {
+                if (!changePasswordCard.hidden) {
+                    changePasswordCard.hidden = true, resetPasswordForm(), showChangePasswordBtn.disabled = false;
+                    hideMessage(changePasswordMessage);
+                }
+            },
+            openChangePasswordCard = () => {
+                closeEditProfileCard(), changePasswordCard.hidden = false, showChangePasswordBtn.disabled = true;
+                resetPasswordForm(), setTimeout(() => currentPasswordInput.focus(), 50), hideMessage(changePasswordMessage);
+            },
+
+            // 备份码模块
+            renderBackupCodes = codes => {
+                if (codes?.length === 0) {
+                    backupCodesPanel.hidden = true, latestBackupCodes = [];
+                    if (currentUser) currentUser.hasBackupCodes = false;
+                    updateDeleteBackupButton(), syncBackupButtonState();
+                    return;
+                }
+                backupCodesList.innerHTML = '', latestBackupCodes = [...codes];
+                if (currentUser) currentUser.hasBackupCodes = true;
+                updateDeleteBackupButton();
+                codes.forEach(code => {
+                    const span = document.createElement('span');
+                    span.className = 'code-item', span.textContent = code, backupCodesList.append(span);
+                });
+                backupCodesPanel.hidden = false, syncBackupButtonState();
+                const infoPara = document.querySelector('#backupCodesPanel .info');
+                if (infoPara) infoPara.classList.add('info-border-flow');
+                scrollToBackupPanelAndFocus();
+            },
+            scrollToBackupPanelAndFocus = () => {
+                if (manage2faPanel.hidden || backupCodesPanel.hidden || latestBackupCodes.length === 0) return;
+                requestAnimationFrame(() => {
+                    manage2faPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (!saveBackupFileBtn.disabled) saveBackupFileBtn.focus();
+                    else if (!printBackupCodesBtn.disabled) printBackupCodesBtn.focus();
+                });
             },
             saveBackupCodesToFile = (backupCodes, prefix = '我的账户备份码') => {
                 if (backupCodes?.length === 0) return alert('没有可保存的备份码');
@@ -853,56 +965,161 @@
             printBackupCodes = (backupCodes, title = '双因素认证备用码') => {
                 if (!backupCodes || backupCodes.length === 0) return alert('没有可打印的备份码');
                 printBackupContainer.innerHTML = `
-                    <div class="print-backup">
-                        <h1>🔐 ${title}</h1>
-                        <p class="timestamp">生成时间：${new Date().toLocaleString()}</p>
-                        <div class="codes-grid">
-                            ${backupCodes.map(code => `<div class="code-card">${code}</div>`).join('')}
-                        </div>
-                        <div class="warning">⚠️ 每个备用码仅能使用一次,请妥善保管;</div>
-                        <div class="footer">共计 ${backupCodes.length} 个备用码</div>
+                <div class="print-backup">
+                    <h1>🔐 ${title}</h1>
+                    <p class="timestamp">生成时间：${new Date().toLocaleString()}</p>
+                    <div class="codes-grid">
+                        ${backupCodes.map(code => `<div class="code-card">${code}</div>`).join('')}
                     </div>
-                `;
+                    <div class="warning">⚠️ 每个备用码仅能使用一次,请妥善保管;</div>
+                    <div class="footer">共计 ${backupCodes.length} 个备用码</div>
+                </div>`;
                 printBackupCodesBtn.disabled = true, window.print(), setTimeout(() => printBackupContainer.innerHTML = '', 500);
             },
-            syncBackupButtonState = () => {
-                const isPanelVisible = !backupCodesPanel.hidden;
-                if (isPanelVisible) {
-                    showBackupBtn.textContent = '关闭备份码显示', showBackupBtn.classList.remove('btn-warning');
-                    showBackupBtn.classList.add('btn-secondary'), showBackupBtn.disabled = false;
-                } else {
-                    showBackupBtn.textContent = '生成新的备份码', showBackupBtn.classList.remove('btn-secondary');
-                    showBackupBtn.classList.add('btn-warning');
+            deleteBackupCodes = async () => {
+                if (!confirm('⚠️ 确定要删除所有备份码吗？删除后将无法使用备份码恢复登录')) return;
+
+                deleteBackupCodesBtn.disabled = true;
+                const result = await requestApi('/api/delete-backup-codes', { method: 'POST' }, backupManageMessage,
+                    deleteBackupCodesBtn);
+                if (result.ok) {
+                    if (currentUser) currentUser.hasBackupCodes = false;
+                    updateDeleteBackupButton();
+
+                    if (!backupCodesPanel.hidden) hideBackupPanel();
+                    refreshMFAUI(), showMessage(backupManageMessage, 'success', '所有备份码已删除');
+                    setTimeout(() => hideMessage(backupManageMessage), 3000);
+                }
+                deleteBackupCodesBtn.disabled = false;
+            },
+
+            // 2FA 认证模块
+            showEnable2faPanel = async () => {
+                verifyTokenInput.value = '', hideMessage(confirmMessage), qrCodeImg.src = '';
+                secretCode.textContent = '加载中...', enable2faPanel.hidden = false, confirm2faBtn.disabled = false;
+                const { ok, data } = await requestApi('/api/enable-2fa', { method: 'POST' }, confirmMessage, toggle2faBtn),
+                    { qrCode, secret } = data;
+                if (ok && qrCode && secret) qrCodeImg.src = qrCode, secretCode.textContent = secret, verifyTokenInput.focus();
+                else enable2faPanel.hidden = true;
+            },
+            hideEnable2faPanel = () => {
+                toggle2faBtn.disabled = false, enable2faPanel.hidden = true;
+                verifyTokenInput.value = '', hideMessage(confirmMessage);
+            },
+
+            // WebAuthn 硬件认证模块
+            loadWebAuthnData = async () => {
+                try {
+                    const { ok, data } = await requestApi('/api/webauthn/credentials', { method: 'GET' }, null, null, true);
+                    if (ok) currentWebAuthnCredentials = data.credentials || [];
+                    else throw new Error(data.message);
+                } catch (err) {
+                    currentWebAuthnCredentials = [], showMessage(webauthnMessage, 'error', '加载硬件凭证失败,请刷新页面重试');
+                } finally { refreshWebAuthnUI() }
+            },
+            addWebAuthnDevice = async () => {
+                try {
+                    const beginResult = await requestApi('/api/webauthn/register/begin', { method: 'POST' }, webauthnMessage, null,
+                        true);
+                    if (!beginResult.ok) return false;
+
+                    showMessage(webauthnMessage, null, "认证硬件添加中...");
+                    const options = beginResult.data,
+                        attResp = await flunWebAuthnBrowser.startRegistration({ optionsJSON: options }),
+                        completeResult = await requestApi('/api/webauthn/register/complete', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ attestationResponse: attResp })
+                        }, webauthnMessage);
+
+                    if (!completeResult.ok) return false;
+                    if (completeResult.data.backupCodes) renderBackupCodes(completeResult.data.backupCodes);
+                    setTimeout(() => hideMessage(webauthnMessage), 3600), await loadUser(), await loadWebAuthnData();
+                    return true;
+                } catch (err) {
+                    if (err.name === 'AbortError' || err.name === 'NotAllowedError') {
+                        hideMessage(webauthnMessage);
+                        return false;
+                    }
+                    showMessage(webauthnMessage, 'error', '添加失败：' + (err.message));
+                    return false;
                 }
             },
-            renderBackupCodes = codes => {
-                if (codes?.length === 0) return backupCodesPanel.hidden = true, latestBackupCodes = [], syncBackupButtonState();
-                backupCodesList.innerHTML = '', latestBackupCodes = [...codes];
-                codes.forEach(code => {
-                    const span = document.createElement('span');
-                    span.className = 'code-item', span.textContent = code, backupCodesList.append(span);
+            renderCredentialsList = () => {
+                if (currentWebAuthnCredentials.length === 0) return;
+
+                webauthnDeviceList.innerHTML = '';
+                currentWebAuthnCredentials.forEach((cred, idx) => {
+                    const li = deviceItemExample.cloneNode(true), nameSpan = li.querySelector('.device-name'),
+                        delBtn = li.querySelector('button'), time = new Date(cred.createdAt).toLocaleString();
+
+                    nameSpan.textContent = `🔑 ${cred.deviceName} 硬件${idx + 1}(添加于${time})`;
+                    li.hidden = false, webauthnDeviceList.append(li);
+                    delBtn.addEventListener('click', async e => {
+                        e.preventDefault();
+                        if (!confirm('确定删除此设备吗？删除后将无法用于登录验证;')) return;
+                        const { ok } = await requestApi('/api/webauthn/credentials/delete',
+                            {
+                                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ credentialId: cred.id })
+                            }, webauthnMessage, delBtn);
+                        if (ok) await loadUser(), await loadWebAuthnData();
+                    });
                 });
-                backupCodesPanel.hidden = false, syncBackupButtonState();
             },
-            hideBackupPanel = () => {
-                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', latestBackupCodes = [], syncBackupButtonState();
+            refreshWebAuthnUI = () => {
+                hideMessage(webauthnMessage);
+                const isEnabled = currentUser?.webauthnEnabled === true;
+                webauthnStatusIcon.innerHTML = isEnabled ? '✅' : '';
+                toggleWebAuthnBtn.textContent = isEnabled ? '关闭硬件验证' : '启用硬件验证';
+                toggleWebAuthnBtn.classList.toggle('btn-danger', isEnabled);
+                toggleWebAuthnBtn.disabled = false, manageAddDeviceBtn.disabled = false;
+                if (isEnabled) webauthnMessage.hidden = true, manageWebAuthnPanel.hidden = false, renderCredentialsList();
+                else webauthnMessage.hidden = false, manageWebAuthnPanel.hidden = true, webauthnDeviceList.innerHTML = '';
             },
-            // ==================== 个人资料修改模块 ====================
-            closeEditProfileCard = () => {
-                if (!editProfileCard.hidden) {
-                    if (isEmailPollingActive) stopEmailPolling();
-                    editProfileCard.hidden = true, updateProfileBtn.disabled = false, editProfileBtn.disabled = false;
-                    updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage), resetEditProfileForm();
+            toggleWebAuthn = async () => {
+                await loadWebAuthnData();
+                const targetState = !currentUser?.webauthnEnabled;
+                if (!targetState) {
+                    if (!confirm('确定关闭硬件验证吗？关闭后登录时不再需要硬件验证;')) return;
+                    const oldUser = { ...currentUser };
+                    if (currentUser) currentUser.webauthnEnabled = false;
+                    refreshWebAuthnUI();
+                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null, toggleWebAuthnBtn);
+                    if (ok) await loadUser();
+                    else {
+                        if (currentUser) currentUser.webauthnEnabled = oldUser?.webauthnEnabled;
+                        refreshWebAuthnUI(), alert(data.message);
+                    }
+                    return;
+                }
+                if (currentWebAuthnCredentials.length === 0) {
+                    toggleWebAuthnBtn.disabled = true;
+                    try {
+                        await addWebAuthnDevice();
+                    } finally { toggleWebAuthnBtn.disabled = false }
+                } else {
+                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null, toggleWebAuthnBtn);
+                    if (ok) {
+                        await loadUser(), await loadWebAuthnData();
+                        if (data.backupCodes?.length) renderBackupCodes(data.backupCodes);
+                    }
                 }
             },
-            openEditProfileCard = () => {
-                closeChangePasswordCard(), editProfileCard.hidden = false;
-                if (currentUser) newUsernameInput.value = currentUser.username, newEmailInput.value = currentUser.email;
-                if (isEmailPollingActive) stopEmailPolling();
-                profileCurrentPasswordInput.value = '', editProfileBtn.disabled = true, setTimeout(() => newUsernameInput.focus(), 50);
-                updateProfileBtn.disabled = false, updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage);
+
+            // 注销账户模块
+            toggleDeleteForm = show => {
+                hideMessage(deleteAccountMessage);
+                if (show) {
+                    showDeleteAccountBtn.hidden = true, deleteAccountForm.hidden = false;
+                    setTimeout(() => deleteAccountPassword.focus(), 50);
+                } else {
+                    showDeleteAccountBtn.hidden = false, deleteAccountForm.hidden = true, deleteAccountPassword.value = '';
+                    showDeleteAccountBtn.focus();
+                }
             };
 
+        // ==================== 事件绑定 ====================
+        // 1. 个人资料
         editProfileBtn.addEventListener('click', openEditProfileCard);
         cancelEditBtn.addEventListener('click', () => { closeEditProfileCard(), editProfileBtn.focus() });
         updateProfileBtn.addEventListener('click', async () => {
@@ -917,8 +1134,7 @@
             let skipFinallyRestore = false;
             try {
                 const { ok } = await requestApi('/api/update-profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, email, currentPassword: pwd })
                 }, updateProfileMessage, updateProfileBtn);
                 if (ok) {
@@ -938,18 +1154,7 @@
             }
         });
 
-        // ==================== 密码修改模块 ====================
-        const closeChangePasswordCard = () => {
-            if (!changePasswordCard.hidden) {
-                changePasswordCard.hidden = true, resetPasswordForm(), showChangePasswordBtn.disabled = false;
-                hideMessage(changePasswordMessage);
-            }
-        },
-            openChangePasswordCard = () => {
-                closeEditProfileCard(), changePasswordCard.hidden = false, showChangePasswordBtn.disabled = true;
-                resetPasswordForm(), setTimeout(() => currentPasswordInput.focus(), 50), hideMessage(changePasswordMessage);
-            };
-
+        // 2. 修改密码
         showChangePasswordBtn.addEventListener('click', openChangePasswordCard);
         cancelChangePasswordBtn.addEventListener('click', () => {
             closeChangePasswordCard(), showChangePasswordBtn.focus();
@@ -959,37 +1164,45 @@
                 .map(input => input.value.trim());
 
             if (!current || !newPwd || !confirm) return showMessage(changePasswordMessage, 'error', '请填写所有字段 ');
-            if (newPwd.length < 6) return showMessage(changePasswordMessage, 'error', '新密码至少6位');
-            if (newPwd !== confirm) return showMessage(changePasswordMessage, 'error', '两次密码不一致');
-            const { ok } = await requestApi('/api/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
-            }, changePasswordMessage, changePasswordBtn);
+            if (newPwd.length < 6) return showMessage(changePasswordMessage, 'error', '新密码至少6位'); if (newPwd !== confirm)
+                return showMessage(changePasswordMessage, 'error', '两次密码不一致'); const { ok } = await
+                    requestApi('/api/change-password', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body:
+                            JSON.stringify({ currentPassword: current, newPassword: newPwd })
+                    }, changePasswordMessage, changePasswordBtn);
             if (ok) setTimeout(() => (closeChangePasswordCard(), window.location.href = '/login'), 1000);
         });
 
-        // ==================== 2FA 功能模块 ====================
-        const showEnable2faPanel = async () => {
-            verifyTokenInput.value = '', hideMessage(confirmMessage), qrCodeImg.src = '';
-            secretCode.textContent = '加载中...', enable2faPanel.hidden = false, confirm2faBtn.disabled = false;
-            const { ok, data } = await requestApi('/api/enable-2fa', { method: 'POST' }, confirmMessage, toggle2faBtn),
-                { qrCode, secret } = data;
-            if (ok && qrCode && secret) qrCodeImg.src = qrCode, secretCode.textContent = secret, verifyTokenInput.focus();
-            else enable2faPanel.hidden = true;
-        },
-            hideEnable2faPanel = () => {
-                toggle2faBtn.disabled = false, enable2faPanel.hidden = true, verifyTokenInput.value = '', hideMessage(confirmMessage);
-            },
-            refreshTwofaUI = () => {
-                toggle2faBtn.disabled = false;
-                const isEnabled = currentUser?.twoFactorEnabled;
-                twofaCheckmark.innerHTML = isEnabled ? '✅' : '', twofaCheckmark.title = isEnabled ? '已启用双因素认证' : '';
-                toggle2faBtn.textContent = isEnabled ? '关闭2FA' : '启用2FA', toggle2faBtn.classList.toggle('btn-danger', isEnabled);
-                if (isEnabled) manage2faPanel.hidden = false, hideBackupPanel();
-                else manage2faPanel.hidden = true, hideMessage(confirmMessage);
-            };
+        // 3. 备份码管理
+        toggleBackupPanelBtn.addEventListener('click', async () => {
+            saveBackupFileBtn.disabled = false, printBackupCodesBtn.disabled = false, toggleBackupPanelBtn.disabled = true;
+            toggleBackupPanelBtn.textContent = '加载中...';
 
+            try {
+                const isPanelVisible = !backupCodesPanel.hidden;
+                if (isPanelVisible) return hideBackupPanel();
+                if (!confirm('重新生成备用码,将会使旧备用码失效,是否继续？')) return toggleBackupPanelBtn.disabled = false;
+
+                const result = await requestApi('/api/regenerate-backup-codes', { method: 'POST' }, backupManageMessage,
+                    toggleBackupPanelBtn);
+                if (result.ok && result.data.backupCodes) renderBackupCodes(result.data.backupCodes),
+                    hideMessage(backupManageMessage);
+                else backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', syncBackupButtonState();
+            } catch (err) {
+                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', syncBackupButtonState();
+            }
+        });
+        saveBackupFileBtn.addEventListener('click', () => {
+            if (latestBackupCodes.length) saveBackupCodesToFile(latestBackupCodes, `${currentUser?.username}*备用码`);
+            else alert('没有备份码可保存');
+        });
+        printBackupCodesBtn.addEventListener('click', () => {
+            if (latestBackupCodes.length) printBackupCodes(latestBackupCodes, `${currentUser?.username}*备用码`);
+            else alert('没有备份码可打印');
+        });
+        deleteBackupCodesBtn.addEventListener('click', deleteBackupCodes);
+
+        // 4. 2FA认证
         toggle2faBtn.addEventListener('click', async () => {
             const isEnabled = currentUser?.twoFactorEnabled;
             if (!isEnabled) {
@@ -997,9 +1210,14 @@
                 else hideEnable2faPanel();
             } else {
                 if (!confirm('确定关闭双因素认证吗？关闭后账户安全性将降低;')) return;
-                const { ok, data } = await requestApi('/api/disable-2fa', { method: 'POST' }, null, toggle2faBtn);
-                if (ok) await loadUser();
-                else alert(data.message);
+                toggle2faBtn.disabled = true;
+                try {
+                    const { ok, data } = await requestApi('/api/disable-2fa', { method: 'POST' }, null, null, true);
+                    if (ok) await loadUser();
+                    else alert(data.message);
+                } catch (err) {
+                    alert(`关闭失败:${err.message}`);
+                } finally { toggle2faBtn.disabled = false }
             }
         });
         cancelEnable2faBtn.addEventListener('click', hideEnable2faPanel);
@@ -1007,149 +1225,25 @@
             const token = verifyTokenInput.value.trim();
             if (!token) return showMessage(confirmMessage, 'error', '请输入6位验证码');
             const { ok, data } = await requestApi('/api/confirm-2fa', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token })
             }, confirmMessage, confirm2faBtn);
+
             if (ok && data.backupCodes) {
                 await loadUser(), renderBackupCodes(data.backupCodes), hideEnable2faPanel();
                 setTimeout(() => hideMessage(confirmMessage), 3000);
-            } else verifyTokenInput.value = '', verifyTokenInput.focus();
-        });
-        showBackupBtn.addEventListener('click', async () => {
-            saveBackupFileBtn.disabled = false, printBackupCodesBtn.disabled = false;
-            showBackupBtn.disabled = true, showBackupBtn.textContent = '加载中...', hideMessage(backupManageMessage);
-            try {
-                const isPanelVisible = !backupCodesPanel.hidden;
-                if (isPanelVisible) return hideBackupPanel(), showBackupBtn.disabled = false;
-                if (!confirm('重新生成备用码,将会使旧备用码失效,是否继续？')) return showBackupBtn.disabled = false;
-                backupCodesPanel.hidden = false;
-                const result = await requestApi('/api/regenerate-backup-codes', { method: 'POST' }, backupManageMessage, showBackupBtn);
-                if (result.ok && result.data.backupCodes) renderBackupCodes(result.data.backupCodes);
-                else backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', syncBackupButtonState();
-            } catch (err) {
-                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', syncBackupButtonState();
+            } else if (ok) {
+                await loadUser(), hideEnable2faPanel(), showMessage(confirmMessage, 'success', '2FA 已启用');
+                setTimeout(() => hideMessage(confirmMessage), 3000);
             }
-        });
-        saveBackupFileBtn.addEventListener('click', () => {
-            if (latestBackupCodes.length) saveBackupCodesToFile(latestBackupCodes, `${currentUser?.username}*2FA备用码`);
-            else alert('没有备份码可保存');
-        });
-        printBackupCodesBtn.addEventListener('click', () => {
-            if (latestBackupCodes.length) printBackupCodes(latestBackupCodes, `${currentUser?.username}*2FA备用码`);
-            else alert('没有备份码可打印');
+            else verifyTokenInput.value = '', verifyTokenInput.focus();
         });
 
-        // ==================== WebAuthn 硬件验证模块 ====================
-        const loadWebAuthnData = async () => {
-            try {
-                const { ok, data } = await requestApi('/api/webauthn/credentials', { method: 'GET' }, null, null, true);
-                if (ok) currentWebAuthnCredentials = data.credentials || [];
-                else throw new Error(data.message);
-            } catch (err) {
-                currentWebAuthnCredentials = [];
-                const targetMsg = manageWebAuthnPanel.hidden ? webauthnMessage : webauthnManageMessage;
-                showMessage(targetMsg, 'error', '加载硬件凭证失败,请刷新页面重试');
-            } finally { refreshWebAuthnUI(); }
-        },
-            renderCredentialsList = () => {
-                if (currentWebAuthnCredentials.length === 0) return noDeviceMsg.style.display = 'block';
-
-                webauthnDeviceList.innerHTML = '', noDeviceMsg.style.display = 'none';
-                currentWebAuthnCredentials.forEach((cred, idx) => {
-                    const li = deviceItemExample.cloneNode(true), nameSpan = li.querySelector('.device-name'),
-                        delBtn = li.querySelector('button'), time = new Date(cred.createdAt).toLocaleString();
-
-                    nameSpan.textContent = `🔑 ${cred.deviceName} 硬件${idx + 1}(添加于${time})`;
-                    li.style.display = 'flex', webauthnDeviceList.append(li);
-                    delBtn.addEventListener('click', async e => {
-                        e.preventDefault();
-                        if (!confirm('确定删除此设备吗？删除后将无法用于登录验证;')) return;
-                        const { ok } = await requestApi('/api/webauthn/credentials/delete',
-                            {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ credentialId: cred.id })
-                            }, webauthnManageMessage, delBtn);
-                        if (ok) await loadUser(), await loadWebAuthnData();
-                    });
-                });
-            },
-            refreshWebAuthnUI = () => {
-                hideMessage(webauthnMessage), hideMessage(webauthnManageMessage);
-                const isEnabled = currentUser?.webauthnEnabled === true;
-                webauthnStatusIcon.innerHTML = isEnabled ? '✅' : '';
-                toggleWebAuthnBtn.textContent = isEnabled ? '关闭硬件验证' : '启用硬件验证';
-                toggleWebAuthnBtn.classList.toggle('btn-danger', isEnabled);
-                toggleWebAuthnBtn.disabled = false, manageAddDeviceBtn.disabled = false;
-                if (isEnabled) webauthnMessage.hidden = true, manageWebAuthnPanel.hidden = false, renderCredentialsList();
-                else {
-                    manageWebAuthnPanel.hidden = true, webauthnMessage.hidden = false;
-                    webauthnDeviceList.innerHTML = '', noDeviceMsg.style.display = 'block';
-                }
-            },
-            startAddDeviceAndEnableIfNeeded = async () => {
-                hideMessage(webauthnMessage), hideMessage(webauthnManageMessage);
-                try {
-                    const beginResult = await requestApi('/api/webauthn/register/begin', { method: 'POST' }, webauthnMessage, null, true);
-                    if (!beginResult.ok) return;
-                    const options = beginResult.data, attResp = await flunWebAuthnBrowser.startRegistration({ optionsJSON: options }),
-                        completeResult = await requestApi('/api/webauthn/register/complete', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ attestationResponse: attResp })
-                        }, webauthnMessage);
-                    if (!completeResult.ok) return;
-                    await loadUser(), await loadWebAuthnData();
-                    if (!currentUser?.webauthnEnabled) {
-                        const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, webauthnMessage);
-                        if (ok) await loadUser();
-                    }
-                } catch (err) {
-                    if (err.name === 'AbortError' || err.name === 'NotAllowedError') return;
-                    let errorMsg = '添加失败：';
-                    if (err.name === 'NotAllowedError') errorMsg += '操作被拒绝或超时,请确保使用 HTTPS 且设备已配置';
-                    else errorMsg += '未知错误';
-                    showMessage(webauthnMessage, 'error', errorMsg);
-                }
-            },
-            toggleWebAuthn = async () => {
-                const targetState = !currentUser?.webauthnEnabled;
-                if (!targetState) {
-                    if (!confirm('确定关闭硬件验证吗？关闭后登录时不再需要硬件验证;')) return;
-                    const oldUser = { ...currentUser };
-                    if (currentUser) currentUser.webauthnEnabled = false;
-                    refreshWebAuthnUI();
-                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null, toggleWebAuthnBtn);
-                    if (ok) await loadUser();
-                    else {
-                        if (currentUser) currentUser.webauthnEnabled = oldUser?.webauthnEnabled;
-                        refreshWebAuthnUI(), alert(data.message);
-                    }
-                    return;
-                }
-                if (currentWebAuthnCredentials.length > 0) {
-                    const { ok } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, webauthnMessage, toggleWebAuthnBtn);
-                    if (ok) await loadUser();
-                } else {
-                    try { await startAddDeviceAndEnableIfNeeded() }
-                    finally { toggleWebAuthnBtn.disabled = false }
-                }
-            };
+        // 5. WebAuthn 硬件验证
         toggleWebAuthnBtn.addEventListener('click', toggleWebAuthn);
-        manageAddDeviceBtn.addEventListener('click', startAddDeviceAndEnableIfNeeded);
+        manageAddDeviceBtn.addEventListener('click', () => addWebAuthnDevice());
 
-        // ==================== 注销账户模块 ====================
-        const toggleDeleteForm = show => {
-            if (show) {
-                showDeleteAccountBtn.hidden = true, deleteAccountForm.hidden = false;
-                setTimeout(() => deleteAccountPassword.focus(), 50), hideMessage(deleteAccountMessage);
-            } else {
-                showDeleteAccountBtn.hidden = false, deleteAccountForm.hidden = true, deleteAccountPassword.value = '';
-                hideMessage(deleteAccountMessage), showDeleteAccountBtn.focus();
-            }
-        };
-
+        // 6. 注销账户
         showDeleteAccountBtn.addEventListener('click', () => toggleDeleteForm(true));
         cancelDeleteBtn.addEventListener('click', () => toggleDeleteForm(false));
         deleteAccountBtn.addEventListener('click', async () => {
@@ -1158,36 +1252,26 @@
             if (!confirm('您确定要永久注销账户吗？此操作不可撤销,所有数据将被删除!!!')) return;
 
             const { ok } = await requestApi('/api/delete-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: pwd })
             }, deleteAccountMessage, deleteAccountBtn);
             if (ok) setTimeout(() => window.location.href = '/login', 2000);
         });
+
+        // 7. 退出登录
         logoutBtn.addEventListener('click', async () => {
             const { ok } = await requestApi('/api/logout', { method: 'POST' }, null, logoutBtn);
             if (ok) window.location.href = '/login';
             else alert('退出失败,请重试');
         });
 
-        // ==================== 初始化及加载 ====================
-        const loadUser = async () => {
-            try {
-                const { ok, data } = await requestApi('/api/user', { method: 'GET' }, null, null, true);
-                if (!ok || [401, 404].includes(data?.status ?? data?.code)) return window.location.href = '/login';
-                currentUser = data;
-                const { username, email, emailVerified, createdAt } = currentUser;
-                usernameEl.textContent = username, emailEl.textContent = email ?? '未设置';
-                emailVerifiedBadge.textContent = emailVerified ? '✅' : '';
-                createdAtEl.textContent = new Date(createdAt).toLocaleString(), await Promise.all([refreshTwofaUI(), loadWebAuthnData()]);
-            } catch (err) { alert('加载用户信息失败,请刷新页面重试'); }
-        },
-            enterHandlers = [
-                { input: profileCurrentPasswordInput, button: updateProfileBtn },
-                { input: confirmPasswordInput, button: changePasswordBtn },
-                { input: deleteAccountPassword, button: deleteAccountBtn },
-                { input: verifyTokenInput, button: confirm2faBtn }
-            ],
+        // ==================== 辅助：回车提交 & 自动清除消息 ====================
+        const enterHandlers = [
+            { input: profileCurrentPasswordInput, button: updateProfileBtn },
+            { input: confirmPasswordInput, button: changePasswordBtn },
+            { input: deleteAccountPassword, button: deleteAccountBtn },
+            { input: verifyTokenInput, button: confirm2faBtn }
+        ],
             clearMessageMappings = [
                 { messageEl: updateProfileMessage, inputs: [newUsernameInput, newEmailInput, profileCurrentPasswordInput] },
                 { messageEl: changePasswordMessage, inputs: [currentPasswordInput, newPasswordInput, confirmPasswordInput] },
@@ -1208,8 +1292,7 @@
                 if (e.key === 'Enter') e.preventDefault(), button.click();
             });
         });
-
-        window.addEventListener('beforeunload', stopEmailPolling), setupInputClearMessage(), loadUser();
+        setupInputClearMessage(), window.addEventListener('beforeunload', stopEmailPolling), loadUser();
     </script>
 </body>
 

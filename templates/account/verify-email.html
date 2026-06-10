@@ -26,6 +26,7 @@
         .card {
             background: var(--container-bg);
             border-radius: 12px;
+            border: 1px solid #2e3135;
             box-shadow: 0 20px 40px var(--content-shadow);
             width: 80%;
             min-width: 400px;
@@ -101,8 +102,8 @@
             text-decoration: underline;
         }
 
-        .hidden {
-            display: none;
+        [hidden] {
+            display: none !important;
         }
 
         /* ==================== 移动端样式适配 (≤640px) ==================== */
@@ -164,8 +165,8 @@
 <body>
     <div class="card">
         <h2 id="pageTitle">邮箱验证</h2>
-        <div id="message" class="message">正在验证，请稍候...</div>
-        <div id="action" style="display:none;"></div>
+        <div id="message" class="message">正在验证,请稍候...</div>
+        <div id="action" hidden></div>
     </div>
 
     <!-- 公共逻辑 -->
@@ -186,7 +187,7 @@
                 },
                 handleError = msg => {
                     messageDiv.className = 'error', messageDiv.textContent = msg;
-                    actionDiv.innerHTML = `<div class="link">${getFallbackLink()}</div>`, actionDiv.style.display = 'block';
+                    actionDiv.innerHTML = `<div class="link">${getFallbackLink()}</div>`, actionDiv.hidden = false;
                 };
 
             if (!token) return handleError('无效的验证链接');
@@ -197,7 +198,7 @@
                 const response = await fetch(`${apiEndpoint}?token=${encodeURIComponent(token)}`), data = await response.json();
 
                 if (response.ok) {
-                    title.classList.add('hidden'), actionDiv.style.display = 'none';
+                    title.classList.add('hidden'), actionDiv.hidden = true;
                     messageDiv.className = 'success big-success', messageDiv.textContent = data.message;
 
                     let seconds = 3;

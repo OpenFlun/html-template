@@ -150,7 +150,7 @@ const printAvailablePages = (pages, port, hotReload, useHttps, host) => {
 
 	if (useHttps && (host === 'localhost' || host === '127.0.0.1')) {
 		console.warn('⚠️  警告: 使用 HTTPS 访问 localhost 会导致浏览器证书安全警告（自签名证书或证书域名不匹配）');
-		console.warn('   请使用 --host 参数指定与证书 CN/SAN 匹配的域名，例如: --host book.123xyz.cn');
+		console.warn('   请使用 --host 参数指定与证书 CN/SAN 匹配的域名，例如: --host www.abc.com');
 	}
 
 	console.log('\n可访问页面:');

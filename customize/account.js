@@ -29,9 +29,7 @@ if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PWD)
 
 // 邮件发送配置
 const transporter = createTransport({
-    host: env.MAIL_HOST,
-    port: env.MAIL_PORT,
-    secure: true,
+    host: env.MAIL_HOST, port: env.MAIL_PORT, secure: true,
     auth: { user: env.MAIL_USER, pass: env.MAIL_PWD }
 }),
     // ========== 辅助函数 ==========
@@ -51,10 +49,10 @@ const transporter = createTransport({
             emailVerified, emailVerificationToken: null,
             passwordResetToken: null, passwordResetExpires: null,
             twoFactorSecret: null, twoFactorEnabled: false,
-            backupCodes: [],
             webauthnCredentials: [], webauthnEnabled: false,
             createdAt: now, updatedAt: now, passwordChangedAt: now,
-            pendingEmail: null, pendingEmailToken: null, pendingEmailExpires: null
+            pendingEmail: null, pendingEmailToken: null, pendingEmailExpires: null,
+            backupCodes: [], codeFailures: 0, codeLockUntil: null
         };
     },
     initAdminUser = () => {
@@ -66,7 +64,7 @@ const transporter = createTransport({
         }
     },
     sendEmail = async (to, subject, html) => {
-        if (transporter) await transporter.sendMail({ from: `"Your App" <${env.MAIL_USER}>`, to, subject, html });
+        if (transporter) await transporter.sendMail({ from: `"我的网站" <${env.MAIL_USER}>`, to, subject, html });
         else console.log(`\n--- 模拟邮件 ---\n收件人: ${to}\n主题: ${subject}\n内容:\n${html}\n---`);
     },
     validateEmail = email => mailRegex.test(email), generateToken = () => randomBytes(32).toString('hex'),
@@ -132,13 +130,17 @@ const transporter = createTransport({
                 subject = '添加验证硬件通知';
                 actionDescription = '添加了一台新的硬件验证设备';
                 break;
+            case 'backup_code_lock':  // 新增：备份码锁定
+                subject = '安全警报：账户临时锁定';
+                actionDescription = '连续多次输入错误的备用码,账户已被临时锁定24小时';
+                break;
             default: return;
         }
 
         const html = `
-            <p>您好!</p>
-            <p>您的账户(${user.username})于 <strong>${now}</strong>在 <strong>${clientIp}</strong> 成功${actionDescription};</p>
-            <p>如果是您本人操作,请忽略此邮件,否则请立即处理;</p>
+            <p>主人好!</p>
+            <p>网站账户(${user.username})于 <strong>${now}</strong>在 <strong>${clientIp}</strong> ${actionDescription};</p>
+            <p>如果是您的操作,请忽略此邮件,否则请前往处理;</p>
             <p style="margin-left:65%;">此致<br/>&emsp;&nbsp;安全中心</p>
         `;
         await sendEmail(user.email, subject, html);
@@ -180,16 +182,14 @@ export const accountRouter = app => {
         set(sid, session, cb) {
             const file = path.join(this.sessionsDir, `${sid}.json`);
             try {
-                fs.writeFileSync(file, JSON.stringify(session));
-                cb(null);
+                fs.writeFileSync(file, JSON.stringify(session)), cb(null);
             } catch (e) { cb(e); }
         }
 
         destroy(sid, cb) {
             const file = path.join(this.sessionsDir, `${sid}.json`);
             try {
-                if (fs.existsSync(file)) fs.unlinkSync(file);
-                cb(null);
+                if (fs.existsSync(file)) fs.unlinkSync(file), cb(null);
             } catch (e) { cb(e); }
         }
 
@@ -225,11 +225,9 @@ export const accountRouter = app => {
     app.use(session({
         secret: env.SESSION_SECRET || 'dev-secret-change-in-production',
         store: sessionStore,
-        resave: false,
-        saveUninitialized: false,
+        resave: false, saveUninitialized: false,
         cookie: { secure: false, httpOnly: true, sameSite: 'lax', maxAge: 30 * 24 * oneHour }
     }));
-
     app.use(express.json(), express.urlencoded({ extended: true })), initAdminUser();
 
     // 2. 全局登录保护中间件
@@ -260,9 +258,7 @@ export const accountRouter = app => {
             const sessionLoginTime = req.session.loginTime || 0;
             if (user.passwordChangedAt > sessionLoginTime) {
                 req.session.destroy(() => {
-                    if (req.path.startsWith('/api/')) {
-                        return res.status(401).json({ message: '密码已修改,请重新登录' });
-                    }
+                    if (req.path.startsWith('/api/')) return res.status(401).json({ message: '密码已修改,请重新登录' });
                     return res.redirect('/login');
                 });
                 return;
@@ -281,7 +277,7 @@ export const accountRouter = app => {
     }, oneHour);
 
     // 定义安全限制和所有页面(公共页面 + 受保护页面)
-    const authLimiter = rateLimit({ windowMs: fifteenMin, max: 50, message: { message: '尝试次数过多，请稍后再试' } }),
+    const authLimiter = rateLimit({ windowMs: fifteenMin, max: 15, message: { message: '尝试次数过多,请稍后再试' } }),
         allPages = [...publicPage, '/profile'];
     allPages.forEach(page => {
         app.get(page, (req, res) => {
@@ -306,8 +302,7 @@ export const accountRouter = app => {
     // ========== 公开认证API ==========
     app.post('/api/register', authLimiter, async (req, res) => {
         const { username, email, password } = req.body;
-        if (!hasAllFields(req.body, ['username', 'email', 'password']))
-            return res.status(400).json({ message: '所有字段必填' });
+        if (!hasAllFields(req.body, ['username', 'email', 'password'])) return res.status(400).json({ message: '所有字段必填' });
         if (!validateEmail(email)) return res.status(400).json({ message: '邮箱格式不正确' });
         if (!validatePasswordLength(password)) return res.status(400).json({ message: '密码至少6位' });
 
@@ -354,12 +349,15 @@ export const accountRouter = app => {
         const valid = await verifyPassword(password, user.password);
         if (!valid) return res.status(401).json({ message: '用户名/邮箱或密码错误' });
         if (!user.emailVerified) return res.status(403).json({ message: '请先验证邮箱', needsVerification: true });
-        if (user.webauthnEnabled && user.webauthnCredentials.length > 0)
-            return req.session.tempUserId = user.id, res.json({ requireWebAuthn: true });
-        if (user.twoFactorEnabled) return req.session.tempUserId = user.id, res.json({ require2FA: true });
 
+        req.session.tempUserId = user.id; // 保存临时用户ID,供后续多因素验证使用
+        if (user.webauthnEnabled && user.webauthnCredentials.length > 0) return res.json({ requireWebAuthn: true });
+        if (user.twoFactorEnabled) return res.json({ require2FA: true });
+
+        // 没有多因素认证,直接登录
         req.session.userId = user.id, req.session.username = user.username, req.session.loginTime = Date.now();
-        recentPasswordResets.delete(user.email), res.json({ success: true, message: '登录成功' });
+        delete req.session.tempUserId, recentPasswordResets.delete(user.email);
+        res.json({ success: true, message: '登录成功' });
     });
 
     app.post('/api/verify-2fa', authLimiter, async (req, res) => {
@@ -370,25 +368,59 @@ export const accountRouter = app => {
         if (!tempUserId) return res.status(401).json({ message: '请先完成第一步登录' });
 
         const users = readUsers(), user = users.find(u => u.id === tempUserId);
-        if (!user?.twoFactorEnabled) return res.status(400).json({ message: '用户未启用2FA' });
+        if (!user?.twoFactorEnabled && !user?.webauthnEnabled)
+            return res.status(400).json({ message: '用户未启用多因素认证' });
 
-        const { twoFactorSecret, backupCodes } = user, verified = await verifyTotp(twoFactorSecret, token);
-        let backupValid = false;
-        if (!verified && backupCodes?.length)
+        // 过期锁定自动清除
+        if (user.codeLockUntil && user.codeLockUntil <= Date.now())
+            user.codeLockUntil = null, user.codeFailures = 0, touchAndSaveUser(users, user);
+        else if (user.codeLockUntil && user.codeLockUntil > Date.now())
+            return res.status(401).json({ message: '账户已被临时锁定,请24小时后重试', locked: true });
+
+        const { twoFactorSecret, backupCodes } = user;
+        let verified = false, backupValid = false;
+
+        // TOTP 验证（6位）
+        if (token.length === 6) {
+            try {
+                verified = await verifyTotp(twoFactorSecret, token);
+            } catch (err) {
+                console.error('TOTP 验证异常:', err.message);
+            }
+        }
+
+        // 备份码验证（长度:10位）
+        if (!verified && backupCodes?.length) {
             for (let i = 0; i < backupCodes.length; i++) {
                 const match = await verifyPassword(token, backupCodes[i]);
                 if (match) {
-                    backupValid = true, backupCodes.splice(i, 1), touchAndSaveUser(users, user);
+                    backupValid = true, backupCodes.splice(i, 1);
                     break;
                 }
             }
-
-        if (verified || backupValid) {
-            delete req.session.tempUserId, req.session.userId = user.id, req.session.username = user.username;
-            req.session.loginTime = Date.now(), recentPasswordResets.delete(user.email);
-            res.json({ success: true, message: '2FA验证成功' });
         }
-        else res.status(401).json({ message: '验证码无效' });
+
+        // 输入错误失败计数与锁定
+        if (!verified && !backupValid) {
+            user.codeFailures = (user.codeFailures || 0) + 1;
+            if (user.codeFailures >= 9) {
+                user.codeLockUntil = Date.now() + 24 * oneHour;
+                await sendSecurityAlertEmail(req, user, 'backup_code_lock'), touchAndSaveUser(users, user);
+                return res.status(401).json({ message: '输入错误次数过多,账户已被锁定24小时,请隔天重试或联系管理员', locked: true });
+            } else {
+                const remaining = 9 - user.codeFailures;
+                touchAndSaveUser(users, user);
+                return res.status(401).json({ message: `输入错误,剩余尝试次数:${remaining}`, remainingAttempts: remaining });
+            }
+        }
+
+        // 验证成功,重置所有限制
+        if (verified || backupValid) {
+            user.codeFailures = 0, user.codeLockUntil = null, delete req.session.tempUserId;
+            req.session.userId = user.id, req.session.username = user.username, req.session.loginTime = Date.now();
+            recentPasswordResets.delete(user.email), touchAndSaveUser(users, user);
+            return res.json({ success: true, message: '二次验证成功' });
+        }
     });
 
     app.post('/api/logout', (req, res) => {
@@ -452,10 +484,10 @@ export const accountRouter = app => {
         const result = getCurrentUser(req);
         if (!result) return res.status(404).json({ message: '用户不存在' });
         const { id, username, email, emailVerified, twoFactorEnabled, createdAt, pendingEmail, webauthnEnabled,
-            webauthnCredentials } = result.user;
+            webauthnCredentials, backupCodes } = result.user;
         res.json({
             id, username, email, emailVerified, twoFactorEnabled, createdAt, pendingEmail, webauthnEnabled,
-            webauthnCredentials
+            webauthnCredentials, hasBackupCodes: !!(backupCodes?.length > 0)
         });
     });
 
@@ -523,7 +555,7 @@ export const accountRouter = app => {
         if (!result) return res.status(404).json({ message: '用户不存在' });
 
         const { user, users } = result, secret = generateSecret({ length: 32 }), otpauth_url = generateURI({
-            issuer: 'YourApp', label: user.username, secret,
+            issuer: '我的网站', label: user.username, secret,
         }), qrCodeUrl = await toDataURL(otpauth_url);
 
         user.twoFactorSecret = secret, touchAndSaveUser(users, user), res.json({ secret, qrCode: qrCodeUrl });
@@ -539,8 +571,14 @@ export const accountRouter = app => {
         const { user, users } = result, verified = await verifyTotp(user.twoFactorSecret, token);
         if (!verified) return res.status(400).json({ message: '验证码错误' });
 
-        const { plainCodes, hashedCodes } = generateBackupCodes();
-        user.backupCodes = hashedCodes, user.twoFactorEnabled = true, touchAndSaveUser(users, user);
+        let plainCodes = null;
+        // 仅当用户当前没有备份码时,生成一组新的
+        if (!user.backupCodes || user.backupCodes.length === 0) {
+            const { plainCodes: newPlain, hashedCodes } = generateBackupCodes();
+            user.backupCodes = hashedCodes, plainCodes = newPlain;;
+        }
+
+        user.twoFactorEnabled = true, touchAndSaveUser(users, user);
         res.json({ success: true, backupCodes: plainCodes, message: '2FA 已启用' });
     });
 
@@ -549,18 +587,24 @@ export const accountRouter = app => {
         if (!result) return res.status(404).json({ message: '用户不存在' });
 
         const { user, users } = result;
-        user.twoFactorEnabled = false, user.twoFactorSecret = null, user.backupCodes = [];
-        touchAndSaveUser(users, user), res.json({ success: true });
+        user.twoFactorEnabled = false, user.twoFactorSecret = null, touchAndSaveUser(users, user), res.json({ success: true });
     });
 
     app.post('/api/regenerate-backup-codes', async (req, res) => {
         const result = getCurrentUser(req);
         if (!result) return res.status(404).json({ message: '用户不存在' });
         const { user, users } = result;
-        if (!user.twoFactorEnabled) return res.status(400).json({ message: '2FA未启用' });
+        if (!user.twoFactorEnabled && !user.webauthnEnabled) return res.status(400).json({ message: '未启用任何多因素认证' });
 
         const { plainCodes, hashedCodes } = generateBackupCodes();
         user.backupCodes = hashedCodes, touchAndSaveUser(users, user), res.json({ backupCodes: plainCodes });
+    });
+
+    app.post('/api/delete-backup-codes', async (req, res) => {
+        const result = getCurrentUser(req);
+        if (!result) return res.status(401).json({ message: '未登录' });
+        const { user, users } = result;
+        user.backupCodes = [], touchAndSaveUser(users, user), res.json({ success: true, message: '备份码已删除' });
     });
 
     // ========== WebAuthn 硬件验证 API ==========
@@ -570,20 +614,18 @@ export const accountRouter = app => {
             if (!result) return res.status(401).json({ message: '未登录' });
             const { id, username, webauthnCredentials } = result.user, rpID = getRpId(req),
                 options = await generateRegistrationOptions({
-                    rpName: 'Your App',
+                    rpName: '我的网站',
                     rpID, userID: Buffer.from(String(id)),
                     userName: username, userDisplayName: username,
                     attestationType: 'none',
                     excludeCredentials: webauthnCredentials.map(cred => ({
-                        id: cred.id,
-                        type: 'public-key',
-                        transports: cred.transports
+                        id: cred.id, type: 'public-key', transports: cred.transports
                     })),
                     authenticatorSelection: { userVerification: 'preferred' },
                 });
             req.session.webauthnRegisterChallenge = options.challenge, res.json(options);
         } catch (err) {
-            return res.status(400).json({ message: err.message || '硬件验证初始化失败,请确保使用 HTTPS 或 localhost 访问;' });
+            return res.status(400).json({ message: err.message });
         }
     });
 
@@ -615,18 +657,27 @@ export const accountRouter = app => {
 
         const clientIp = getClientIp(req), { id, publicKey, counter, transports = [], deviceType, backedUp } = cred,
             newCredential = {
-                id,
-                publicKey: fromBuffer(publicKey),
-                counter: Number(counter),
+                id, publicKey: fromBuffer(publicKey), counter: Number(counter),
                 transports, deviceType, backedUp,
                 deviceName: clientIp, createdAt: Date.now()
             };
 
         result.user.webauthnCredentials.push(newCredential);
         if (!result.user.webauthnEnabled) result.user.webauthnEnabled = true;
+
+        // 如果用户还没有备份码且至少启用了一个多因素认证,则自动生成备份码
+        let newBackupCodes = null;
+        if ((!result.user.backupCodes || result.user.backupCodes.length === 0) && !result.user.twoFactorEnabled) {
+            const { plainCodes, hashedCodes } = generateBackupCodes();
+            result.user.backupCodes = hashedCodes, newBackupCodes = plainCodes;
+        }
+
         touchAndSaveUser(result.users, result.user), delete req.session.webauthnRegisterChallenge;
         await sendSecurityAlertEmail(req, result.user, 'webauthn_added');
-        res.json({ success: true, credentials: result.user.webauthnCredentials });
+
+        const responseData = { success: true, credentials: result.user.webauthnCredentials };
+        if (newBackupCodes) responseData.backupCodes = newBackupCodes;
+        res.json(responseData);
     });
 
     // 获取用户凭证列表
@@ -643,26 +694,38 @@ export const accountRouter = app => {
 
         const result = getCurrentUser(req);
         if (!result) return res.status(401).json({ message: '未登录' });
-        if (!result.user) return res.status(500).json({ message: '用户数据异常' });
 
-        const credentials = result.user.webauthnCredentials ?? [], index = credentials.findIndex(c => c.id === credentialId);
+        const { user, users } = result, credentials = user.webauthnCredentials ?? [],
+            index = credentials.findIndex(c => c.id === credentialId);
+
         if (index === -1) return res.status(404).json({ message: '凭证不存在' });
+        credentials.splice(index, 1), user.webauthnCredentials = credentials;
 
-        credentials.splice(index, 1);
-        if (credentials.length === 0) result.user.webauthnEnabled = false;
-        result.user.webauthnCredentials = credentials;
-        touchAndSaveUser(result.users, result.user), res.json({ success: true, message: '设备已删除' });
+        // 如果没有凭证了,自动关闭硬件验证标志
+        if (credentials.length === 0) user.webauthnEnabled = false;
+        touchAndSaveUser(users, user), res.json({ success: true, message: '设备已删除' });
     });
 
     // 切换硬件验证启用状态
     app.post('/api/webauthn/toggle', authLimiter, async (req, res) => {
         const result = getCurrentUser(req);
         if (!result) return res.status(401).json({ message: '未登录' });
-        if (!result.user.webauthnEnabled && result.user.webauthnCredentials.length === 0)
+
+        const newState = !result.user.webauthnEnabled;
+        if (newState && result.user.webauthnCredentials.length === 0)
             return res.status(400).json({ message: '没有可用的硬件凭证,请先添加设备' });
 
-        result.user.webauthnEnabled = !result.user.webauthnEnabled, touchAndSaveUser(result.users, result.user);
-        res.json({ success: true, enabled: result.user.webauthnEnabled });
+        result.user.webauthnEnabled = newState;
+        let newBackupCodes = null;
+        if (newState && (!result.user.backupCodes || result.user.backupCodes.length === 0)) {
+            const { plainCodes, hashedCodes } = generateBackupCodes();
+            result.user.backupCodes = hashedCodes, newBackupCodes = plainCodes;
+        }
+
+        touchAndSaveUser(result.users, result.user);
+        const response = { success: true, enabled: result.user.webauthnEnabled };
+        if (newBackupCodes) response.backupCodes = newBackupCodes;
+        res.json(response);
     });
 
     // 开始硬件验证登录（生成断言选项）
@@ -678,9 +741,7 @@ export const accountRouter = app => {
                 options = await generateAuthenticationOptions({
                     rpID,
                     allowCredentials: user.webauthnCredentials.map(cred => ({
-                        id: cred.id,
-                        type: 'public-key',
-                        transports: cred.transports,
+                        id: cred.id, type: 'public-key', transports: cred.transports,
                     })),
                     userVerification: 'preferred', timeout: 60000,
                 });
