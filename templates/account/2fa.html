@@ -141,10 +141,10 @@
         <h2>双因素验证</h2>
 
         <!-- TOTP 模式区域 -->
-        <div id="totpSection">
+        <div id="totpSection" hidden>
             <p id="promptText">请输入身份验证器中的6位数字验证码</p>
             <div class="form-group">
-                <input type="text" id="tokenInput" placeholder="6位验证码" maxlength="6" autofocus
+                <input type="text" id="totpInput" placeholder="6位验证码" maxlength="6" autofocus
                     autocomplete="one-time-code" class="totp-input">
             </div>
             <button type="button" class="btn" id="verifyTotpBtn">验证</button>
@@ -176,8 +176,8 @@
     <script src="/static/topImg.js" defer></script>
     <script src="/static/utils/browser.js"></script>
     <script>
-        const [totpSection, webauthnSection, backupPanel, messageDiv, tokenInput, verifyTotpBtn, backupCodeInput, submitBackupBtn,
-            retryHardwareBtn] = ['totpSection', 'webauthnSection', 'backupPanel', 'message', 'tokenInput',
+        const [totpSection, webauthnSection, backupPanel, messageDiv, totpInput, verifyTotpBtn, backupCodeInput, submitBackupBtn,
+            retryHardwareBtn] = ['totpSection', 'webauthnSection', 'backupPanel', 'message', 'totpInput',
                 'verifyTotpBtn', 'backupCodeInput', 'submitBackupBtn', 'retryHardwareBtn']
                 .map(id => document.getElementById(id)),
             urlParams = new URLSearchParams(window.location.search), method = urlParams.get('method'),
@@ -187,7 +187,7 @@
         const setMessage = msg => messageDiv.textContent = msg, clearMessage = () => messageDiv.textContent = '',
             // 禁用/启用表单控件
             setFormDisabled = disabled => {
-                const inputs = [tokenInput, backupCodeInput, verifyTotpBtn, submitBackupBtn, retryHardwareBtn];
+                const inputs = [totpInput, backupCodeInput, verifyTotpBtn, submitBackupBtn, retryHardwareBtn];
                 inputs.forEach(el => { if (el) el.disabled = disabled; });
             },
             // 显示备份码面板
@@ -197,25 +197,25 @@
                 backupCodeInput.value = '', backupCodeInput.focus();
             },
             // 统一处理验证响应（TOTP 和备份码共用）
-            handleVerifyResponse = async input => {
-                if (!input) {
+            handleVerifyResponse = async token => {
+                if (!token) {
                     setMessage('请输入验证码/备用码');
                     return false;
                 }
-                const isToken = input.length === 6, isBackup = input.length === 10;
-                if (!isToken && !isBackup) {
+                const totp = token.length === 6, isBackup = token.length === 10;
+                if (!totp && !isBackup) {
                     setMessage('验证码必须为6位数字,备用码为10位');
                     return false;
                 }
 
                 // 临时禁用提交按钮防止重复请求
-                const activeBtn = isToken ? verifyTotpBtn : submitBackupBtn;
+                const [activeInput, activeBtn] = totp ? [totpInput, verifyTotpBtn] : [backupCodeInput, submitBackupBtn];
                 activeBtn.disabled = true, clearMessage();
 
                 try {
                     const response = await fetch('/api/verify-2fa', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ input })
+                        body: JSON.stringify({ token })
                     }), data = await response.json();
 
                     if (response.ok) {
@@ -233,16 +233,10 @@
                     if (data.remainingAttempts !== undefined) {
                         const failuresSoFar = 9 - data.remainingAttempts;
                         setMessage(`${data.message} (已失败 ${failuresSoFar} 次)`);
-                        if (failuresSoFar >= maxNum && isToken) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
+                        if (failuresSoFar >= maxNum && totp) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
                     }
                     else setMessage(data.message);
-
-                    // 清空输入框,准备下次尝试
-                    tokenInput?.value = '', backupCodeInput?.value = '', activeBtn.disabled = false;
-
-                    // 判断焦点归属
-                    if (isBackup) backupCodeInput.focus();
-                    else if (isToken) tokenInput.focus();
+                    activeInput.value = '', activeInput.focus(), activeBtn.disabled = false;
                     return false;
                 } catch (err) {
                     setMessage(err.message), activeBtn.disabled = false;
@@ -250,7 +244,7 @@
                 }
             },
             // TOTP验证和备份码提交入口
-            performTotpVerification = () => handleVerifyResponse(tokenInput.value.trim()),
+            performTotpVerification = () => handleVerifyResponse(totpInput.value.trim()),
             submitBackupCode = () => handleVerifyResponse(backupCodeInput.value.trim()),
             // 硬件验证核心
             performHardwareVerification = async () => {
@@ -305,7 +299,7 @@
                 backupPanel.hidden = true;
                 if (method === 'webauthn')
                     totpSection.hidden = true, webauthnSection.hidden = false, performHardwareVerification().catch(e => console.warn(e));
-                else totpSection.hidden = false, webauthnSection.hidden = true, tokenInput.maxLength = 6, tokenInput.focus();
+                else totpSection.hidden = false, webauthnSection.hidden = true, totpInput.focus();
 
                 // 事件监听
                 submitBackupBtn.addEventListener('click', submitBackupCode);
@@ -313,10 +307,10 @@
                 backupCodeInput.addEventListener('keypress', e => {
                     if (e.key === 'Enter') submitBackupCode();
                 });
-                tokenInput.addEventListener('keypress', e => {
+                totpInput.addEventListener('keypress', e => {
                     if (e.key === 'Enter') performTotpVerification();
                 });
-                [backupCodeInput, tokenInput].forEach(el => el.addEventListener('input', clearMessage));
+                [backupCodeInput, totpInput].forEach(el => el.addEventListener('input', clearMessage));
             };
 
         initPage();
