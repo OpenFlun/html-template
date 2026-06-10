@@ -130,7 +130,7 @@ const transporter = createTransport({
                 subject = '添加验证硬件通知';
                 actionDescription = '添加了一台新的硬件验证设备';
                 break;
-            case 'backup_code_lock':  // 新增：备份码锁定
+            case 'backup_code_lock':
                 subject = '安全警报：账户临时锁定';
                 actionDescription = '连续多次输入错误的备用码,账户已被临时锁定24小时';
                 break;
@@ -277,7 +277,7 @@ export const accountRouter = app => {
     }, oneHour);
 
     // 定义安全限制和所有页面(公共页面 + 受保护页面)
-    const authLimiter = rateLimit({ windowMs: fifteenMin, max: 15, message: { message: '尝试次数过多,请稍后再试' } }),
+    const authLimiter = rateLimit({ windowMs: fifteenMin, max: 18, message: { message: '尝试次数过多,请稍后再试' } }),
         allPages = [...publicPage, '/profile'];
     allPages.forEach(page => {
         app.get(page, (req, res) => {
