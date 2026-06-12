@@ -24,9 +24,9 @@ export default {
 			app.get('/api/user', (req, res) => {
 				res.json({ message: '登录功能未启用' });
 			});
+			app.use(express.json(), express.urlencoded({ extended: true }));
 		}
-		accountRouter?.(app);
-		app.use(express.json(), express.urlencoded({ extended: true }));
+		else accountRouter(app);
 
 		// ============ 元素样式 API ============
 		let data;
