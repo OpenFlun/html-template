@@ -12,6 +12,7 @@ dist/
 package-lock.json
 logs
 *.log
+*.bat
 *.bak
 *.backup
 *.tgz

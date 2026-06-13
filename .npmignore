@@ -9,11 +9,12 @@
 node_modules/
 logs
 *.ps1
-*.log
+*.bat
 *.bak
 *.backup
 *.tgz
 *.tar.gz
+*.log
 
 customize/user.json
 dist/
