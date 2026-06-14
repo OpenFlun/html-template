@@ -7,7 +7,7 @@
     <title>个人资料 - 安全账户中心</title>
 
     <!-- 引入公共主题变量与全局样式 -->
-    <link rel="stylesheet" href="/static/constants.css" />
+    <link rel="stylesheet" href="/static/constants.css" /> <!-- 样式常量 -->
     <link rel="stylesheet" href="/static/public.css" /> <!-- 公共样式 -->
     <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
     <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
@@ -15,8 +15,7 @@
     <style>
         /* ========== 基础移动优先增强 ========== */
         body {
-            background: var(--body-bg);
-            background-color: var(--bg-color);
+            display: flex;
             padding: 40px 20px;
         }
 
@@ -97,11 +96,9 @@
             padding: 10px 20px;
             background: var(--btn-bg);
             color: var(--text-color);
-            border: none;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 500;
-            cursor: pointer;
             transition: background 0.2s, opacity 0.2s;
             margin-right: 10px;
             text-align: center;

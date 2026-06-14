@@ -17,13 +17,12 @@
 
 /* 页面主体样式 */
 body {
-	/* 回退背景色 */
+	min-height: 100vh;
 	background-color: var(--bg-color);
 	background-image: var(--body-bg);
-	font-size: 15px;
 	color: var(--text-color);
+	font-size: 15px;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	min-height: 100vh;
 	transition: background 0.5s ease, color 0.5s ease;
 }
 
