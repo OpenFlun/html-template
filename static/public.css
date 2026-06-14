@@ -1,8 +1,4 @@
-/* ================================================================ *
- * 全局元素样式
- * ================================================================ */
-
-/* 全局元素重置：清除内外边距，设置盒模型 */
+/* 全局元素重置：清除内外边距 */
 * {
 	padding: 0;
 	margin: 0;
@@ -28,8 +24,6 @@ body {
 	color: var(--text-color);
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
 	transition: background 0.5s ease, color 0.5s ease;
 }
 
@@ -117,42 +111,6 @@ input:-moz-autofill {
 	color: var(--text-color) !important;
 }
 
-/* ================================================================ *
- * 页面布局组件样式
- * ================================================================ */
-
-header {
-	position: relative;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 60px;
-	background: var(--header-bg);
-	color: var(--text-color);
-	padding: 0 24px;
-	box-shadow: var(--header-shadow);
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 20px;
-}
-
-header .home-link {
-	color: var(--header-text);
-	background: var(--header-link-bg);
-	font-weight: 500;
-	padding: 8px 12px;
-	border-radius: 6px;
-	transition: all 0.3s ease;
-	white-space: nowrap;
-}
-
-header .home-link:hover {
-	background: var(--header-link-hover-bg);
-	transform: translateY(-2px);
-	text-decoration: none;
-}
-
 /* 个人中心容器 */
 .user-center {
 	display: flex;
@@ -160,7 +118,7 @@ header .home-link:hover {
 }
 
 .user-center a {
-	background: var(--header-link-bg);
+	background: var(--link-bg);
 	border-radius: 30px;
 	padding: 8px 20px;
 	font-weight: 600;
@@ -170,119 +128,7 @@ header .home-link:hover {
 }
 
 .user-center a:hover {
-	background: var(--header-link-hover-bg);
+	background: var(--link-hover-bg);
 	transform: translateY(-2px);
-	text-decoration: none;
-}
-
-/* 主内容容器样式 */
-.container {
-	max-width: 900px;
-	margin: 40px auto;
-	padding: 30px;
-	background: var(--container-bg);
-	border-radius: 12px;
-	box-shadow: var(--container-shadow);
-	text-align: center;
-}
-
-/* 页脚样式 */
-footer {
-	background: var(--footer-bg);
-	color: var(--text-color);
-	text-align: center;
-	padding: 20px;
-	margin-top: auto;
-	font-size: 0.9em;
-}
-
-/* ================================================================ *
- * 内容元素样式
- * ================================================================ */
-
-/* 一级标题样式 */
-h1 {
-	color: var(--h1-color);
-	border-bottom: 3px solid var(--h1-border);
-	padding-bottom: 12px;
-	display: inline-block;
-	margin: 0 auto 15px;
-	font-size: 2.2rem;
-	font-weight: 700;
-}
-
-/* 二级标题样式 */
-h2 {
-	color: var(--h2-color);
-	margin-bottom: 15px;
-	font-size: 1.8rem;
-}
-
-/* 段落样式 */
-p {
-	color: var(--p-color);
-	line-height: 1.7;
-	margin: 15px 0;
-	font-size: 1.1rem;
-}
-
-/* 无序列表容器样式 */
-ul {
-	display: inline-block;
-	text-align: left;
-	padding-left: 0;
-	margin: 20px 0;
-	list-style-type: none;
-}
-
-/* 列表项样式 */
-ul li {
-	background: var(--li-bg);
-	margin: 12px 0;
-	padding: 15px 25px;
-	border-radius: 6px;
-	font-size: 1.1rem;
-	box-shadow: var(--item-shadow);
-	transition: all 0.3s ease;
-}
-
-/* 列表项悬停效果 */
-ul li:hover {
-	background: var(--li-hover);
-	transform: translateX(5px);
-}
-
-/* 通用链接样式 */
-a {
-	color: var(--link-color);
-	transition: all 0.3s ease;
-}
-
-/* 链接悬停效果 */
-a:hover {
-	color: var(--link-hover);
-	text-decoration: underline;
-}
-
-/* 按钮样式 */
-.btn {
-	display: inline-block;
-	background: var(--btn-bg);
-	color: var(--text-color);
-	padding: 12px 28px;
-	border-radius: 6px;
-	text-decoration: none;
-	margin-top: 25px;
-	font-weight: 600;
-	font-size: 1.05rem;
-	box-shadow: var(--btn-shadow);
-	transition: all 0.3s ease;
-}
-
-/* 按钮悬停效果 */
-.btn:hover {
-	background: var(--btn-hover);
-	transform: translateY(-3px);
-	box-shadow: var(--btn-shadow-hover);
 	text-decoration: none;
 }

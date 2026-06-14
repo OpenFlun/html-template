@@ -11,14 +11,14 @@
             }), data = await res.json();
 
             if (data?.username) {
-                userCenter.style.display = 'flex';
+                userCenter.hidden = false;
                 const link = userCenter.querySelector('a');
                 if (link) link.innerHTML = `👽 ${data.username}`;
                 document.dispatchEvent(new CustomEvent('userCenterReady')); // 创建并派发自定义事件,通知用户中心已准备好
             }
-            else userCenter.style.display = 'none';
+            else userCenter.hidden = true;
         } catch (err) {
-            userCenter.style.display = 'none';
+            userCenter.hidden = true;
         }
     }
 
