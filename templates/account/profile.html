@@ -7,7 +7,6 @@
     <title>个人资料 - 安全账户中心</title>
 
     <!-- 引入公共主题变量与全局样式 -->
-    <link rel="stylesheet" href="/static/constants.css" /> <!-- 样式常量 -->
     <link rel="stylesheet" href="/static/public.css" /> <!-- 公共样式 -->
     <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
     <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
@@ -318,23 +317,21 @@
 
         .device-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
             gap: 8px;
             padding: 10px 5px;
             border-bottom: 1px solid var(--content-border);
         }
 
         .device-name {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            word-break: break-word;
+            font-size: 14px;
         }
 
-        .btn-small {
-            padding: 4px 12px;
-            font-size: 12px;
+        .device-item .btn-small {
+            align-self: flex-end;
+            margin-top: 4px;
+            min-width: 80px;
         }
 
         [hidden] {
