@@ -110,6 +110,10 @@ input:-moz-autofill {
 	color: var(--text-color) !important;
 }
 
+[hidden] {
+	display: none !important;
+}
+
 /* 个人中心容器 */
 .user-center {
 	display: flex;
