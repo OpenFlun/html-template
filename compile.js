@@ -140,7 +140,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			httpServerCreation = ` server = http.createServer(app),	protocol = 'http';`;
 
 
-		// 服务器创建代码（仅赋值，不再重复声明）
+		// 服务器创建代码（仅赋值,不再重复声明）
 		let serverCreationCode;
 		if (httpsEnabled && httpsKeyPath && httpsCertPath) {
 			const safeKeyPath = JSON.stringify(httpsKeyPath), safeCertPath = JSON.stringify(httpsCertPath);
@@ -169,7 +169,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 					${declarations}
 
 				let allRoutes = [];
-				const wrapAppMethods = (app) => {
+				const wrapAppMethods = app => {
 				    const methodsToWrap = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all'];
 				    const originals = {};
 				    methodsToWrap.forEach(method => {
