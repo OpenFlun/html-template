@@ -166,7 +166,7 @@ const runCopyFiles = async (options = {}) => {
         // 添加专业支持信息
         console.log('\n✅ 专业支持:');
         console.log('✅ • 开发文档: https://www.npmjs.com/package/@flun/html-template');
-        console.log('✅ • 技术支持: cn@flun.top');
+        console.log('✅ • 技术支持: open@flun.top');
         console.log('✅ • 企业微信: https://work.weixin.qq.com/kfid/kfc44c370d4ddbac6f0');
     } catch (error) {
         const errorMsg = `❌ 复制过程中发生错误: ${error.message}`;
