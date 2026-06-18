@@ -3,7 +3,7 @@
 ### 本包基于 ESM 模块系统编写->拥抱趋势
 
 - **推荐方式**：使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
-- **兼容方式**：Node.js ≥ 23.5.0 原生支持 `require(esm)`；22.12+ 需开启 `--experimental-require-module` 标志;
+- **兼容方式**：Node.js ≥ 23.5.0 原生支持 `require(esm)`;22.12+ 需开启 `--experimental-require-module` 标志;
 - **重要**：本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为 `.mjs`;
 
 ---
@@ -172,6 +172,10 @@ node build.js
   import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
 ```
+> **文件管理**：启用时,若 `customize/account.js` 和 `templates/account/` 缺失,会自动从包内复制默认文件;停用时,会将这两个文件/目录移至项目根目录的 `account_backup/` 统一备份,避免残留导致误渲染;再次启用时,优先保留您的自定义修改,仅当缺失时才从备份恢复或复制默认模板,多次开关不会丢失定制内容;
+
+---
+
 ### 自定义打包目录
 - **编程方式**（默认输出到`dist`目录）：
 ```javascript
@@ -353,6 +357,7 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 - 支持长按元素选择设置其各种属性样式(比如:边距,颜色,字体等等);
 - 支持跳转到编辑器修改整个页面样式文件:
 > - 编辑器功能: 颜色选择 · 编辑 · 自动补全 · 代码折叠 · 预览 · 保存应用· 取消
+> **开关灵活**：您可通过 `--account` / `--no-account` 随时启用或关闭登录功能;关闭时相关文件自动迁移至 `account_backup/` 备份,启用时智能恢复,确保项目整洁且自定义内容不丢失;
 
 ### 自定义拖动元素(默认支持主题图标和返回顶部图标)
 - 登录系统额外支持编辑器和预览容器拖动

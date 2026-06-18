@@ -3,12 +3,12 @@
  *
  * 模块结构：
  * 1. 依赖导入与服务器初始化
- * 2. 服务器配置与端口管理(parseServerConfig)
+ * 2. 工具函数
  * 3. 全局CORS中间件和静态资源配置(/static路径)
  * 4. 服务器生命周期管理(printAvailablePages, startServer)
  * 5. 请求页面路由处理(自动路由与模板渲染) —— 已在 startServer 内部动态添加
  * 6. 热重载功能实现(文件监听、事件处理、服务器重启) —— setupHotReload, restartServer
- * 7. 导出接口与启动执行(module.exports , startServer)
+ * 7. 导出接口与启动执行(module.exports, startServer)
  */
 
 // ==================== 1.依赖导入与服务器初始化 ====================
@@ -31,7 +31,7 @@ let server, io, watcher, cachedPages = [], unmountMonitor = null, currentHttpsCo
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
 	app = express(), staticAbsDir = path.join(CWD, staticDir), customizeAbsDir = path.join(CWD, customizeDir),
 
-	// ==================== 工具函数 ====================
+	// ==================== 2.工具函数 ====================
 	/**
 	 * 创建带WebSocket的服务器（支持HTTP/HTTPS）
 	 * @param {Express} app Express应用
@@ -89,42 +89,96 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	},
 
 	/**
-	 * 确保登录模式所需文件存在(从包内复制缺失文件)
-	 */
-	ensureAccountFiles = async () => {
-		const userAccountJs = path.join(customizeAbsDir, 'account.js'),
-			userTemplatesAccount = path.join(CWD, templatesDir, accountDir);
-		// 检查并拷贝 customize/account.js
-		try {
-			await fsPromises.access(userAccountJs, constants.F_OK);
-		} catch {
-			console.log('检测到 account=true 但缺少 customize/account.js,正在从包内复制...');
-			const pkgCustomizeDir = path.join(__dirname, customizeDir),
-				defaultAccountJs = path.join(pkgCustomizeDir, 'account.js');
-			try {
-				await fsPromises.access(defaultAccountJs, constants.F_OK);
-				await fsPromises.mkdir(customizeAbsDir, { recursive: true });
-				await fsPromises.copyFile(defaultAccountJs, userAccountJs);
-				console.log('✅ 已复制 account.js');
-			} catch (err) {
-				console.error('❌ 默认 account.js 不存在或复制失败:', err.message);
-			}
-		}
+	* 根据启用状态同步 account 相关文件（统一备份目录）
+	* - 启用时：若主目录已有文件则保留,否则从备份恢复或复制默认
+	* - 停用时：将主目录文件移动到备份目录
+	* @param {boolean} enable - true 启用,false 停用
+	*/
+	syncAccountFiles = async (enable) => {
+		const backupRoot = path.join(CWD, 'account_bak'), jsFile = path.join(customizeAbsDir, 'account.js'),
+			jsBak = path.join(backupRoot, 'account.js'), dirAccount = path.join(CWD, templatesDir, accountDir),
+			dirBak = path.join(backupRoot, accountDir), pkgCustomizeDir = path.join(__dirname, customizeDir),
+			pkgTemplatesDir = path.join(__dirname, templatesDir);
 
-		// 检查并拷贝 templates/account 目录
-		try {
-			await fsPromises.access(userTemplatesAccount, constants.F_OK);
-		} catch {
-			console.log('检测到 account=true 但缺少 templates/account 目录,正在从包内复制...');
-			const pkgTemplatesDir = path.join(__dirname, templatesDir),
-				defaultTemplatesAccount = path.join(pkgTemplatesDir, accountDir);
+		if (enable) {
+			// 1. 处理 account.js
+			let jsExists = false;
 			try {
-				await fsPromises.access(defaultTemplatesAccount, constants.F_OK);
-				await copyDir(defaultTemplatesAccount, userTemplatesAccount);
-				console.log('✅ 已复制 templates/account 目录');
-			} catch (err) {
-				console.error('❌ 默认 templates/account 目录不存在或复制失败:', err.message);
+				await fsPromises.access(jsFile, constants.F_OK), jsExists = true;
+			} catch (_) { /* 不存在 */ }
+
+			if (!jsExists) {
+				// 尝试从备份恢复
+				let restored = false;
+				try {
+					await fsPromises.access(jsBak, constants.F_OK);
+					await fsPromises.mkdir(customizeAbsDir, { recursive: true });
+					await fsPromises.rename(jsBak, jsFile);
+					console.log('✅ 已从备份恢复 account.js'), restored = true;
+				} catch (_) { /* 备份不存在 */ }
+
+				if (!restored) {
+					// 从包内复制默认
+					console.log('检测到 account=true 但缺少 customize/account.js,正在从包内复制默认...');
+					try {
+						const defaultAccountJs = path.join(pkgCustomizeDir, 'account.js');
+						await fsPromises.access(defaultAccountJs, constants.F_OK);
+						await fsPromises.mkdir(customizeAbsDir, { recursive: true });
+						await fsPromises.copyFile(defaultAccountJs, jsFile);
+						console.log('✅ 已复制默认 account.js');
+					} catch (err) {
+						console.error('❌ 默认 account.js 不存在或复制失败:', err.message);
+					}
+				}
 			}
+
+			// 2. 处理 templates/account 目录
+			let dirExists = false;
+			try {
+				await fsPromises.access(dirAccount, constants.F_OK), dirExists = true;
+			} catch (_) { /* 不存在 */ }
+
+			if (!dirExists) {
+				let dirRestored = false;
+				try {
+					await fsPromises.access(dirBak, constants.F_OK);
+					await fsPromises.rename(dirBak, dirAccount);
+					console.log('✅ 已从备份恢复 templates/account 目录'), dirRestored = true;
+				} catch (_) { /* 备份不存在 */ }
+
+				if (!dirRestored) {
+					console.log('检测到 account=true 但缺少 templates/account 目录,正在从包内复制默认...');
+					try {
+						const defaultTemplatesAccount = path.join(pkgTemplatesDir, accountDir);
+						await fsPromises.access(defaultTemplatesAccount, constants.F_OK);
+						await copyDir(defaultTemplatesAccount, dirAccount);
+						console.log('✅ 已复制默认 templates/account 目录');
+					} catch (err) {
+						console.error('❌ 默认 templates/account 目录不存在或复制失败:', err.message);
+					}
+				}
+			}
+
+		} else {
+			// 1. 备份 account.js
+			try {
+				await fsPromises.access(jsFile, constants.F_OK);
+				if (await fsPromises.access(jsBak, constants.F_OK).then(() => true).catch(() => false))
+					await fsPromises.unlink(jsBak);
+				await fsPromises.mkdir(backupRoot, { recursive: true });
+				await fsPromises.rename(jsFile, jsBak);
+				console.log('📦 已备份 account.js 到 account_backup');
+			} catch (_) { /* 文件不存在,无需备份 */ }
+
+			// 2. 备份 templates/account 目录
+			try {
+				await fsPromises.access(dirAccount, constants.F_OK);
+				if (await fsPromises.access(dirBak, constants.F_OK).then(() => true).catch(() => false))
+					await fsPromises.rm(dirBak, { recursive: true, force: true });
+				await fsPromises.mkdir(backupRoot, { recursive: true });
+				await fsPromises.rename(dirAccount, dirBak);
+				console.log('📦 已备份 templates/account 目录到 account_backup');
+			} catch (_) { /* 目录不存在,无需备份 */ }
 		}
 	};
 
@@ -150,7 +204,7 @@ const printAvailablePages = (pages, port, hotReload, useHttps, host) => {
 
 	if (useHttps && (host === 'localhost' || host === '127.0.0.1')) {
 		console.warn('⚠️  警告: 使用 HTTPS 访问 localhost 会导致浏览器证书安全警告（自签名证书或证书域名不匹配）');
-		console.warn('   请使用 --host 参数指定与证书 CN/SAN 匹配的域名，例如: --host www.abc.com');
+		console.warn('   请使用 --host 参数指定与证书 CN/SAN 匹配的域名,例如: --host www.abc.com');
 	}
 
 	console.log('\n可访问页面:');
@@ -190,8 +244,7 @@ const startServer = async (options = {}) => {
 		currentHttpsConfig = { https: httpsEnabled, keyPath: httpsKeyPath, certPath: httpsCertPath };
 		currentHost = host;
 
-		if (account) await ensureAccountFiles();
-		await loadUserFeatures(app);
+		await syncAccountFiles(account), await loadUserFeatures(app);
 		cachedPages = await getAvailableTemplates();
 
 		// 核心模板渲染中间件
@@ -224,7 +277,7 @@ const startServer = async (options = {}) => {
 		printAvailablePages(cachedPages, port, hotReload, httpsEnabled, host);
 
 		server.listen(port, () => {
-			console.log(`服务器运行中，按 Ctrl+C 退出`), console.log('-----------------------------------');
+			console.log(`服务器运行中,按 Ctrl+C 退出`), console.log('-----------------------------------');
 		});
 		return port;
 	} catch (error) {
