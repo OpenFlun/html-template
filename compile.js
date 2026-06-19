@@ -83,7 +83,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			type: 'module', main: 'server.js',
 			scripts: { dev: 'node server.js' },
 			dependencies: mergedDeps,
-			overrides: { 'fast-xml-parser': '^5.8.0' }
+			overrides: { 'fast-xml-parser': '^5.9.3' }
 		};
 		return JSON.stringify(finalPkg, null, 2);
 	},
