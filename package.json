@@ -55,9 +55,9 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
-    "@flun/env": "*",
-    "@flun/mailer": "*",
-    "@flun/webauthn-server": "*",
+    "@flun/env": "^3.1.21",
+    "@flun/mailer": "^2.1.19",
+    "@flun/webauthn-server": "^2.0.28",
     "mysql2": "^3.22.5",
     "otplib": "^13.4.1",
     "qrcode": "^1.5.4",
@@ -69,9 +69,5 @@
   "devDependencies": {
     "nodemon": "^3.1.14"
   },
-  "scripts": {
-    "dev": "node dev-server.js",
-    "build": "node compile.js",
-    "postinstall": "node copy-files.js 2>&1"
-  }
+  "scripts": {}
 }
