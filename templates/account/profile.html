@@ -1014,7 +1014,7 @@
                         true);
                     if (!beginResult.ok) return false;
 
-                    showMessage(webauthnMessage, null, "认证硬件添加中...");
+                    showMessage(webauthnMessage, null, "⏳添加中...");
                     const options = beginResult.data,
                         attResp = await flunWebAuthnBrowser.startRegistration({ optionsJSON: options }),
                         completeResult = await requestApi('/api/webauthn/register/complete', {

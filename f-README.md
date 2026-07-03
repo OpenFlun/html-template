@@ -72,6 +72,7 @@ npm i @flun/html-template # 简写
 npm i -g @flun/html-template # 简写
 
 # flun其它npm家族安装包:
+npm i @flun/desktop-builder  # 将 Node.js 网站一键打包为当前桌面应用
 npm i @flun/dns-auto-ssl     # https证书申请及配置自动续期
 npm i @flun/env              # .env 文件的环境变量调用
 npm i @flun/mailer           # 邮件发送
