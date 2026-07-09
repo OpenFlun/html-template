@@ -281,8 +281,7 @@ const compileAllTemplates = async (options = {}) => {
 		const configFile = path.join(CWD, '.dev-config.json');
 		try {
 			const content = await fsPromises.readFile(configFile, 'utf8');
-			defaults = JSON.parse(content);
-			console.log('📋 已读取上次开发配置作为默认值');
+			defaults = JSON.parse(content), console.log('📋 已读取上次开发配置作为默认值');
 		} catch (err) {
 			if (err.code !== 'ENOENT') console.warn('⚠️ 读取开发配置失败:', err.message);
 		}

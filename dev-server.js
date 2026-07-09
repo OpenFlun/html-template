@@ -52,8 +52,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				serverInstance = https.createServer({ key, cert }, app);
 				console.log(`🔒 证书加载成功,HTTPS已启用`);
 			} catch (err) {
-				console.error(`❌ HTTPS证书加载失败: ${err.message}`);
-				process.exit(1);
+				console.error(`❌ HTTPS证书加载失败: ${err.message}`), process.exit(1);
 			}
 		}
 		else serverInstance = http.createServer(app);
@@ -94,7 +93,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	* - 停用时：将主目录文件移动到备份目录
 	* @param {boolean} enable - true 启用,false 停用
 	*/
-	syncAccountFiles = async (enable) => {
+	syncAccountFiles = async enable => {
 		const backupRoot = path.join(CWD, 'account_bak'), jsFile = path.join(customizeAbsDir, 'account.js'),
 			jsBak = path.join(backupRoot, 'account.js'), dirAccount = path.join(CWD, templatesDir, accountDir),
 			dirBak = path.join(backupRoot, accountDir), pkgCustomizeDir = path.join(__dirname, customizeDir),
@@ -240,11 +239,8 @@ const startServer = async (options = {}) => {
 				port, host, https: httpsEnabled, httpsKey: httpsKeyPath, httpsCert: httpsCertPath
 			};
 		await fsPromises.writeFile(path.join(CWD, '.dev-config.json'), JSON.stringify(configToSave, null, 2), 'utf8');
-
 		currentHttpsConfig = { https: httpsEnabled, keyPath: httpsKeyPath, certPath: httpsCertPath };
-		currentHost = host;
-
-		await syncAccountFiles(account), await loadUserFeatures(app);
+		currentHost = host, await syncAccountFiles(account), await loadUserFeatures(app);
 		cachedPages = await getAvailableTemplates();
 
 		// 核心模板渲染中间件
@@ -265,8 +261,7 @@ const startServer = async (options = {}) => {
 				}
 				next();
 			} catch (error) {
-				console.error(`处理请求时出错: ${error.message}`, error.stack);
-				next(error);
+				console.error(`处理请求时出错: ${error.message}`, error.stack), next(error);
 			}
 		});
 
@@ -281,8 +276,7 @@ const startServer = async (options = {}) => {
 		});
 		return port;
 	} catch (error) {
-		console.error('服务器启动失败:', error.message);
-		process.exit(1);
+		console.error('服务器启动失败:', error.message), process.exit(1);
 	}
 },
 

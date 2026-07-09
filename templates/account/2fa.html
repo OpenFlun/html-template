@@ -190,15 +190,9 @@
             },
             // 统一处理验证响应（TOTP 和备份码共用）
             handleVerifyResponse = async token => {
-                if (!token) {
-                    setMessage('请输入验证码/备用码');
-                    return false;
-                }
+                if (!token) return setMessage('请输入验证码/备用码'), false;
                 const totp = token.length === 6, isBackup = token.length === 10;
-                if (!totp && !isBackup) {
-                    setMessage('验证码必须为6位数字,备用码为10位');
-                    return false;
-                }
+                if (!totp && !isBackup) return setMessage('验证码必须为6位数字,备用码为10位'), false;
 
                 // 临时禁用提交按钮防止重复请求
                 const [activeInput, activeBtn] = totp ? [totpInput, verifyTotpBtn] : [backupCodeInput, submitBackupBtn];
@@ -210,17 +204,9 @@
                         body: JSON.stringify({ token })
                     }), data = await response.json();
 
-                    if (response.ok) {
-                        window.location.href = '/';
-                        return true;
-                    }
-
+                    if (response.ok) return window.location.href = '/', true;
                     // 处理锁定情况
-                    if (data.locked) {
-                        setMessage(data.message), setFormDisabled(true);
-                        return false;
-                    }
-
+                    if (data.locked) return setMessage(data.message), setFormDisabled(true), false;
                     // 处理普通失败（包含 remainingAttempts）
                     if (data.remainingAttempts !== undefined) {
                         const failuresSoFar = 9 - data.remainingAttempts;
@@ -228,11 +214,9 @@
                         if (failuresSoFar >= maxNum && totp) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
                     }
                     else setMessage(data.message);
-                    activeInput.value = '', activeInput.focus(), activeBtn.disabled = false;
-                    return false;
+                    return activeInput.value = '', activeInput.focus(), activeBtn.disabled = false, false;
                 } catch (err) {
-                    setMessage(err.message), activeBtn.disabled = false;
-                    return false;
+                    return setMessage(err.message), activeBtn.disabled = false, false;
                 }
             },
             // TOTP验证和备份码提交入口
@@ -240,14 +224,9 @@
             submitBackupCode = () => handleVerifyResponse(backupCodeInput.value.trim()),
             // 硬件验证核心
             performHardwareVerification = async () => {
-                if (!window.PublicKeyCredential) {
-                    showBackupPanel('当前浏览器不支持硬件安全验证,请使用备用码登录');
-                    return false;
-                }
-                if (!currentUsername) {
-                    showBackupPanel('无法获取用户身份,请使用备用码登录');
-                    return false;
-                }
+                if (!window.PublicKeyCredential)
+                    return showBackupPanel('当前浏览器不支持硬件安全验证,请使用备用码登录'), false;
+                if (!currentUsername) return showBackupPanel('无法获取用户身份,请使用备用码登录'), false;
                 if (retryHardwareBtn && !retryHardwareBtn.hasListener)
                     retryHardwareBtn.addEventListener('click', () => performHardwareVerification()), retryHardwareBtn.hasListener = true;
                 if (hardwareRunning) return false;
@@ -274,16 +253,12 @@
                             body: JSON.stringify({ assertionResponse: assertionResp })
                         }), completeData = await completeRes.json();
 
-                    if (completeRes.ok) {
-                        window.location.href = '/';
-                        return true;
-                    }
+                    if (completeRes.ok) return window.location.href = '/', true;
                     else throw new Error(completeData.message);
                 } catch (err) {
                     let errorMsg = err.message;
                     if (err.name === 'NotAllowedError') errorMsg = '硬件验证已取消';
-                    showBackupPanel(`${errorMsg},请使用备用码登录`);
-                    return false;
+                    return showBackupPanel(`${errorMsg},请使用备用码登录`), false;
                 } finally { hardwareRunning = false }
             },
             // 页面初始化

@@ -64,8 +64,7 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 	 * @returns {RegExp} 重置后的正则表达式
 	 */
 	_resetRegex = regex => {
-		regex.lastIndex = 0;
-		return regex;
+		return regex.lastIndex = 0, regex;
 	},
 
 	/**
@@ -99,11 +98,9 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 			try {
 				return JSON.stringify(value);
 			} catch (error) {
-				console.warn('对象转字符串失败:', error.message);
-				return '';
+				return console.warn('对象转字符串失败:', error.message), '';
 			}
 		}
-
 		return String(value);
 	},
 
@@ -311,9 +308,7 @@ const findEntryFile = async cachedPages => {
 	 * @param {string} html - 模板内容
 	 * @returns {string} 清理后的纯净HTML
 	 */
-	_cleanTemplateTags = html => {
-		return html.replace(_resetRegex(templateTagRegex), '');
-	};
+	_cleanTemplateTags = html => html.replace(_resetRegex(templateTagRegex), '');
 
 // ==================== 3. 包含文件处理 ====================
 /**
@@ -331,9 +326,7 @@ const setCompilationMode = mode => {
  * >查看定义:@see {@link getIncludedFiles}
  * @returns {Set<string>} 包含文件路径集合
  */
-const getIncludedFiles = () => {
-	return new Set(includedFiles);
-};
+const getIncludedFiles = () => new Set(includedFiles);
 
 /**
  * 递归处理模板中的包含指令
@@ -428,22 +421,19 @@ const monitorFileWrites = () => {
 	// 劫持同步写入
 	fs.writeFileSync = (file, ...args) => {
 		const r = sWrite.call(fs, file, ...args);
-		process.nextTick(track, file);
-		return r;
+		return process.nextTick(track, file), r;
 	};
 
 	// 劫持异步写入（回调版）
 	fs.writeFile = (file, ...args) => {
 		const r = fWrite.call(fs, file, ...args);
-		process.nextTick(track, file);
-		return r;
+		return process.nextTick(track, file), r;
 	};
 
 	// 劫持 Promise 版写入
 	fsPromises.writeFile = (file, ...args) => {
 		const r = pWrite.call(fsPromises, file, ...args);
-		process.nextTick(track, file);
-		return r;
+		return process.nextTick(track, file), r;
 	};
 
 	// 停止监控
@@ -471,8 +461,7 @@ const monitorFileWrites = () => {
 			if (d && typeof d === 'object' && hasUserFeature) return d;
 			return mod;
 		} catch (error) {
-			console.error(`加载模块失败: ${modulePath}`, error.message);
-			return null;
+			return console.error(`加载模块失败: ${modulePath}`, error.message), null;
 		}
 	};
 
@@ -545,8 +534,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 		const tagsToCheck = [forRegex, forKeyValueRegex, IfRegex, userFuncRegex, expressionRegex, objectPropertyRegex];
 
 		return tagsToCheck.some(regex => {
-			_resetRegex(regex);
-			return regex.test(content);
+			return _resetRegex(regex), regex.test(content);
 		});
 	},
 
@@ -569,10 +557,8 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 		const processLoop = (itemNames, collectionName, loopContent, emptyContent, variables) => {
 			const namesArray = Array.isArray(itemNames) ? itemNames : [itemNames];
 
-			if (namesArray.some(name => unsafeKeys.includes(name))) {
-				console.warn(`检测到不安全的循环变量名: ${namesArray.join(', ')}`);
-				return '';
-			}
+			if (namesArray.some(name => unsafeKeys.includes(name)))
+				return console.warn(`检测到不安全的循环变量名: ${namesArray.join(', ')}`), '';
 
 			try {
 				const collection = _evaluateExpression(collectionName, variables),
@@ -607,8 +593,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 
 				return loopResult;
 			} catch (error) {
-				console.error(`处理循环时出错: ${collectionName}`, error.message);
-				return '';
+				return console.error(`处理循环时出错: ${collectionName}`, error.message), '';
 			}
 		}
 
@@ -656,8 +641,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 
 					return elseContent || ''; // 处理 else 分支
 				} catch (error) {
-					console.error(`处理条件判断时出错: ${ifCondition}`, error.message);
-					return '';
+					return console.error(`处理条件判断时出错: ${ifCondition}`, error.message), '';
 				}
 			});
 		}
@@ -676,8 +660,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 			if (!userFeatures.functions[funcName]) throw new Error(`找不到函数: ${funcName}`);
 			return userFeatures.functions[funcName](...args);
 		} catch (error) {
-			console.error(`执行用户函数 ${funcName} 时出错:`, error.message);
-			return null;
+			return console.error(`执行用户函数 ${funcName} 时出错:`, error.message), null;
 		}
 	},
 
@@ -700,11 +683,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 			(_match, funcCall, argsStr) => {
 				try {
 					// 检查函数名安全性
-					if (unsafeKeys.includes(funcCall)) {
-						console.warn(`检测到不安全的函数名: ${funcCall}`);
-						return '';
-					}
-
+					if (unsafeKeys.includes(funcCall)) return console.warn(`检测到不安全的函数名: ${funcCall}`), '';
 					const cleanedArgs = argsStr.split(',')
 						.map(arg => arg.trim()).filter(arg => arg !== '')
 						.map(arg => {
@@ -716,10 +695,8 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 							const varMatch = arg.match(/\{\{(\w+)\}\}/);
 							if (varMatch) {
 								const varName = varMatch[1];
-								if (unsafeKeys.includes(varName)) {
-									console.warn(`检测到不安全的变量名: ${varName}`);
-									return undefined;
-								}
+								if (unsafeKeys.includes(varName))
+									return console.warn(`检测到不安全的变量名: ${varName}`), undefined;
 								if (variables[varName] !== undefined) return variables[varName];
 							}
 
@@ -731,18 +708,14 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 							if (!isNaN(Number(arg))) return Number(arg);
 
 							// 安全性检查
-							if (unsafeKeys.includes(arg)) {
-								console.warn(`检测到不安全的变量名: ${arg}`);
-								return undefined;
-							}
+							if (unsafeKeys.includes(arg)) return console.warn(`检测到不安全的变量名: ${arg}`), undefined;
 							return variables[arg] !== undefined ? variables[arg] : arg;
 						}).filter(arg => arg !== undefined); // 过滤掉不安全的值
 
 					const funcResult = _executeUserFunction(funcCall, ...cleanedArgs);
 					return _safeToString(funcResult);
 				} catch (error) {
-					console.error(`处理用户函数调用 ${funcCall} 时出错:`, error.message);
-					return '';
+					return console.error(`处理用户函数调用 ${funcCall} 时出错:`, error.message), '';
 				}
 			});
 	},
@@ -818,8 +791,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 
 			return result;
 		} catch (error) {
-			console.error(`表达式求值失败: ${expr}`, error.message);
-			return null;
+			return console.error(`表达式求值失败: ${expr}`, error.message), null;
 		}
 	},
 
@@ -853,8 +825,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 				const value = _getValueByPath(variables, path);
 				return _safeToString(value);
 			} catch (error) {
-				console.warn(`处理对象属性访问 ${path} 时出错:`, error.message);
-				return '';
+				return console.warn(`处理对象属性访问 ${path} 时出错:`, error.message), '';
 			}
 		});
 
@@ -865,7 +836,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 				const stringValue = _safeToString(value), regex = new RegExp(`{{\\s*${_escapeRegExp(key)}\\s*}}`, 'g');
 				result = result.replace(regex, stringValue);
 			} catch (error) {
-				console.warn(`处理变量 ${key} 时出错:`, error.message);
+				return console.warn(`处理变量 ${key} 时出错:`, error.message), '';
 			}
 		});
 
@@ -885,8 +856,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 				const value = _evaluateExpression(expression.trim(), variables);
 				return _safeToString(value);
 			} catch (error) {
-				console.warn(`表达式求值失败: ${expression}`, error.message);
-				return '';
+				return console.warn(`表达式求值失败: ${expression}`, error.message), '';
 			}
 		});
 

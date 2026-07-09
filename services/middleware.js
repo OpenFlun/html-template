@@ -18,10 +18,7 @@ const corsMiddleware = (req, res, next) => {
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
 
-    if (req.method === 'OPTIONS') {
-        res.setHeader('Content-Length', '0');
-        return res.status(204).end();
-    }
+    if (req.method === 'OPTIONS') return res.setHeader('Content-Length', '0'), res.status(204).end();
     next();
 };
 

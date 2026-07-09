@@ -210,7 +210,6 @@ const readUsers = () => {
         if (!fs.existsSync(sessionsDir)) fs.mkdirSync(sessionsDir, { recursive: true });
 
         const sessionStore = new SimpleFileStore(sessionsDir), oneHour = 3600000, fifteenMin = 900000;
-
         // 定期清理超过 30 天的 session 文件(每天执行一次)
         setInterval(() => {
             const now = Date.now();
@@ -775,7 +774,7 @@ const readUsers = () => {
                 const webauthnCredential = {
                     id: credential.id,
                     publicKey: toBuffer(credential.publicKey),
-                    counter: Number(credential.counter),
+                    counter: Number(credential.counter)
                 },
                     verification = await verifyAuthenticationResponse({
                         response: assertionResponse,
@@ -783,7 +782,7 @@ const readUsers = () => {
                         expectedOrigin: webauthnOrigin,
                         expectedRPID: webauthnRpID,
                         credential: webauthnCredential,
-                        requireUserVerification: false,
+                        requireUserVerification: false
                     }), { verified, authenticationInfo } = verification;
                 if (!verified) return res.status(400).json({ message: '签名验证失败' });
 

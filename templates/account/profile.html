@@ -1027,10 +1027,8 @@
                     setTimeout(() => hideMessage(webauthnMessage), 3600), await loadUser(), await loadWebAuthnData();
                     return true;
                 } catch (err) {
-                    if (err.name === 'AbortError' || err.name === 'NotAllowedError') {
-                        hideMessage(webauthnMessage);
-                        return false;
-                    }
+                    if (err.name === 'AbortError' || err.name === 'NotAllowedError')
+                        return hideMessage(webauthnMessage), false;
                     showMessage(webauthnMessage, 'error', '添加失败：' + (err.message));
                     return false;
                 }
@@ -1155,12 +1153,12 @@
                 .map(input => input.value.trim());
 
             if (!current || !newPwd || !confirm) return showMessage(changePasswordMessage, 'error', '请填写所有字段 ');
-            if (newPwd.length < 6) return showMessage(changePasswordMessage, 'error', '新密码至少6位'); if (newPwd !== confirm)
-                return showMessage(changePasswordMessage, 'error', '两次密码不一致'); const { ok } = await
-                    requestApi('/api/change-password', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body:
-                            JSON.stringify({ currentPassword: current, newPassword: newPwd })
-                    }, changePasswordMessage, changePasswordBtn);
+            if (newPwd.length < 6) return showMessage(changePasswordMessage, 'error', '新密码至少6位');
+            if (newPwd !== confirm) return showMessage(changePasswordMessage, 'error', '两次密码不一致');
+            const { ok } = await requestApi('/api/change-password', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
+            }, changePasswordMessage, changePasswordBtn);
             if (ok) setTimeout(() => (closeChangePasswordCard(), window.location.href = '/login'), 1000);
         });
 

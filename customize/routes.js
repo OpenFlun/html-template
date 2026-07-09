@@ -21,9 +21,7 @@ try {
 export default {
 	setupRoutes: app => {
 		if (!accountRouter) {
-			app.get('/api/user', (req, res) => {
-				res.json({ message: '登录功能未启用' });
-			});
+			app.get('/api/user', (req, res) => res.json({ message: '登录功能未启用' }));
 			app.use(express.json(), express.urlencoded({ extended: true }));
 		}
 		else accountRouter(app);
@@ -37,7 +35,7 @@ export default {
 		}
 
 		const elements = ['topImg', 'themeImg', 'longPic'],
-			getElementStyle = (elementKey) => {
+			getElementStyle = elementKey => {
 				return (req, res) => {
 					try {
 						res.json(data[elementKey] || {});
@@ -47,7 +45,7 @@ export default {
 					}
 				};
 			},
-			updateElementStyle = (elementKey) => {
+			updateElementStyle = elementKey => {
 				return (req, res) => {
 					try {
 						const devViewSize = Object.keys(req.body)[0];
@@ -94,8 +92,7 @@ export default {
 
 			try {
 				const normalizedPath = fileDir.startsWith('/') ? fileDir.slice(1) : fileDir,
-					filePath = path.resolve(normalizedPath),
-					dir = path.dirname(filePath);
+					filePath = path.resolve(normalizedPath), dir = path.dirname(filePath);
 				if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 				fs.writeFileSync(filePath, content, 'utf8');
 				res.json({ success: true, message: 'CSS 已保存' });
@@ -120,21 +117,13 @@ export default {
 		console.log('✅ 非认证路由加载完成（routes.js）');
 
 		// ============ 其它自定义API路由 ============
-		app.get('/api/greeting', (req, res) => {
-			res.json({ message: '你好！这是来自用户自定义路由的问候！' });
-		});
-
-		app.get('/api/hi/:name', (req, res) => {
+		app.get('/api/greeting', (req, res) => res.json({ message: '你好！这是来自用户自定义路由的问候！' }));
+		app.get('/api/hi/:name', (req, res) =>
 			res.json({
-				message: `你好, ${req.params.name}!`, timestamp: new Date().toLocaleString('zh-CN'),
-			});
-		});
-
-		app.post('/api/contact', (req, res) => {
-			res.json({
-				success: true, message: '感谢您的留言！',
-			});
-		});
+				message: `你好, ${req.params.name}!`, timestamp: new Date().toLocaleString('zh-CN')
+			})
+		);
+		app.post('/api/contact', (req, res) => res.json({ success: true, message: '感谢您的留言！' }));
 
 		console.log('✅ 自定义路由已加载！');
 	},
