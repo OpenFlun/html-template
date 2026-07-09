@@ -12,7 +12,6 @@ import { fromBuffer, toBuffer } from '@flun/webauthn-server/helpers';
 import { randomBytes } from 'crypto';
 import { hashSync, hash, compare } from 'bcrypt';
 import { toDataURL } from 'qrcode';
-import { EventEmitter } from 'events';
 import session from 'express-session';
 import { rateLimit } from 'express-rate-limit';
 import { generateSecret, verify, generateURI } from 'otplib';

@@ -83,7 +83,12 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			type: 'module', main: 'server.js',
 			scripts: { dev: 'node server.js' },
 			dependencies: mergedDeps,
-			overrides: { 'fast-xml-parser': '^5.9.3' }
+			overrides: { 'fast-xml-parser': '^5.9.3' },
+			allowScripts: {
+				"node": true, "bcrypt": true, "electron-winstaller": true,
+				"@flun/desktop-builder": true, "@flun/webauthn-server": true,
+				"@flun/env": true, "@flun/mailer": true
+			}
 		};
 		return JSON.stringify(finalPkg, null, 2);
 	},
@@ -226,8 +231,8 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    ${serverCreationCode}
 				    server.listen(port, host, () => {
 				        console.log(\`\\n🚀 服务已启动: \${protocol}://\${host}:\${port}\`);
-				        console.log('📡 路由监控:');
 				        printRoutes();
+						console.log('按 Ctrl+C 停止服务器');
 				    });
 				};
 				start();`;
@@ -243,6 +248,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			server.listen(port, host, () => {
 			    console.log(\`\\n🚀 静态服务器已启动: \${protocol}://\${host}:\${port}\`);
 			    console.log('📁 当前仅提供静态文件服务（未检测到用户路由）');
+				console.log('按 Ctrl+C 停止服务器');
 			});`;
 	},
 

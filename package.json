@@ -58,7 +58,6 @@
     "@flun/env": "*",
     "@flun/mailer": "*",
     "@flun/webauthn-server": "*",
-    "mysql2": "^3.22.5",
     "otplib": "^13.4.1",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.3"
