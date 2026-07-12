@@ -16,12 +16,49 @@
         /* ========== 基础移动优先增强 ========== */
         body {
             display: flex;
-            padding: 40px 20px;
+            flex-direction: column;
+        }
+
+        header {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--header-bg);
+            color: var(--text-color);
+            padding: 0 24px;
+            box-shadow: var(--header-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+
+        header .home-link {
+            color: var(--header-text);
+            background: var(--link-bg);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        header .home-link:hover {
+            background: var(--link-hover-bg);
+            transform: translateY(-2px);
+            text-decoration: none;
         }
 
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: var(--container-shadow);
+            text-align: center;
         }
 
         /* 卡片 */
@@ -584,6 +621,9 @@
 </head>
 
 <body>
+    <header>
+        <button type="button" class="home-link" onclick="history.back()">← 返回</button>
+    </header>
     <div class="container">
         <!-- 资料卡片 -->
         <div class="card">
@@ -821,7 +861,6 @@
                     if (isEmailPollingActive) stopEmailPolling(), timeoutCallback?.();
                 }, 900000);
             },
-
             // 全局 UI
             refreshMFAUI = () => {
                 const is2faEnabled = currentUser?.twoFactorEnabled, isWebAuthnEnabled = currentUser?.webauthnEnabled;
@@ -858,7 +897,6 @@
                 const infoPara = document.querySelector('#backupCodesPanel .info');
                 if (infoPara) infoPara.classList.remove('info-border-flow');
             },
-
             // 页面入口
             loadUser = async () => {
                 try {
@@ -872,10 +910,9 @@
                     createdAtEl.textContent = new Date(createdAt).toLocaleString();
                     await Promise.all([refreshMFAUI(), loadWebAuthnData()]), updateDeleteBackupButton();
                 } catch (err) {
-                    alert('加载用户信息失败,请刷新页面重试');
+                    alert(`加载用户信息失败:${err}`);
                 }
             },
-
             // 个人资料模块
             resetEditProfileForm = () => {
                 profileCurrentPasswordInput.value = '', newUsernameInput.value = currentUser?.username;
@@ -916,8 +953,7 @@
                 if (codes?.length === 0) {
                     backupCodesPanel.hidden = true, latestBackupCodes = [];
                     if (currentUser) currentUser.hasBackupCodes = false;
-                    updateDeleteBackupButton(), syncBackupButtonState();
-                    return;
+                    return updateDeleteBackupButton(), syncBackupButtonState();
                 }
                 backupCodesList.innerHTML = '', latestBackupCodes = [...codes];
                 if (currentUser) currentUser.hasBackupCodes = true;
@@ -1010,10 +1046,10 @@
             },
             addWebAuthnDevice = async () => {
                 try {
-                    const beginResult = await requestApi('/api/webauthn/register/begin', { method: 'POST' }, webauthnMessage, null,
-                        true);
-                    if (!beginResult.ok) return false;
+                    const beginResult = await requestApi('/api/webauthn/register/begin', { method: 'POST' },
+                        webauthnMessage, null, true);
 
+                    if (!beginResult.ok) return false;
                     showMessage(webauthnMessage, null, "⏳添加中...");
                     const options = beginResult.data,
                         attResp = await flunWebAuthnBrowser.startRegistration({ optionsJSON: options }),
@@ -1254,7 +1290,7 @@
             else alert('退出失败,请重试');
         });
 
-        // ==================== 辅助：回车提交 & 自动清除消息 ====================
+        // 回车提交 & 自动清除消息
         const enterHandlers = [
             { input: profileCurrentPasswordInput, button: updateProfileBtn },
             { input: confirmPasswordInput, button: changePasswordBtn },
