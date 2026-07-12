@@ -101,8 +101,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			if (stderr) console.error(stderr);
 			console.log('✅ 依赖安装完成');
 		} catch (error) {
-			console.error('❌ 依赖安装失败:', error.message);
-			console.log('💡 请手动进入目标目录执行 npm install');
+			console.error('❌ 依赖安装失败:', error.message), console.log('💡 请手动进入目标目录执行 npm install');
 		}
 	},
 
@@ -126,15 +125,13 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			import { corsMiddleware, trustProxySetting } from './middleware.js';`,
 
 			// 变量声明
-			declarations = `const __filename = fileURLToPath(import.meta.url),
-			 __dirname = path.dirname(__filename), app = express(), port = ${port}, host = ${JSON.stringify(host)};
-			let server, protocol = 'http';`,
+			declarations = `let server, protocol = 'http';
+			const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
+			app = express(), port = ${port}, host = ${JSON.stringify(host)}
+			`,
 
 			// 公共中间件
-			corsAndSecurity = `
-			app.use(corsMiddleware);
-			app.set('trust proxy', trustProxySetting);`,
-
+			corsAndSecurity = `app.use(corsMiddleware),app.set('trust proxy', trustProxySetting)`,
 			// 静态文件服务
 			staticMiddleware = `
 			app.use('/static', express.static(path.join(__dirname, '${staticDir}')));
@@ -143,8 +140,6 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			// 默认根路由
 			defaultRootRoute = `app.get('/', (req, res) => res.redirect('/${entryFile}'));`,
 			httpServerCreation = ` server = http.createServer(app),	protocol = 'http';`;
-
-
 		// 服务器创建代码（仅赋值,不再重复声明）
 		let serverCreationCode;
 		if (httpsEnabled && httpsKeyPath && httpsCertPath) {
@@ -171,21 +166,18 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 		// 有用户路由时
 		if (hasUserRoutes) {
 			return `${baseImports}
-					${declarations}
-
-				let allRoutes = [];
+					${declarations},allRoutes = [];
 				const wrapAppMethods = app => {
-				    const methodsToWrap = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all'];
-				    const originals = {};
+				    const methodsToWrap = ['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all'],
+				    originals = {};
 				    methodsToWrap.forEach(method => {
 				        originals[method] = app[method].bind(app);
-				        app[method] = function(routePath, ...handlers) {
+				        app[method] = (routePath, ...handlers)=> {
 				            allRoutes.push({ method: method.toUpperCase(), path: routePath });
 				            return originals[method](routePath, ...handlers);
 				        };
 				    });
 				};
-				wrapAppMethods(app);
 
 				const printRoutes = () => {
 				    if (allRoutes.length) {
@@ -221,8 +213,6 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    }
 				};
 
-				${corsAndSecurity}
-
 				const start = async () => {
 				    await loadUserRoutes();
 				    ${staticMiddleware}
@@ -235,13 +225,13 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 						console.log('按 Ctrl+C 停止服务器');
 				    });
 				};
-				start();`;
+				wrapAppMethods(app),${corsAndSecurity},start();`;
 		}
 
 		// 无用户路由（纯静态服务器）
 		return `${baseImports}
-			${declarations}
-			${corsAndSecurity}
+			${declarations};
+			${corsAndSecurity};
 			${staticMiddleware}
 			${defaultRootRoute}
 			${serverCreationCode}

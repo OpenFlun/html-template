@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
 
     <style>
-        /* ========== 基础移动优先增强 ========== */
         body {
             display: flex;
             flex-direction: column;
@@ -417,7 +416,7 @@
             }
         }
 
-        /* ==================== 移动端样式适配 (≤640px) ==================== */
+        /* 移动端样式适配 (≤640px) */
         @media (max-width: 640px) {
             body {
                 padding: 16px 12px;
@@ -717,7 +716,7 @@
                 <button type="button" class="btn" id="toggle2faBtn">启用2FA</button>
             </h2>
 
-            <div id="enable2faPanel" hidden style="margin-top: 16px;">
+            <div id="enable2faPanel" hidden style="margin-top:16px;">
                 <form onsubmit="return false;" class="form-group">
                     <p>请使用 Google Authenticator 或类似应用扫描二维码添加认证：</p>
                     <div class="qr-placeholder">
@@ -746,10 +745,6 @@
             <div id="webauthnMessage" class="message" hidden></div>
             <div id="manageWebAuthnPanel" class="webauthn-panel" hidden>
                 <ul id="webauthnDeviceList" class="device-list"></ul>
-                <li id="deviceItemExample" class="device-item" hidden>
-                    <span class="device-name"></span>
-                    <button type="button" class="btn btn-danger btn-small">删除</button>
-                </li>
                 <button type="button" class="btn btn-outline" id="manageAddDeviceBtn">➕ 添加新设备</button>
             </div>
         </div>
@@ -801,7 +796,7 @@
             twofaCheckmark, toggle2faBtn, enable2faPanel,
             qrCodeImg, secretCode, verifyTokenInput, confirm2faBtn, cancelEnable2faBtn, confirmMessage,
             webauthnStatusIcon, toggleWebAuthnBtn, webauthnMessage, manageWebAuthnPanel,
-            webauthnDeviceList, deviceItemExample, manageAddDeviceBtn,
+            webauthnDeviceList, manageAddDeviceBtn,
             showDeleteAccountBtn, deleteAccountForm, deleteAccountPassword,
             deleteAccountBtn, cancelDeleteBtn, deleteAccountMessage, printBackupContainer
         ] = [
@@ -815,7 +810,7 @@
             'twofaCheckmark', 'toggle2faBtn', 'enable2faPanel',
             'qrCodeImg', 'secretCode', 'verifyToken', 'confirm2faBtn', 'cancelEnable2faBtn', 'confirmMessage',
             'webauthnStatusIcon', 'toggleWebAuthnBtn', 'webauthnMessage', 'manageWebAuthnPanel',
-            'webauthnDeviceList', 'deviceItemExample', 'manageAddDeviceBtn',
+            'webauthnDeviceList', 'manageAddDeviceBtn',
             'showDeleteAccountBtn', 'deleteAccountForm', 'deleteAccountPassword',
             'deleteAccountBtn', 'cancelDeleteBtn', 'deleteAccountMessage', 'printBackupContainer'
         ].map(id => document.getElementById(id)),
@@ -857,9 +852,7 @@
                         }
                     } catch (e) { console.error(e); }
                 }, 2000);
-                setTimeout(() => {
-                    if (isEmailPollingActive) stopEmailPolling(), timeoutCallback?.();
-                }, 900000);
+                setTimeout(() => { if (isEmailPollingActive) stopEmailPolling(), timeoutCallback?.(); }, 900000);
             },
             // 全局 UI
             refreshMFAUI = () => {
@@ -932,7 +925,6 @@
                 profileCurrentPasswordInput.value = '', editProfileBtn.disabled = true, newUsernameInput.focus();
                 updateProfileBtn.disabled = false, updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage);
             },
-
             // 密码修改模块
             resetPasswordForm = () => {
                 currentPasswordInput.value = '', newPasswordInput.value = '', confirmPasswordInput.value = '';
@@ -947,7 +939,6 @@
                 closeEditProfileCard(), changePasswordCard.hidden = false, showChangePasswordBtn.disabled = true;
                 resetPasswordForm(), setTimeout(() => currentPasswordInput.focus(), 50), hideMessage(changePasswordMessage);
             },
-
             // 备份码模块
             renderBackupCodes = codes => {
                 if (codes?.length === 0) {
@@ -1019,7 +1010,6 @@
                 }
                 deleteBackupCodesBtn.disabled = false;
             },
-
             // 2FA 认证模块
             showEnable2faPanel = async () => {
                 verifyTokenInput.value = '', hideMessage(confirmMessage), qrCodeImg.src = '';
@@ -1033,7 +1023,6 @@
                 toggle2faBtn.disabled = false, enable2faPanel.hidden = true;
                 verifyTokenInput.value = '', hideMessage(confirmMessage);
             },
-
             // WebAuthn 硬件认证模块
             loadWebAuthnData = async () => {
                 try {
@@ -1065,20 +1054,22 @@
                 } catch (err) {
                     if (err.name === 'AbortError' || err.name === 'NotAllowedError')
                         return hideMessage(webauthnMessage), false;
-                    showMessage(webauthnMessage, 'error', '添加失败：' + (err.message));
-                    return false;
+                    return showMessage(webauthnMessage, 'error', '添加失败：' + (err.message)), false;
                 }
             },
             renderCredentialsList = () => {
-                if (currentWebAuthnCredentials.length === 0) return;
+                if (currentWebAuthnCredentials.length === 0) return webauthnDeviceList.innerHTML = '';
 
                 webauthnDeviceList.innerHTML = '';
                 currentWebAuthnCredentials.forEach((cred, idx) => {
-                    const li = deviceItemExample.cloneNode(true), nameSpan = li.querySelector('.device-name'),
-                        delBtn = li.querySelector('button'), time = new Date(cred.createdAt).toLocaleString();
+                    const li = document.createElement('li'), nameSpan = document.createElement('span'),
+                        delBtn = document.createElement('button'), time = new Date(cred.createdAt).toLocaleString();
 
+                    li.className = 'device-item', nameSpan.className = 'device-name';
+                    delBtn.type = 'button', delBtn.className = 'btn btn-danger btn-small', delBtn.textContent = '删除';
                     nameSpan.textContent = `🔑 ${cred.deviceName} 硬件${idx + 1}(添加于${time})`;
-                    li.hidden = false, webauthnDeviceList.append(li);
+                    li.append(nameSpan, delBtn), webauthnDeviceList.append(li);
+
                     delBtn.addEventListener('click', async e => {
                         e.preventDefault();
                         if (!confirm('确定删除此设备吗？删除后将无法用于登录验证;')) return;
@@ -1130,7 +1121,6 @@
                     }
                 }
             },
-
             // 注销账户模块
             toggleDeleteForm = show => {
                 hideMessage(deleteAccountMessage);
@@ -1142,14 +1132,11 @@
                     showDeleteAccountBtn.focus();
                 }
             };
-
-        // ==================== 事件绑定 ====================
         // 1. 个人资料
         editProfileBtn.addEventListener('click', openEditProfileCard);
         cancelEditBtn.addEventListener('click', () => { closeEditProfileCard(), editProfileBtn.focus() });
         updateProfileBtn.addEventListener('click', async () => {
             if (isEmailPollingActive) return showMessage(updateProfileMessage, 'info', '邮件验证中,请稍后...');
-
             const [username, email, pwd] = [newUsernameInput, newEmailInput, profileCurrentPasswordInput]
                 .map(input => input.value.trim());
 
