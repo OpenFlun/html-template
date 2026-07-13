@@ -2,7 +2,7 @@ function initTopImg() {
     const topIcon = document.createElement('img'), api = '/api/topImg';
     topIcon.className = 'scroll-to-top', topIcon.alt = '返回顶部', topIcon.src = '/static/img/top.png';
     // 统一处理按钮显示/隐藏
-    function updateTopImg() {
+    const updateTopImg = () => {
         topIcon.classList.toggle('show', window.pageYOffset > 300);
     };
 

@@ -1,4 +1,4 @@
-/* ======= 返回顶部样式 ======= */
+/* 返回顶部样式 */
 :root {
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }

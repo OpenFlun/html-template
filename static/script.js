@@ -1,4 +1,3 @@
-// 根目录/static/script.js
 function scriptFun() {
     const modal = document.querySelector('.modal'), cssEditor = document.getElementById('cssEditor'),
         closeBtn = document.querySelector('.close-btn'), saveBtn = document.getElementById('saveBtn'),
@@ -9,14 +8,9 @@ function scriptFun() {
         fileDir = urlParams.get('fileDir'), returnUrl = urlParams.get('return');
 
     let cm = window.cssEditor;
-    if (!cm) {
-        console.error('CodeMirror not ready, retry');
-        setTimeout(scriptFun, 100);
-        return;
-    }
+    if (!cm) return console.error('CodeMirror not ready, retry'), setTimeout(scriptFun, 100);
 
     let isEditingColor = false, editColorRange = null, isPreviewMode = false, globalColorPicker = null;
-
     cm.getWrapperElement().addEventListener('mousedown', e => e.stopPropagation());
     cm.getWrapperElement().addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
     cm.getWrapperElement().addEventListener('contextmenu', e => e.stopPropagation());
@@ -227,8 +221,7 @@ function scriptFun() {
             if (Math.abs(currentPercent - originalAlpha * 100) < 0.1) newColor = originalColor;
             else newColor = makeColorFromAlpha(currentPercent);
 
-            cm.replaceRange(newColor, pos.from, pos.to);
-            setTimeout(() => updateColorWidgets(cm), 10);
+            cm.replaceRange(newColor, pos.from, pos.to), setTimeout(() => updateColorWidgets(cm), 10);
         });
         as.addEventListener('mousedown', e => e.stopPropagation());
         as.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
@@ -253,8 +246,7 @@ function scriptFun() {
 
                 if (av) av.textContent = `${Math.round(na * 100)}%`;
                 to = { line: to.line, ch: fr.ch + nc.length };
-                this.removeEventListener('change', chf);
-                globalColorPicker._ch = null;
+                this.removeEventListener('change', chf), globalColorPicker._ch = null;
             };
             globalColorPicker._ch = chf;
             globalColorPicker.addEventListener('change', chf);
@@ -320,9 +312,8 @@ function scriptFun() {
         }
     });
 
-    // ================= 预览控制逻辑（使用静态取消预览按钮） =================
+    // ================= 预览控制逻辑 =================
     let styleUpdateHandler = null;   // 编辑器 change 监听函数
-
     // 更新预览样式
     function updatePreviewStyles() {
         if (!isPreviewMode || !previewFrame.contentWindow?.document) return;
@@ -332,9 +323,7 @@ function scriptFun() {
             if (!styleEl) styleEl = doc.createElement('style'), styleEl.id = 'dynamic-css', doc.head.appendChild(styleEl);
 
             styleEl.textContent = css;
-        } catch (e) {
-            console.log('预览更新失败', e);
-        }
+        } catch (e) { console.log('预览更新失败', e) }
     }
 
     // 开启预览模式
@@ -425,8 +414,7 @@ function scriptFun() {
                 cm.setValue(ct), updateEditorTitle(fd);
             } else throw new Error(`无法加载CSS文件: ${fd}`);
         } catch (err) {
-            alert(`加载CSS失败: ${err.message}`);
-            updateEditorTitle(fd);
+            alert(`加载CSS失败: ${err.message}`), updateEditorTitle(fd);
         } finally { hideLoader() }
     }
 
@@ -434,8 +422,7 @@ function scriptFun() {
         showLoader();
         try {
             const r = await fetch('/api/css', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fileDir, content: cm.getValue() })
             });
             if (r.ok) window.location.href = returnUrl;
@@ -455,14 +442,11 @@ function scriptFun() {
     addTapSupport(saveBtn, saveCSS);
     addTapSupport(cancelBtn, cancelEdit);
     addTapSupport(closeBtn, cancelEdit);
-
     // 键盘快捷键
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
-            if (isEditingColor) {
-                e.preventDefault(), isEditingColor = false, editColorRange = null, updateColorWidgets(cm);
-                return;
-            }
+            if (isEditingColor)
+                return e.preventDefault(), isEditingColor = false, editColorRange = null, updateColorWidgets(cm);
             isPreviewMode ? stopPreview() : cancelEdit();
         }
         if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveCSS(); }

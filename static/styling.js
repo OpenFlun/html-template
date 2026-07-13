@@ -11,7 +11,7 @@ class LongPressBackground {
 
         // 添加颜色选择器容器,长按指示器
         document.body.append(pressIndicator, picker), this.pressIndicator = pressIndicator, this.picker = picker;
-        this.currentMode = 'background'; // 当前模式：初始为background
+        this.currentMode = 'background'; // 初始模式
 
         // 提前绑定所有需要的事件处理器
         this.handleStart = this.handleStart.bind(this), this.handleEnd = this.handleEnd.bind(this);
@@ -23,7 +23,7 @@ class LongPressBackground {
     }
 
     init() {
-        // 使用事件委托，避免为每个元素单独绑定事件
+        // 使用事件委托,避免为每个元素单独绑定事件
         document.addEventListener('mousedown', this.handleStart, true);
         document.addEventListener('mouseup', this.handleEnd, true);
         document.addEventListener('mouseleave', this.handleCancel, true);
@@ -56,16 +56,13 @@ class LongPressBackground {
 
         // 检测是否拖动
         const { x, y } = this.getEventCoordinates(e), deltaX = Math.abs(x - this.startX), deltaY = Math.abs(y - this.startY);
-        // 如果拖动距离超过阈值，取消长按
+        // 如果拖动距离超过阈值,取消长按
         if (deltaX > this.dragThreshold || deltaY > this.dragThreshold) this.handleCancel(), this.isDragging = true;
     }
 
     // 全局单击事件处理
     handleGlobalClick(e) {
-        if (this.isLongPress) {
-            this.preventingDefault(e), e.stopImmediatePropagation();
-            return false;
-        }
+        if (this.isLongPress) return this.preventingDefault(e), e.stopImmediatePropagation(), false;
     }
 
     // 设置跳过元素
@@ -93,21 +90,18 @@ class LongPressBackground {
         // 设置长按定时器
         this.pressTimer = setTimeout(() => {
             this.isLongPress = true, this.showPicker(e);
-            if (e.type === 'touchstart' || e.type === 'touchmove') e.preventDefault(); // 长按成功后，才阻止后续默认行为
+            if (e.type === 'touchstart' || e.type === 'touchmove') e.preventDefault(); // 长按成功后,才阻止后续默认行为
         }, this.longPressDuration);
     }
 
     handleEnd(e) {
         // 如果是拖动,不执行长按后的操作
-        if (this.isDragging) {
-            this.handleCancel();
-            return;
-        }
+        if (this.isDragging) return this.handleCancel();
         if (this.visualFeedbackTimer) clearTimeout(this.visualFeedbackTimer), this.visualFeedbackTimer = null;
         if (this.pressTimer) clearTimeout(this.pressTimer), this.pressTimer = null;   // 清除定时器
         if (this.isLongPress && e.type === 'touchend') this.preventingDefault(e);
         this.removeVisualFeedback();                                                  // 移除视觉反馈
-        if (!this.isLongPress) return;                                                // 如果不是长按，直接返回
+        if (!this.isLongPress) return;                                                // 如果不是长按,直接返回
     }
 
     // 取消长按
@@ -119,7 +113,7 @@ class LongPressBackground {
 
     // 处理文档点击事件（关闭选择器）
     handleDocumentClick(e) {
-        // 如果选择器正在显示，并且点击的不是选择器内部，也不是长按元素
+        // 如果选择器正在显示,并且点击的不是选择器内部,也不是长按元素
         if (this.picker.style.display === 'grid' && !this.picker.contains(e.target)
             && this.nowElement !== this.longPressedElement) this.hidepicker();
     }
@@ -172,7 +166,6 @@ class LongPressBackground {
         this.removeVisualFeedback();
     }
 
-    // =================================================================================================================
     initPicker() {
         // 创建模式切换按钮组和添加跳转到编辑器按钮
         const modeBtns = [{ text: '背景', mode: 'background', isActive: true }, { text: '字体', mode: 'font', isActive: false }
@@ -292,8 +285,7 @@ class LongPressBackground {
             if (!response.ok) throw new Error('获取图片列表失败');
             return await response.json();
         } catch (error) {
-            console.error('获取图片列表失败:', error);
-            return null;
+            return console.error('获取图片列表失败:', error), null;
         }
     }
 
@@ -351,8 +343,6 @@ class LongPressBackground {
 
         // 事件监听
         closeBtn.onclick = removeAndShow, cancelBtn.onclick = removeAndShow;
-
-        // 搜索按钮点击事件
         searchBtn.onclick = () => this.filterImages(imageGrid, searchInput.value);
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') this.filterImages(imageGrid, searchInput.value);
@@ -415,7 +405,7 @@ class LongPressBackground {
                 }
             };
         } catch (error) {
-            container.innerHTML = '<div class="error-overlay">加载图片失败，请检查网络连接</div>';
+            container.innerHTML = '<div class="error-overlay">加载图片失败,请检查网络连接</div>';
         }
     }
 
@@ -684,7 +674,6 @@ class LongPressBackground {
         if (this.longPressedElement) this.longPressedElement.style[property] = value;// 如果长按元素存在,设置其属性值;
     };
 
-    // =================================================================================================================
     // 跳转到编辑器页面
     navigateToEditor() {
         // 获取当前页面的外部样式文件
@@ -698,7 +687,7 @@ class LongPressBackground {
 
     // 获取当前页面的样式文件
     getCurrentStyleFile(fileDir) {
-        // 如果全局函数已定义，则调用它来获取样式文件路径
+        // 如果全局函数已定义,则调用它来获取样式文件路径
         if (typeof window.getCurrentStyleFile === 'function') return window.getCurrentStyleFile();
 
         // 否则尝试从link标签获取
@@ -707,7 +696,7 @@ class LongPressBackground {
 
         return null;
     }
-    // =================================================================================================================
+
     // 保存样式到文件
     async saveStylesToFile() {
         const lement = this.longPressedElement; // 长按的元素
@@ -730,20 +719,16 @@ class LongPressBackground {
             const existingContent = await this.fetchCSSFile(styleFileDir);
             if (existingContent === null) return alert('无法读取CSS文件！');
 
-            // 6. 更新CSS内容
-            const updatedContent = this.updateCSSContent(existingContent, selector, styles);
-
-            // 7. 保存到服务器
-            const result = await this.saveCSSFile(styleFileDir, updatedContent);
+            // 6. 更新CSS内容并保存到服务器
+            const updatedContent = this.updateCSSContent(existingContent, selector, styles),
+                result = await this.saveCSSFile(styleFileDir, updatedContent);
 
             if (result.success) {
                 alert(`样式已保存到 ${styleFileDir}\n操作元素: ${selector}`);
                 setTimeout(() => this.applyStylesFromCSS(lement, styles), 100);// 移除元素的内联样式,让保存样式生效
             }
             else throw new Error(result.error || '保存失败');
-        } catch (error) {
-            alert(`保存失败: ${error.message}`);
-        }
+        } catch (error) { alert(`保存失败: ${error.message}`) }
     }
 
     // 生成元素的选择器
@@ -760,18 +745,17 @@ class LongPressBackground {
             }
 
             return selector;
-        },// 1. 优先使用ID
-            idSelector = getSelector(element);
+        }, idSelector = getSelector(element);
         if (idSelector.startsWith('#')) return idSelector;
 
-        // 2. 尝试使用所有类名的选择器
+        // 尝试使用所有类名的选择器
         const fullClassSelector = getSelector(element, Infinity);
         if (fullClassSelector !== element.tagName.toLowerCase()) {
             const matches = document.querySelectorAll(fullClassSelector);
-            if (matches.length === 1) return fullClassSelector;// 类名唯一，直接使用
+            if (matches.length === 1) return fullClassSelector;// 类名唯一,直接使用
         }
 
-        // 3. 生成层级路径(最多8层)
+        // 生成层级路径(最多8层)
         const path = [];
         let current = element;
         for (let depth = 0; depth < 8 && current && current !== document.body; depth++) {
@@ -787,7 +771,7 @@ class LongPressBackground {
             }
 
             path.unshift(selector);
-            if (current.id) break; // 如果当前元素有ID，停止向上
+            if (current.id) break; // 如果当前元素有ID,停止向上
             current = current.parentElement;
         }
 
@@ -797,7 +781,6 @@ class LongPressBackground {
             const parentSelector = getSelector(parent, 1); // 最多一个类
             path.unshift(parentSelector);
         }
-
         return path.join(' > ');
     }
 
@@ -853,8 +836,7 @@ class LongPressBackground {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.text();
         } catch (error) {
-            console.error('读取CSS文件失败:', fileDir, error.message);
-            return null;
+            return console.error('读取CSS文件失败:', fileDir, error.message), null;
         }
     }
 
@@ -918,8 +900,7 @@ class LongPressBackground {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } catch (error) {
-            console.error('保存CSS文件失败:', error);
-            return null;
+            return console.error('保存CSS文件失败:', error), null;
         }
     }
 

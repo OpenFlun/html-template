@@ -1,5 +1,3 @@
-// /static/auth.js
-
 (function () {
     const userCenter = document.getElementById('userCenter');
     if (!userCenter) return;
@@ -17,9 +15,7 @@
                 document.dispatchEvent(new CustomEvent('userCenterReady')); // 创建并派发自定义事件,通知用户中心已准备好
             }
             else userCenter.hidden = true;
-        } catch (err) {
-            userCenter.hidden = true;
-        }
+        } catch (err) { userCenter.hidden = true }
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', checkLoginStatus);

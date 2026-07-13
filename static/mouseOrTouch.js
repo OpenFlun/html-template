@@ -1,4 +1,3 @@
-// 项目/static/mouseOrTouch.js
 const devViewSize = `${window.innerWidth}x${window.innerHeight}`; // 使用设备视口作为设备唯一标识
 let zIndex = 1001; // 全局层级计数器
 /**
@@ -15,7 +14,7 @@ function getStyle(element, api = null) {
 }
 
 /**
- * 为元素添加鼠标和触摸事件支持，实现拖拽和点击功能
+ * 为元素添加鼠标和触摸事件支持,实现拖拽和点击功能
  * @param {HTMLElement} element - 需要添加交互功能的DOM元素
  * @param {Function} onClick - 点击事件回调函数
  * @param {string} [api=null] - 更新位置信息的路由API
@@ -127,8 +126,7 @@ function mouseOrTouch(element, onClick = null, api = null, isEndShow = false) {
         if (api && hasDragged) {
             fetch(api, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPosition)
-            })
-                .then(res => res.ok ? res.json() : Promise.reject(`Network error:${element}`))
+            }).then(res => res.ok ? res.json() : Promise.reject(`Network error:${element}`))
                 .catch(error => console.error(`更新${devViewSize}储存样式数据失败:`, error));
         }
 

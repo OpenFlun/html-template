@@ -1,17 +1,9 @@
-// ===================== 主题模块 (优化版) =====================
 /**
- * 主题管理模块，负责处理主题切换功能
- *
- * 主要优化：
- * 1. 移除了重复的主题计算和设置逻辑
- * 2. 使用永久系统主题监听器替代频繁销毁/重建
- * 3. 简化初始化流程，同时保持功能完整
- *
- * 主要功能：
+ * 主题管理模块：
  * 1. 支持三种主题模式：system（跟随系统）、light（明亮模式）、dark（暗黑模式）
  * 2. 自动保存用户偏好到本地存储
  * 3. 自动监听系统主题变化（当处于系统模式时）
- * 4. 提供图标更新回调机制，只在浅色和深色模式间切换
+ * 4. 提供图标更新回调机制,只在浅色和深色模式间切换
  *
  * 使用说明：
  * 1. 模块加载后自动初始化
@@ -20,62 +12,59 @@
  *
  * @namespace
  */
-const ThemeModule = (function () {
+const ThemeModule = (() => {
 	let currentPreference = 'system', iconUpdateCallback = null; 			// 私有变量,封装模块内部状态(主题偏好和图标更新回调函数)
-	const systemMedia = window.matchMedia('(prefers-color-scheme: dark)'); // 系统主题监听器
+	const systemMedia = window.matchMedia('(prefers-color-scheme: dark)'), // 系统主题监听器
+		/**
+		 * 加载用户保存的主题偏好
+		 * @private
+		 */
+		loadPreference = () => {
+			const savedPreference = localStorage.getItem('themePreference'); // 从本地存储获取保存的偏好设置
+			// 验证保存的偏好是否有效
+			if (savedPreference && ['system', 'light', 'dark'].includes(savedPreference)) currentPreference = savedPreference;
+		},
 
-	/**
-	 * 加载用户保存的主题偏好
-	 * @private
-	 */
-	function loadPreference() {
-		const savedPreference = localStorage.getItem('themePreference'); // 从本地存储获取保存的偏好设置
-		// 验证保存的偏好是否有效
-		if (savedPreference && ['system', 'light', 'dark'].includes(savedPreference)) currentPreference = savedPreference;
-	}
+		/**
+		 * 计算实际应用的主题
+		 * @private
+		 * @returns {'light' | 'dark'} 实际应用的主题
+		 */
+		getActualTheme = () => {
+			if (currentPreference === 'system') return systemMedia.matches ? 'dark' : 'light'; // 当处于系统模式时,返回当前系统主题
+			return currentPreference; 														   // 否则返回用户指定的主题
+		},
 
-	/**
-	 * 计算实际应用的主题
-	 * @private
-	 * @returns {'light' | 'dark'} 实际应用的主题
-	 */
-	function getActualTheme() {
-		if (currentPreference === 'system') return systemMedia.matches ? 'dark' : 'light'; // 当处于系统模式时，返回当前系统主题
-		return currentPreference; 														   // 否则返回用户指定的主题
-	}
+		/**
+		 * 应用主题到文档根元素
+		 * @private
+		 */
+		applyTheme = () => {
+			const targetTheme = getActualTheme(); 							  // 获取实际应用的主题
+			document.documentElement.setAttribute('data-theme', targetTheme); // 设置文档根元素的data-theme属性
+		},
 
-	/**
-	 * 应用主题到文档根元素
-	 * @private
-	 */
-	function applyTheme() {
-		const targetTheme = getActualTheme(); 							  // 获取实际应用的主题
-		document.documentElement.setAttribute('data-theme', targetTheme); // 设置文档根元素的data-theme属性
-	}
-
-	/**
-	 * 安全更新主题切换图标
-	 * @private
-	 */
-	function safeUpdateIcon() {
-		// 检查图标更新回调是否已设置
-		if (iconUpdateCallback && typeof iconUpdateCallback === 'function') {
-			try {
-				const actualTheme = getActualTheme(); // 获取当前实际应用的主题
-				iconUpdateCallback(actualTheme); 	  // 调用回调函数并传递当前实际主题
-			} catch (e) {
-				console.warn('主题图标更新失败', e);
+		/**
+		 * 安全更新主题切换图标
+		 * @private
+		 */
+		safeUpdateIcon = () => {
+			// 检查图标更新回调是否已设置
+			if (iconUpdateCallback && typeof iconUpdateCallback === 'function') {
+				try {
+					const actualTheme = getActualTheme(); // 获取当前实际应用的主题
+					iconUpdateCallback(actualTheme); 	  // 调用回调函数并传递当前实际主题
+				} catch (e) { console.warn('主题图标更新失败', e) }
 			}
-		}
-	}
+		},
 
-	/**
-	 * 处理系统主题变化事件
-	 * @private
-	 */
-	function handleSystemThemeChange() {
-		if (currentPreference === 'system') applyTheme(), safeUpdateIcon(); // 仅当处于系统模式时响应变化(更新主题和图标)
-	}
+		/**
+		 * 处理系统主题变化事件
+		 * @private
+		 */
+		handleSystemThemeChange = () => {
+			if (currentPreference === 'system') applyTheme(), safeUpdateIcon(); // 仅当处于系统模式时响应变化(更新主题和图标)
+		};
 
 	systemMedia.addEventListener('change', handleSystemThemeChange);        // 初始化系统主题监听器
 	// 公共API
@@ -84,7 +73,7 @@ const ThemeModule = (function () {
 		 * 初始化主题模块
 		 * @method
 		 */
-		init: function () {
+		init: () => {
 			// 加载保存的偏好并应用主题
 			loadPreference(), applyTheme();
 			const updateOnReady = () => safeUpdateIcon();
@@ -102,7 +91,7 @@ const ThemeModule = (function () {
 		 * @param {Function} callback - 图标更新回调函数
 		 * @method
 		 */
-		setIconUpdateCallback: function (callback) {
+		setIconUpdateCallback: callback => {
 			if (typeof callback === 'function') iconUpdateCallback = callback, safeUpdateIcon(); // 设置后立即更新一次图标状态
 		},
 
@@ -110,7 +99,7 @@ const ThemeModule = (function () {
 		 * 设置主题偏好
 		 *
 		 * 使用说明：
-		 * 此方法直接设置主题偏好，适用于需要精确控制主题的场景
+		 * 此方法直接设置主题偏好,适用于需要精确控制主题的场景
 		 *
 		 * 示例：
 		 * ThemeModule.setPreference('dark'); // 设置为暗黑模式
@@ -119,7 +108,7 @@ const ThemeModule = (function () {
 		 * @param {'system' | 'light' | 'dark'} preference - 主题偏好
 		 * @method
 		 */
-		setPreference: function (preference) {
+		setPreference: preference => {
 			if (['system', 'light', 'dark'].indexOf(preference) === -1) return;// 验证输入有效性
 			currentPreference = preference;									   // 更新当前偏好
 			localStorage.setItem('themePreference', preference);			   // 保存到本地存储
@@ -130,8 +119,8 @@ const ThemeModule = (function () {
 		 * 切换主题（在浅色和深色模式间切换）
 		 *
 		 * 使用说明：
-		 * 此方法用于在浅色和深色模式间切换，忽略系统模式
-		 * 如果当前是系统模式，会先切换到当前实际主题
+		 * 此方法用于在浅色和深色模式间切换,忽略系统模式
+		 * 如果当前是系统模式,会先切换到当前实际主题
 		 *
 		 * 示例：
 		 * document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -140,7 +129,7 @@ const ThemeModule = (function () {
 		 *
 		 * @method
 		 */
-		toggleTheme: function () {
+		toggleTheme: () => {
 			// 获取当前实际主题,切换到相反的主题（忽略系统模式）
 			const currentTheme = this.getActualTheme(), newTheme = currentTheme === 'light' ? 'dark' : 'light';
 			this.setPreference(newTheme); // 设置新偏好
@@ -159,9 +148,7 @@ const ThemeModule = (function () {
 		 * @returns {string} 当前主题偏好
 		 * @method
 		 */
-		getPreference: function () {
-			return currentPreference;
-		},
+		getPreference: () => currentPreference,
 
 		/**
 		 * 获取实际应用的主题
@@ -176,14 +163,12 @@ const ThemeModule = (function () {
 		 * @returns {string} 实际应用的主题 ('light' 或 'dark')
 		 * @method
 		 */
-		getActualTheme: function () {
-			return getActualTheme();
-		}
+		getActualTheme: () => getActualTheme()
 	};
 })();
 
 ThemeModule.init(); // 初始化主题模块
-// ===================== 使用示例 =====================
+// 使用示例
 /**
  * 基本使用：
  * 1. 在页面加载后自动初始化(直接引入模块即可)

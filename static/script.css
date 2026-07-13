@@ -1,4 +1,4 @@
-/* ========== 全局与容器样式 ========== */
+/* 全局与容器样式 */
 .container {
     max-width: 100%;
     margin: 0px;
@@ -16,7 +16,7 @@
     display: none;
 }
 
-/* ========== 布局工具栏 ========== */
+/* 布局工具栏 */
 .layout-toolbar {
     display: flex;
     align-items: center;
@@ -60,7 +60,7 @@
     background-color: #821d90;
 }
 
-/* ========== 主工作区 ========== */
+/* 主工作区 */
 .workspace {
     display: flex;
     flex: 1;
@@ -88,7 +88,7 @@
     flex: 1;
 }
 
-/* ========== 编辑器面板 #cssEditor ========== */
+/* 编辑器面板 #cssEditor */
 #cssEditor {
     display: flex;
     flex-direction: column;
@@ -273,7 +273,7 @@
     text-align: left !important;
 }
 
-/* ========== 预览容器 #preview ========== */
+/* 预览容器 #preview */
 #preview {
     display: none;
     flex-direction: column;
@@ -304,7 +304,7 @@
     flex: 1;
 }
 
-/* ========== 加载指示器 ========== */
+/* 加载指示器 */
 #loader {
     display: none;
 }
@@ -323,7 +323,7 @@
     text-align: center;
 }
 
-/* ========== 响应式布局 ========== */
+/* 响应式布局 */
 @media (max-width: 768px) {
     #cssEditor .actions {
         flex-wrap: wrap;
