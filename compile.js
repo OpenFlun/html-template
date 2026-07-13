@@ -183,9 +183,8 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    if (allRoutes.length) {
 				        console.log(\`   🗺️ 检测到 \${ allRoutes.length } 条注册路由\`);
 						// allRoutes.forEach(r => console.log(\`      \${r.method.padEnd(6)} \${r.path}\`));
-				    } else {
-				        console.log('   ℹ️ 未找到任何路由');
 				    }
+					else console.log('   ℹ️ 未找到任何路由');
 				};
 
 				const loadUserRoutes = async () => {
@@ -196,17 +195,13 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    const routeFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.js'));
 				    for (const file of routeFiles) {
 				        try {
-				            const modulePath = path.join(featuresDir, file);
-				            const moduleUrl = pathToFileURL(modulePath);
+				            const modulePath = path.join(featuresDir, file), moduleUrl = pathToFileURL(modulePath);
 				            moduleUrl.search = 'update=' + Date.now();
 				            const feature = await import(moduleUrl.href);
-				            if (typeof feature.default?.setupRoutes === 'function') {
-				                feature.default.setupRoutes(app);
-				                console.log(\`   ✅ 路由加载文件: \${file}\`);
-				            } else if (typeof feature?.setupRoutes === 'function') {
-				                feature.setupRoutes(app);
-				                console.log(\`   ✅ 路由加载文件: \${file}\`);
-				            }
+				            if (typeof feature.default?.setupRoutes === 'function')
+				                feature.default.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
+				             else if (typeof feature?.setupRoutes === 'function')
+				                feature.setupRoutes(app), console.log(\`   ✅ 路由加载文件: \${file}\`);
 				        } catch (e) {
 				            console.error(\`   ❌ \${file} 加载失败:\`, e.message);
 				        }
@@ -217,12 +212,10 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    await loadUserRoutes();
 				    ${staticMiddleware}
 				    if (!allRoutes.some(r => r.method === 'GET' && r.path === '/')) ${defaultRootRoute}
-
 				    ${serverCreationCode}
 				    server.listen(port, host, () => {
 				        console.log(\`\\n🚀 服务已启动: \${protocol}://\${host}:\${port}\`);
-				        printRoutes();
-						console.log('按 Ctrl+C 停止服务器');
+				        printRoutes(),console.log('按 Ctrl+C 停止服务器');
 				    });
 				};
 				wrapAppMethods(app),${corsAndSecurity},start();`;
@@ -237,8 +230,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			${serverCreationCode}
 			server.listen(port, host, () => {
 			    console.log(\`\\n🚀 静态服务器已启动: \${protocol}://\${host}:\${port}\`);
-			    console.log('📁 当前仅提供静态文件服务（未检测到用户路由）');
-				console.log('按 Ctrl+C 停止服务器');
+			    console.log('📁 当前仅提供静态文件服务（未检测到用户路由）'),console.log('按 Ctrl+C 停止服务器');
 			});`;
 	},
 

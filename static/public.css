@@ -26,6 +26,10 @@ body {
 	transition: background 0.5s ease, color 0.5s ease;
 }
 
+[hidden] {
+	display: none !important;
+}
+
 /* Vue.js属性选择器 - 防止渲染阻塞 */
 [v-cloak] {
 	display: none;
@@ -108,10 +112,6 @@ input:-webkit-autofill:active {
 input:-moz-autofill {
 	background-color: var(--li-bg) !important;
 	color: var(--text-color) !important;
-}
-
-[hidden] {
-	display: none !important;
 }
 
 /* 个人中心容器 */
