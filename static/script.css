@@ -305,10 +305,6 @@
 }
 
 /* 加载指示器 */
-#loader {
-    display: none;
-}
-
 .loader {
     display: none;
     position: fixed;

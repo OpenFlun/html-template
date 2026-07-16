@@ -1,4 +1,4 @@
-/* 基于[@simplewebauthn/browser@13.3.0] 开发 */
+/* 基于 @simplewebauthn/browser 修改，增加 Electron 自动适配 */
 !function (e, t) {
     "object" == typeof exports && "undefined" != typeof module ? t(exports) : "function" == typeof define && define.amd
         ? define(["exports"], t) : t((e = "undefined" != typeof globalThis ? globalThis : e || self).flunWebAuthnBrowser = {})
@@ -7,14 +7,12 @@
 
     const defaultPropDescriptor = { enumerable: true, configurable: true, writable: true, value: void 0 },
         falsePromise = Promise.resolve(false),
-        // 将 ArrayBuffer 转换为 Base64URL 字符串
         bufferToBase64URLString = (e) => {
             const t = new Uint8Array(e);
             let r = "";
             for (const e of t) r += String.fromCharCode(e);
             return btoa(r).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
         },
-        // 将 Base64URL 字符串转换为 ArrayBuffer
         base64URLStringToBuffer = (e) => {
             const t = e.replace(/-/g, "+").replace(/_/g, "/"), r = (4 - t.length % 4) % 4, n = t.padEnd(t.length + r, "="),
                 o = atob(n), i = new ArrayBuffer(o.length), a = new Uint8Array(i);
@@ -22,19 +20,14 @@
             return i
         },
         o = { stubThis: e => e },
-        // 检查浏览器是否支持 WebAuthn
         browserSupportsWebAuthn = () =>
             o.stubThis(void 0 !== globalThis?.PublicKeyCredential && "function" == typeof globalThis.PublicKeyCredential),
-        // 转换允许凭证中的 ID 字段
         convertAllowCredential = e => {
             const { id: t } = e;
             return { ...e, id: base64URLStringToBuffer(t), transports: e.transports }
         },
-        // 验证域名有效性
         isValidDomain = e =>
             "localhost" === e || /^((xn--[a-z0-9-]+|[a-z0-9]+(-[a-z0-9]+)*)\.)+([a-z]{2,}|xn--[a-z0-9-]+)$/i.test(e),
-
-        // WebAuthn 中止服务（用于取消进行中的认证/注册）
         WebAuthnAbortService = new class {
             constructor() {
                 Object.defineProperty(this, "controller", defaultPropDescriptor)
@@ -54,7 +47,6 @@
                 }
             }
         },
-
         authenticatorAttachmentValues = ["cross-platform", "platform"],
         normalizeAuthenticatorAttachment = (e) => {
             if (e && !(authenticatorAttachmentValues.indexOf(e) < 0)) return e
@@ -63,15 +55,22 @@
             console.warn(`拦截此 WebAuthn API 调用的浏览器扩展错误地实现了 ${e};请向扩展开发者报告此问题;\n`, t)
         },
         p = { stubThis: e => e },
-        // 检查浏览器是否支持 WebAuthn 自动填充
         browserSupportsWebAuthnAutofill = () => {
             if (!browserSupportsWebAuthn()) return p.stubThis(falsePromise);
             const e = globalThis.PublicKeyCredential;
             return void 0 === e?.isConditionalMediationAvailable ? p.stubThis(falsePromise)
                 : p.stubThis(e.isConditionalMediationAvailable())
+        },
+        // Electron 环境检测与 IPC 调用
+        isElectron = !!globalThis?.electronAPI, electronAPI = isElectron ? globalThis.electronAPI : null,
+        electronRegister = async options => {
+            if (!electronAPI) throw new Error('Electron API 不可用');
+            return electronAPI.registerCredential(options);
+        },
+        electronLogin = async options => {
+            if (!electronAPI) throw new Error('Electron API 不可用');
+            return electronAPI.login(options);
         };
-
-    // 自定义 WebAuthn 错误类
     class WebAuthnError extends Error {
         constructor({ message: e, code: t, cause: r, name: n }) {
             super(e, { cause: r });
@@ -79,25 +78,45 @@
         }
     };
 
-    // 导出内部工具（供测试/扩展使用）
+    // 导出
+    // 1. 内部工具（高级用户使用）
     e.WebAuthnAbortService = WebAuthnAbortService;
-    e.WebAuthnError = WebAuthnError;
     e._browserSupportsWebAuthnAutofillInternals = p;
     e._browserSupportsWebAuthnInternals = o;
+    // 2. 编解码工具
     e.base64URLStringToBuffer = base64URLStringToBuffer;
+    e.bufferToBase64URLString = bufferToBase64URLString;
+    // 3. 环境/功能检测工具（统一放在这里）
     e.browserSupportsWebAuthn = browserSupportsWebAuthn;
     e.browserSupportsWebAuthnAutofill = browserSupportsWebAuthnAutofill;
-    e.bufferToBase64URLString = bufferToBase64URLString;
     e.platformAuthenticatorIsAvailable = () => {
         return browserSupportsWebAuthn() ? PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable() : falsePromise;
     };
-
-    // 开始认证（登录）
+    e.isElectronEnvironment = () => isElectron;  // 与环境检测函数放在一起
+    // 4. 错误类
+    e.WebAuthnError = WebAuthnError;
+    // 5. 核心方法（注册和认证）
     e.startAuthentication = async e => {
-        if (!e.optionsJSON && e.challenge) {
-            console.warn(`startAuthentication() 调用方式不正确;将尝试继续使用提供的选项,但建议按照正确的调用结构重构;`);
-            e = { optionsJSON: e }
+        if (isElectron) {
+            const accountId = e.accountId || e.optionsJSON?.allowCredentials?.[0]?.id;
+            if (!accountId) throw new Error('Electron 环境下需要提供 accountId');
+            const result = await electronLogin({ accountId });
+            if (result.success) {
+                return {
+                    id: accountId,
+                    rawId: bufferToBase64URLString(base64URLStringToBuffer(accountId)),
+                    response: { authenticatorData: '', clientDataJSON: '', signature: '', userHandle: '' },
+                    type: 'public-key',
+                    clientExtensionResults: {},
+                    authenticatorAttachment: 'platform'
+                };
+            }
+            else throw new Error(result.error);
         }
+
+        // 浏览器标准流程
+        if (!e.optionsJSON && e.challenge)
+            console.warn("startAuthentication() 调用方式不正确;将尝试继续"), e = { optionsJSON: e }
         const { optionsJSON: o, useBrowserAutofill: c = !1, verifyBrowserAutofillInput: d = !0 } = e;
         if (!browserSupportsWebAuthn()) throw new Error("当前浏览器不支持 WebAuthn");
         let p, R;
@@ -106,7 +125,7 @@
         if (c) {
             if (!await browserSupportsWebAuthnAutofill()) throw new Error("当前浏览器不支持 WebAuthn 自动填充");
             if (document.querySelectorAll("input[autocomplete$='webauthn']").length < 1 && d)
-                throw new Error('未检测到任何 `autocomplete` 属性值以 "webauthn" 结尾的 <input> 元素');
+                throw new Error('未检测到任何 autocomplete 属性值以 "webauthn" 结尾的 <input> 元素');
             b.mediation = "conditional", f.allowCredentials = []
         }
         b.publicKey = f, b.signal = WebAuthnAbortService.createNewAbortSignal();
@@ -158,19 +177,39 @@
         }
     };
 
-    // 开始注册（创建凭证）
+    // 自动适配 Electron
     e.startRegistration = async e => {
-        if (!e.optionsJSON && e.challenge) {
-            console.warn("startRegistration() 调用方式不正确;将尝试继续使用提供的选项,但建议按照正确的调用结构重构;");
-            e = { optionsJSON: e }
+        if (isElectron) {
+            const optionsJSON = e.optionsJSON || e, userName = optionsJSON?.user?.name || 'default-user',
+                userId = optionsJSON?.user?.id || crypto.randomUUID(), result = await electronRegister({ userName, userId });
+            if (result.success) {
+                return {
+                    id: result.credential.id,
+                    rawId: bufferToBase64URLString(base64URLStringToBuffer(result.credential.id)),
+                    response: {
+                        attestationObject: '',
+                        clientDataJSON: '',
+                        transports: [],
+                        publicKeyAlgorithm: -7,
+                        publicKey: result.credential.publicKey,
+                        authenticatorData: ''
+                    },
+                    type: 'public-key',
+                    clientExtensionResults: {},
+                    authenticatorAttachment: 'platform'
+                };
+            }
+            else throw new Error(result.error);
         }
+
+        // 浏览器标准流程
+        if (!e.optionsJSON && e.challenge)
+            console.warn("startRegistration() 调用方式不正确;将尝试继续"), e = { optionsJSON: e }
         const { optionsJSON: o, useAutoRegister: c = !1 } = e;
         if (!browserSupportsWebAuthn()) throw new Error("当前浏览器不支持 WebAuthn");
         const h = {
             ...o, challenge: base64URLStringToBuffer(o.challenge),
-            user: {
-                ...o.user, id: base64URLStringToBuffer(o.user.id)
-            },
+            user: { ...o.user, id: base64URLStringToBuffer(o.user.id) },
             excludeCredentials: o.excludeCredentials?.map(convertAllowCredential)
         }, p = {};
         let f;
@@ -266,5 +305,5 @@
             clientExtensionResults: f.getClientExtensionResults(),
             authenticatorAttachment: normalizeAuthenticatorAttachment(f.authenticatorAttachment)
         }
-    }
+    };
 });
