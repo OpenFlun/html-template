@@ -53,7 +53,7 @@
     "bcrypt": "^6.0.0",
     "chokidar": "^5.0.0",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.5.2",
+    "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
     "@flun/env": "*",
     "@flun/mailer": "*",
@@ -63,7 +63,7 @@
     "socket.io": "^4.8.3"
   },
   "overrides": {
-    "fast-xml-parser": "^5.9.3"
+    "fast-xml-parser": "^5.10.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

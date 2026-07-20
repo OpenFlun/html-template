@@ -6,13 +6,13 @@
     "use strict";
     const defaultPropDescriptor = { enumerable: true, configurable: true, writable: true, value: void 0 },
         falsePromise = Promise.resolve(false),
-        bufferToBase64URLString = (e) => {
+        bufferToBase64URLString = e => {
             const t = new Uint8Array(e);
             let r = "";
             for (const e of t) r += String.fromCharCode(e);
             return btoa(r).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")
         },
-        base64URLStringToBuffer = (e) => {
+        base64URLStringToBuffer = e => {
             const t = e.replace(/-/g, "+").replace(/_/g, "/"), r = (4 - t.length % 4) % 4, n = t.padEnd(t.length + r, "="),
                 o = atob(n), i = new ArrayBuffer(o.length), a = new Uint8Array(i);
             for (let e = 0; e < o.length; e++) a[e] = o.charCodeAt(e);
