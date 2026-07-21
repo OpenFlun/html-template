@@ -47,7 +47,7 @@
             }
         },
         authenticatorAttachmentValues = ["cross-platform", "platform"],
-        normalizeAuthenticatorAttachment = (e) => {
+        normalizeAuthenticatorAttachment = e => {
             if (e && !(authenticatorAttachmentValues.indexOf(e) < 0)) return e
         },
         warnExtensionMishandling = (e, t) => {
