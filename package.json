@@ -53,17 +53,17 @@
     "bcrypt": "^6.0.0",
     "chokidar": "^5.0.0",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.6.2",
+    "express-rate-limit": "^8.7.0",
     "express-session": "^1.19.0",
     "@flun/env": "*",
     "@flun/mailer": "*",
     "@flun/webauthn-server": "*",
-    "otplib": "^13.4.1",
+    "otplib": "^13.5.0",
     "qrcode": "^1.5.4",
     "socket.io": "^4.8.3"
   },
   "overrides": {
-    "fast-xml-parser": "^5.10.1"
+    "fast-xml-parser": "^5.11.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
