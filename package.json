@@ -68,5 +68,9 @@
   "devDependencies": {
     "nodemon": "^3.1.14"
   },
-  "scripts": {}
+  "scripts": {
+    "dev": "node dev-server.js",
+    "build": "node compile.js",
+    "postinstall": "node copy-files.js 2>&1"
+  }
 }
