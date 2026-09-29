@@ -7,13 +7,11 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
     // 常量定义(直接覆盖文件列表和复制列表)
     alwaysOverwriteFiles = ['f-README.md', 'f-CHANGELOG.md'], filesToCopy = ['templates', 'customize', 'static', 'dev.js',
         'build.js', 'restoreDefaults.js', 'f-README.md', 'f-CHANGELOG.md'],
-
     // 日志函数
     log = (message, config, isErrorLog = false) => {
         if (isErrorLog) console.log(`❌ ${message}`);
         else if (config.verbose) console.log(`✅ ${message}`); // 非错误日志只在详细模式下显示
     },
-
     // 显示帮助信息
     showHelp = () => {
         console.log(`
@@ -36,7 +34,6 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
     `);
         process.exit(0);
     },
-
     // 判断是否应该跳过文件
     shouldSkipFile = (destExists, isRootItem, config, shouldAlwaysOverwrite) => {
         if (!destExists || shouldAlwaysOverwrite) return false;
@@ -44,13 +41,11 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
         else if (config.mode === 'skip-dirs' && isRootItem) return true;
         return false;
     },
-
     // 处理权限错误
     handlePermissionError = (filePath, config) => {
         log(`权限拒绝: ${filePath}`, config, true);
         throw new Error(`权限拒绝: ${filePath}`);
     },
-
     // 确保目录存在
     ensureDirectoryExists = async (dirPath, config) => {
         try {
@@ -60,7 +55,6 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
             else if (error.code !== 'EEXIST') throw error;
         }
     },
-
     // 检查路径是否存在
     pathExists = async path => {
         try {
@@ -69,38 +63,6 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
         } catch {
             return false;
         }
-    },
-
-    // 复制文件或目录
-    copyFileOrDir = async (src, dest, isRootItem = true, config) => {
-        if (!config.account) {
-            const accountDir = path.join(config.packageDir, 'templates', 'account'),
-                accountFile = path.join(config.packageDir, 'customize', 'account.js');
-            if (src === accountDir || src === accountFile) return log(`跳过account相关:${path.basename(src)}`, config);
-        }
-
-        try {
-            if (!await pathExists(src)) throw new Error(`源文件不存在: ${src}`);
-            const stat = await fs.stat(src);
-            if (stat.isDirectory()) await copyDirectory(src, dest, isRootItem, config);
-            else await copyFile(src, dest, isRootItem, config);
-        } catch (error) {
-            log(`复制失败: ${src} -> ${dest}, ${error.message}`, config, true);
-            throw error;
-        }
-    },
-
-    // 复制目录
-    copyDirectory = async (src, dest, isRootItem = true, config) => {
-        const destExists = await pathExists(dest); // 检查目标目录是否存在
-        if (destExists && (config.mode === 'skip-dirs')) return log(`跳过已存在目录: ${path.basename(dest)}`, config);
-
-        await ensureDirectoryExists(dest, config); // 创建目标目录
-        const items = await fs.readdir(src);       // 读取源目录内容
-        log(`复制目录: ${src} -> ${dest} (${items.length} 个项目)`, config);
-
-        // 并行复制所有项目
-        await Promise.all(items.map(item => copyFileOrDir(path.join(src, item), path.join(dest, item), false, config)));
     },
 
     // 复制单个文件
@@ -128,6 +90,36 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
             if (error.code === 'EACCES') handlePermissionError(dest, config);
             else throw error;
         }
+    },
+    // 复制目录
+    copyDirectory = async (src, dest, isRootItem = true, config) => {
+        const destExists = await pathExists(dest); // 检查目标目录是否存在
+        if (destExists && (config.mode === 'skip-dirs')) return log(`跳过已存在目录: ${path.basename(dest)}`, config);
+
+        await ensureDirectoryExists(dest, config); // 创建目标目录
+        const items = await fs.readdir(src);       // 读取源目录内容
+        log(`复制目录: ${src} -> ${dest} (${items.length} 个项目)`, config);
+
+        // 并行复制所有项目
+        await Promise.all(items.map(item => copyFileOrDir(path.join(src, item), path.join(dest, item), false, config)));
+    },
+    // 复制文件或目录
+    copyFileOrDir = async (src, dest, isRootItem = true, config) => {
+        if (!config.account) {
+            const accountDir = path.join(config.packageDir, 'templates', 'account'),
+                accountFile = path.join(config.packageDir, 'customize', 'account.js');
+            if (src === accountDir || src === accountFile) return log(`跳过account相关:${path.basename(src)}`, config);
+        }
+
+        try {
+            if (!await pathExists(src)) throw new Error(`源文件不存在: ${src}`);
+            const stat = await fs.stat(src);
+            if (stat.isDirectory()) await copyDirectory(src, dest, isRootItem, config);
+            else await copyFile(src, dest, isRootItem, config);
+        } catch (error) {
+            log(`复制失败: ${src} -> ${dest}, ${error.message}`, config, true);
+            throw error;
+        }
     };
 
 /**
@@ -146,7 +138,8 @@ const runCopyFiles = async (options = {}) => {
         account: options.account ?? false,
         packageDir: __dirname                        // 包所在目录,用于路径判断
     },
-        targetDir = path.resolve(__dirname, '../../..'); // 目标目录（项目根目录）
+        // 目标目录（项目根目录）：npm 场景用 INIT_CWD，手动执行 / import 调用用 cwd
+        targetDir = path.resolve(process.env.INIT_CWD || process.cwd());
 
     console.log('✅ 开始复制文件'); // 关键消息总是显示
     if (config.verbose) {
