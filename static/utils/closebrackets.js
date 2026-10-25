@@ -2,8 +2,8 @@
 /**
  * closebrackets.js - CodeMirror 自定义自动括号补全插件(基于6.65.7版本的优化)
  *
- * 本插件为 CodeMirror 编辑器提供智能括号补全功能。当用户输入左括号时，自动插入对应的右括号，
- * 并支持在空括号对中使用退格键同时删除两个括号，以及在括号对中按回车时自动缩进;
+ * 本插件为 CodeMirror 编辑器提供智能括号补全功能;当用户输入左括号时,自动插入对应的右括号,
+ * 并支持在空括号对中使用退格键同时删除两个括号,以及在括号对中按回车时自动缩进;
  * 可通过配置选项自定义括号对、触发字符等;优化:添加了括号平衡检查,代码现代化;
  *
  * @author flun and others
@@ -38,7 +38,8 @@
             const ranges = cm.listSelections(), newRanges = [];
             let primary = 0;
             for (let i = 0; i < ranges.length; i++) {
-                const range = ranges[i], { ch, line } = range.head, pos = ch || dir > 0 ? { line, ch: ch + dir } : { line: line - 1 };
+                const range = ranges[i], { ch, line } = range.head, pos = ch || dir > 0 ? { line,
+                ch: ch + dir } : { line: line - 1 };
                 if (range.head === cm.getCursor()) primary = i;
                 newRanges.push({ anchor: pos, head: pos });
             }
@@ -48,7 +49,7 @@
             const { anchor, head } = sel, dir = CodeMirror.cmpPos(anchor, head) > 0 ? -1 : 1;
             return { anchor: new Pos(anchor.line, anchor.ch + dir), head: new Pos(head.line, head.ch - dir) };
         },
-        // 通用按键处理：封装配置、禁用输入、选项存在性、选区合法性检查,通过后执行 action
+        // 通用按键处理:封装配置、禁用输入、选项存在性、选区合法性检查,通过后执行 action
         handleWithOption = (optionName, action) => cm => {
             const conf = getConfig(cm);
             if (!conf || cm.getOption("disableInput")) return CodeMirror.Pass;
@@ -91,7 +92,8 @@
             if (pos === -1) return CodeMirror.Pass;
 
             const nextChar = pairs.charAt(pos + 1), opening = pos % 2 === 0, left = pos % 2 ? pairs.charAt(pos - 1) : ch,
-                right = pos % 2 ? ch : nextChar, bracketPair = `${left}${right}`, closeBefore = getOption(conf, "closeBefore"),
+                right = pos % 2 ? ch : nextChar, bracketPair = `${left}${right}`, closeBefore = getOption(conf,
+                "closeBefore"),
                 triples = getOption(conf, "triples"), identical = nextChar === ch, ranges = cm.listSelections();
 
             // 基于光标后文本的括号平衡检查
@@ -111,9 +113,11 @@
                 if (opening && !range.empty()) curType = "surround";
                 else if ((identical || !opening) && next === ch) {
                     if (identical && stringStartsAfter(cm, cur)) curType = "both";
-                    else if (triples.includes(ch) && cm.getRange(cur, Pos(line, cCh + 3)) === ch.repeat(3)) curType = "skipThree";
+                    else if (triples.includes(ch) && cm.getRange(cur, Pos(line,
+                    cCh + 3)) === ch.repeat(3)) curType = "skipThree";
                     else curType = "skip";
-                } else if (identical && cCh > 1 && triples.includes(ch) && cm.getRange(Pos(line, cCh - 2), cur) === ch.repeat(2)) {
+                } else if (identical && cCh > 1 && triples.includes(ch) && cm.getRange(Pos(line, cCh - 2),
+                cur) === ch.repeat(2)) {
                     if (cCh > 2 && bstring.test(cm.getTokenTypeAt(Pos(line, cCh - 2)))) return false;
                     curType = "addFour";
                 } else if (identical) {
@@ -121,7 +125,7 @@
                     if (!CodeMirror.isWordChar(next) && prev !== ch && !CodeMirror.isWordChar(prev)) curType = "both";
                     else return false;
                 } else if (opening && (next.length === 0 || /\s/.test(next) || closeBefore.includes(next))) {
-                    if (suppressBoth) return false; // 如果光标后有多余右括号，则抑制补全
+                    if (suppressBoth) return false; // 如果光标后有多余右括号,则抑制补全
                     curType = "both";
                 }
                 else return false;
@@ -144,7 +148,8 @@
                     for (let i = 0; i < newSels.length; i++)  newSels[i] = contractSelection(newSels[i]);
                     cm.setSelections(newSels);
                 }
-                else if (type === "both") cm.replaceSelection(bracketPair, null), cm.triggerElectric(bracketPair), moveSel(cm, -1);
+                else if (type === "both") cm.replaceSelection(bracketPair, null),
+                    cm.triggerElectric(bracketPair), moveSel(cm, -1);
                 else if (type === "addFour") cm.replaceSelection(left.repeat(4), "before"), moveSel(cm, 1);
             });
         },

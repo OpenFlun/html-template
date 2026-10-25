@@ -1,11 +1,11 @@
 // 根目录/utils/css-lint.js
 /**
- * 自定义 CSS Lint 函数(适配 CSSTree 的中文消息)，由 CodeMirror 的 lint 插件自动调用;
+ * 自定义 CSS Lint 函数(适配 CSSTree 的中文消息),由 CodeMirror 的 lint 插件自动调用;
  *
  * @param {string} text           - 编辑器文本:用于解析和检查语法;
  * @param {function} callback     - 回调函数,接收检查结果数组:用于向编辑器反馈错误/警告;
  * @param {object} [_options]     - lint 配置选项中传入的自定义属性:用于传递用户偏好、开关、环境变量等;
- * @param {CodeMirror} [_cm]      - 当前的编辑器实例:获取光标位置、选中的文本、行信息、编辑器状态等，
+ * @param {CodeMirror} [_cm]      - 当前的编辑器实例:获取光标位置、选中的文本、行信息、编辑器状态等,
  *                                      实现更智能的检查(如只检查可见区域、根据光标位置优化提示等);
  */
 function customCssLint(text, callback, _options, _cm) {
@@ -15,15 +15,15 @@ function customCssLint(text, callback, _options, _cm) {
     if (typeof csstree === 'undefined') return console.error('csstree未加载,lint功能不可用'), callback(annotations);
 
     /**
-     * 将CSSTree原始的英文错误消息转换为中文提示；
-     * @param {string} originalMsg - 原始错误消息；
-     * @returns {string} 本地化后的错误消息；
+     * 将CSSTree原始的英文错误消息转换为中文提示;
+     * @param {string} originalMsg - 原始错误消息;
+     * @returns {string} 本地化后的错误消息;
      */
     function localizeLintMessage(originalMsg) {
         if (originalMsg.includes("Unexpected input")) return "意外的输入,波浪线后缺少分号或大括号或存在非法字符";
         if (originalMsg.includes("Identifier is expected")) return "波浪线后存在非法字符或缺少大括号或使用了CSS嵌套";
-        if (originalMsg.includes("Declaration is expected")) return "声明错误，波浪线后缺少分号或大括号";
-        if (originalMsg.includes("Selector is expected")) return "选择器错误，波浪线后不应为大括号或多余";
+        if (originalMsg.includes("Declaration is expected")) return "声明错误,波浪线后缺少分号或大括号";
+        if (originalMsg.includes("Selector is expected")) return "选择器错误,波浪线后不应为大括号或多余";
         if (originalMsg.includes('")" is expected')) return "当前行缺少闭合小括号或某个单词书写错误或参数中存在注释";
         if (originalMsg.includes('Identifier or parenthesis is expected')) return "当前行缺少标识符或括号";
         if (originalMsg.includes('Semicolon or block is expected')) return "当前行缺少分号或大括号";
@@ -92,10 +92,10 @@ function customCssLint(text, callback, _options, _cm) {
     }
 
     /**
-     * 处理匹配失败的情况，添加本地化错误注解
+     * 处理匹配失败的情况,添加本地化错误注解
      * @param {object} match - 匹配结果对象 (包含 matched 和 error)
      * @param {object} location - 错误位置 (如 node.loc)
-     * @param {string} defaultMsg - 默认错误消息（当 match.error 不存在时使用）
+     * @param {string} defaultMsg - 默认错误消息(当 match.error 不存在时使用)
      * @param {Array} annotations - 存储注解的数组
      */
     function addMatchError(match, location, defaultMsg, annotations) {
@@ -164,9 +164,9 @@ function customCssLint(text, callback, _options, _cm) {
     }
 
     /**
-     * 遍历CSS AST节点，检查并报告未知的CSS单位；
-     * @param {object} node - CSSTree 语法树节点；
-     * @param {Array} annotations - 用于存储错误信息的数组；
+     * 遍历CSS AST节点,检查并报告未知的CSS单位;
+     * @param {object} node - CSSTree 语法树节点;
+     * @param {Array} annotations - 用于存储错误信息的数组;
      */
     function validateUnits(node, annotations) {
         if (containsVar(node)) return;
@@ -203,14 +203,15 @@ function customCssLint(text, callback, _options, _cm) {
         for (const node of atRules) {
             if (node.name === 'charset') continue;
             if (node.name === 'import' && seenNonImport)
-                addAnnotation(annotations, node.loc, '@import 必须在其他规则（除 @charset 外）之前', 'error');
+                addAnnotation(annotations, node.loc, '@import 必须在其他规则(除 @charset 外)之前', 'error');
             else if (node.name !== 'import') seenNonImport = true;
         }
 
-        // ---------- 上下文感知：维护@规则栈 ----------
-        const descriptorAtrules = new Set(['page', 'font-face', 'viewport', 'counter-style', 'property']), atruleStack = [];
+        // ---------- 上下文感知:维护@规则栈 ----------
+        const descriptorAtrules = new Set(['page', 'font-face', 'viewport', 'counter-style', 'property']),
+            atruleStack = [];
 
-        // 详细检查（带 enter/leave 以维护栈）
+        // 详细检查(带 enter/leave 以维护栈)
         csstree.walk(ast, {
             enter: node => {
                 const { type, property, value, loc, name, prelude } = node;
@@ -220,7 +221,7 @@ function customCssLint(text, callback, _options, _cm) {
                 if (type === 'Declaration') {
                     const hasVar = containsVar(value);
 
-                    // 处理自定义属性（以 -- 开头）
+                    // 处理自定义属性(以 -- 开头)
                     if (property.startsWith('--')) {
                         if (!hasVar) validateUnits(value, annotations);
                         return;
@@ -256,7 +257,8 @@ function customCssLint(text, callback, _options, _cm) {
                         if (!matched) {
                             const errMsg = match && !match.matched ? match.error?.message
                                 : `无效的 ${currentAtrule} 描述符 '${property}'`;
-                            addMatchError({ matched: false, error: { message: errMsg } }, value.loc || loc, errMsg, annotations);
+                            addMatchError({ matched: false, error: { message: errMsg } },
+                            value.loc || loc, errMsg, annotations);
                         }
                         return;
                     }

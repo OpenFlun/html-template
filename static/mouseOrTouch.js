@@ -22,7 +22,8 @@ function getStyle(element, api = null) {
  * @returns {void}
  */
 function mouseOrTouch(element, onClick = null, api = null, isEndShow = false) {
-    let dragStartX, dragStartY, initialX, initialY, isDragging = false, hasDragged = false, touchStartTime = 0, touchIdentifier = null;
+    let dragStartX, dragStartY, initialX, initialY, isDragging = false, hasDragged = false,
+        touchStartTime = 0, touchIdentifier = null;
     const originalZIndex = element.style.zIndex || getComputedStyle(element).zIndex;
 
     setupEventBubbleBlocking();
@@ -119,7 +120,8 @@ function mouseOrTouch(element, onClick = null, api = null, isEndShow = false) {
 
     function endDrag() {
         if (!isDragging) return;
-        const { left, top, right, bottom } = element.style, finalPosition = { [devViewSize]: { style: { left, top, right, bottom } } };
+        const { left, top, right, bottom } = element.style,
+            finalPosition = { [devViewSize]: { style: { left, top, right, bottom } } };
 
         isDragging = false, element.style.transition = '', element.style.cursor = '';
         if (isEndShow) element.classList.add('show');
@@ -137,13 +139,13 @@ function mouseOrTouch(element, onClick = null, api = null, isEndShow = false) {
  * 为元素添加点击和触摸事件支持
  * @param {HTMLElement} element - DOM元素
  * @param {Function} handler - 事件处理函数
- * @param {Object} options - 选项（阻止默认行为等）
+ * @param {Object} options - 选项(阻止默认行为等)
  */
 function addTapSupport(element, handler, options = { preventDefault: true }) {
     if (!element || !handler) return;
 
     element.addEventListener('click', handler); // 鼠标点击事件
-    // 触摸结束事件（模拟点击）
+    // 触摸结束事件(模拟点击)
     element.addEventListener('touchend', (e) => {
         if (options.preventDefault && e.cancelable) e.preventDefault();
         handler(e);

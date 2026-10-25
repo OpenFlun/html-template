@@ -4,7 +4,8 @@ class LongPressBackground {
     constructor() {
         this.pressTimer = null, this.longPressDuration = 2000, this.isLongPress = false;    // 定时器,长按时间 2秒,是否长按
         this.visualFeedbackTimer = null, this.visualFeedbackDelay = 600;                    // 视觉反馈定时器
-        this.nowElement = null, this.longPressedElement = null; this.lastSelect = null;     // 当前元素,长按元素,最后下拉框对象
+        this.nowElement = null,
+        this.longPressedElement = null; this.lastSelect = null;     // 当前元素,长按元素,最后下拉框对象
         this.dragThreshold = 10, this.startX = 0, this.startY = 0, this.isDragging = false; // 添加拖动检测相关变量
         const pressIndicator = document.createElement('div'), picker = document.createElement('div'), api = '/api/longPic';
         pressIndicator.className = 'pressIndicator', picker.id = 'picker', picker.className = 'picker';
@@ -16,7 +17,8 @@ class LongPressBackground {
         // 提前绑定所有需要的事件处理器
         this.handleStart = this.handleStart.bind(this), this.handleEnd = this.handleEnd.bind(this);
         this.handleCancel = this.handleCancel.bind(this), this.handleMove = this.handleMove.bind(this);
-        this.handleDocumentClick = this.handleDocumentClick.bind(this), this.handleGlobalClick = this.handleGlobalClick.bind(this);
+        this.handleDocumentClick = this.handleDocumentClick.bind(this),
+        this.handleGlobalClick = this.handleGlobalClick.bind(this);
 
         getStyle(this.picker, api), mouseOrTouch(this.picker, null, api); // 获取储存样式,绑定元素移动事件
         this.init();
@@ -44,7 +46,8 @@ class LongPressBackground {
     getEventCoordinates(e) {
         let x, y;
         if (e.touches && e.touches.length > 0) x = e.touches[0].pageX, y = e.touches[0].pageY;
-        else if (e.changedTouches && e.changedTouches.length > 0) x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
+        else if (e.changedTouches && e.changedTouches.length > 0) x = e.changedTouches[0].pageX,
+        y = e.changedTouches[0].pageY;
         else x = e.pageX, y = e.pageY;
 
         return { x, y };
@@ -55,7 +58,8 @@ class LongPressBackground {
         if (!this.pressTimer) return;
 
         // 检测是否拖动
-        const { x, y } = this.getEventCoordinates(e), deltaX = Math.abs(x - this.startX), deltaY = Math.abs(y - this.startY);
+        const { x, y } = this.getEventCoordinates(e), deltaX = Math.abs(x - this.startX),
+        deltaY = Math.abs(y - this.startY);
         // 如果拖动距离超过阈值,取消长按
         if (deltaX > this.dragThreshold || deltaY > this.dragThreshold) this.handleCancel(), this.isDragging = true;
     }
@@ -111,7 +115,7 @@ class LongPressBackground {
         this.removeVisualFeedback(), this.isLongPress = false;
     }
 
-    // 处理文档点击事件（关闭选择器）
+    // 处理文档点击事件(关闭选择器)
     handleDocumentClick(e) {
         // 如果选择器正在显示,并且点击的不是选择器内部,也不是长按元素
         if (this.picker.style.display === 'grid' && !this.picker.contains(e.target)
@@ -162,13 +166,15 @@ class LongPressBackground {
             const { btn, list, txt, arrow } = this.lastSelect;
             btn.textContent = txt, btn.append(arrow), list.style.display = 'none'
         };
-        this.picker.style.display = 'none', this.isLongPress = false, this.nowElement = null, this.longPressedElement = null;
+        this.picker.style.display = 'none', this.isLongPress = false, this.nowElement = null,
+        this.longPressedElement = null;
         this.removeVisualFeedback();
     }
 
     initPicker() {
         // 创建模式切换按钮组和添加跳转到编辑器按钮
-        const modeBtns = [{ text: '背景', mode: 'background', isActive: true }, { text: '字体', mode: 'font', isActive: false }
+        const modeBtns = [{ text: '背景', mode: 'background', isActive: true }, { text: '字体', mode: 'font',
+        isActive: false }
             , { text: '边框', mode: 'border', isActive: false }, { text: '宽高', mode: 'size', isActive: false }],
             modeToggle = document.createElement('div'), saveEditor = document.createElement('div'),
             toEditorBtn = document.createElement('button'), toSaveBtn = document.createElement('button');
@@ -184,7 +190,7 @@ class LongPressBackground {
         toEditorBtn.className = 'toEditorBtn', toEditorBtn.textContent = '去编辑样式', toEditorBtn.type = 'button';
         toSaveBtn.className = 'toSaveBtn', toSaveBtn.textContent = '保存到文件', toSaveBtn.type = 'button';
 
-        this.picker.append(modeToggle), this.createBackgroundContent(); // 初始化默认内容（背景模式）
+        this.picker.append(modeToggle), this.createBackgroundContent(); // 初始化默认内容(背景模式)
         addTapSupport(toEditorBtn, () => this.navigateToEditor()), addTapSupport(toSaveBtn, () => this.saveStylesToFile());
         saveEditor.append(toEditorBtn, toSaveBtn), this.picker.append(saveEditor);
     }
@@ -203,7 +209,8 @@ class LongPressBackground {
             else modeBtn.classList.remove('active');
         });
 
-        this.currentMode = mode, this.picker.innerHTML = '', this.picker.append(modeToggle);// 清空picker内容(除了模式按钮和编辑器按钮)
+        this.currentMode = mode, this.picker.innerHTML = '',
+        this.picker.append(modeToggle);// 清空picker内容(除了模式按钮和编辑器按钮)
 
         // 根据模式创建内容
         if (mode === 'background') this.createBackgroundContent();
@@ -216,9 +223,11 @@ class LongPressBackground {
 
     // 创建自定义输入组件
     createCustomInput(options) {
-        const { labelText = '', inputType = 'text', inputId = '', inputValue = '', placeholder = '', accept = '', buttonText = null,
+        const { labelText = '', inputType = 'text', inputId = '', inputValue = '', placeholder = '', accept = '',
+        buttonText = null,
             onApply = null, containerClass = 'custom' } = options, container = document.createElement('div'),
-            label = document.createElement('label'), input = document.createElement('input'), btn = document.createElement('button');
+            label = document.createElement('label'), input = document.createElement('input'),
+            btn = document.createElement('button');
 
         container.className = containerClass;
         // 设置标签
@@ -265,7 +274,8 @@ class LongPressBackground {
         });
         // 添加背景透明度输入框
         this.createCustomInput({
-            labelText: '背景透明度:', inputType: 'range', inputId: 'bgOpacityInput', inputValue: '255', placeholder: '0-255之间',
+            labelText: '背景透明度:', inputType: 'range', inputId: 'bgOpacityInput', inputValue: '255',
+            placeholder: '0-255之间',
             onApply: opacit => {
                 // 获取当前自定义颜色输入框的值
                 const colorInput = this.picker.querySelector('#customColorInput'), baseColor = colorInput.value,
@@ -305,7 +315,8 @@ class LongPressBackground {
                 <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
         </span>`;
-        removeBgBtn.className = 'selectImageBtn remove-bg-btn', removeBgBtn.textContent = '移除', removeBgBtn.type = 'button';
+        removeBgBtn.className = 'selectImageBtn remove-bg-btn', removeBgBtn.textContent = '移除',
+        removeBgBtn.type = 'button';
 
         addTapSupport(removeBgBtn, () => this.setStyle('background-image', 'none'));
         addTapSupport(selectBtn, () => this.showImagePickerOverlay());
@@ -323,15 +334,18 @@ class LongPressBackground {
             imageGrid = document.createElement('div'), actions = document.createElement('div'),
             cancelBtn = document.createElement('button'), applyBtn = document.createElement('button'),
             removeAndShow = () => {
-                overlay.remove(), setTimeout(() => this.showPicker({ target: this.longPressedElement }), 50); // 延迟确保DOM更新完成
+                overlay.remove(), setTimeout(() => this.showPicker({ target: this.longPressedElement }),
+                50); // 延迟确保DOM更新完成
             };
 
         overlay.className = 'image-picker-overlay', pickerContainer.className = 'image-picker-container';
-        header.className = 'image-picker-header', title.className = 'image-picker-title', title.textContent = '选择背景图片';
+        header.className = 'image-picker-header', title.className = 'image-picker-title',
+        title.textContent = '选择背景图片';
         closeBtn.className = 'close-image-btn', closeBtn.type = 'button'; closeBtn.innerHTML = '&times;';
 
         // 搜索和筛选区域
-        filterSection.className = 'image-filter-section', searchInput.type = 'text', searchInput.placeholder = '输入图片名称...';
+        filterSection.className = 'image-filter-section', searchInput.type = 'text',
+        searchInput.placeholder = '输入图片名称...';
         searchInput.className = 'image-search-input', searchInput.name = "fullname"
         searchBtn.className = 'selectImageBtn image-search-btn', searchBtn.type = 'button', searchBtn.textContent = '搜索';
 
@@ -372,14 +386,16 @@ class LongPressBackground {
 
         try {
             const images = await this.getImageList(), path = '/static/img/';
-            if (!images) return container.innerHTML = `<div class="no-images-overlay">暂无图片,请上传图片到 ${path} 目录</div>`;
+            if (!images)
+                return container.innerHTML = `<div class="no-images-overlay">暂无图片,请上传图片到 ${path} 目录</div>`;
             container.innerHTML = '';
 
             let selectedImage = null;
             // 创建图片项(缩略图->原图;图片名称,选择指示器)
             images.forEach(imgName => {
                 const imgItem = document.createElement('div'), thumbnail = document.createElement('div'),
-                    img = document.createElement('img'), N = document.createElement('div'), checkmark = document.createElement('div');
+                    img = document.createElement('img'), N = document.createElement('div'),
+                    checkmark = document.createElement('div');
 
                 imgItem.className = 'image-item-overlay', imgItem.dataset.image = imgName, imgItem.title = "双击预览原图";
                 thumbnail.className = 'image-thumbnail-overlay', img.src = `${path}${imgName}`, img.alt = imgName;
@@ -394,7 +410,8 @@ class LongPressBackground {
                 });
 
                 // 双击预览大图
-                imgItem.addEventListener('dblclick', () => this.previewImageOverlay(`${path}${imgName}`, imgName, removeAndShow));
+                imgItem.addEventListener('dblclick', () => this.previewImageOverlay(`${path}${imgName}`, imgName,
+                removeAndShow));
             });
 
             // 应用按钮事件
@@ -445,7 +462,8 @@ class LongPressBackground {
         // 事件处理
         previewOverlay.querySelectorAll('.close-preview, .close-preview-btn').forEach(btn => btn.onclick = closePreview);
         previewOverlay.querySelector('.use-this-image').onclick = () => {
-            this.setStyle('background-image', `url(${imageUrl})`), closePreview(), removeAndShow(); // 关闭预览,遮罩层并显示选择器
+            this.setStyle('background-image', `url(${imageUrl})`), closePreview(),
+            removeAndShow(); // 关闭预览,遮罩层并显示选择器
         };
 
         // 点击背景关闭
@@ -471,17 +489,21 @@ class LongPressBackground {
                 { name: '默认', value: '' }, { name: 'Arial', value: 'Arial, sans-serif' },
                 { name: '微软雅黑', value: 'Microsoft YaHei, sans-serif' }, { name: '宋体', value: 'SimSun, serif' },
                 { name: '黑体', value: 'SimHei, sans-serif' }, { name: '楷体', value: 'KaiTi, serif' },
-                { name: 'Times New Roman', value: 'Times New Roman, serif' }, { name: 'Verdana', value: 'Verdana, sans-serif' },
+                { name: 'Times New Roman', value: 'Times New Roman, serif' }, { name: 'Verdana',
+                value: 'Verdana, sans-serif' },
                 { name: 'Georgia', value: 'Georgia, serif' }, { name: 'Courier New', value: 'Courier New, monospace' },
-                { name: 'Comic Sans MS', value: 'Comic Sans MS, cursive' }, { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' }
+                { name: 'Comic Sans MS', value: 'Comic Sans MS, cursive' }, { name: 'Trebuchet MS',
+                value: 'Trebuchet MS, sans-serif' }
             ],
             // 水平对齐方式列表
             textAlignments = [{ name: '左对齐', value: 'left' }, { name: '居中对齐', value: 'center' },
-            { name: '右对齐', value: 'right' }, { name: '两端对齐', value: 'justify' }, { name: '起始对齐', value: 'start' },
+            { name: '右对齐', value: 'right' }, { name: '两端对齐', value: 'justify' }, { name: '起始对齐',
+            value: 'start' },
             { name: '结束对齐', value: 'end' }, { name: '继承父元素', value: 'inherit' }],
             // 垂直对齐方式列表
             verticalAlignments = [{ name: '基线对齐', value: 'baseline' }, { name: '顶部对齐', value: 'top' },
-            { name: '中间对齐', value: 'middle' }, { name: '底部对齐', value: 'bottom' }, { name: '文本顶部', value: 'text-top' },
+            { name: '中间对齐', value: 'middle' }, { name: '底部对齐', value: 'bottom' }, { name: '文本顶部',
+            value: 'text-top' },
             { name: '文本底部', value: 'text-bottom' }, { name: '上标', value: 'super' }, { name: '下标', value: 'sub' },
             { name: '继承父元素', value: 'inherit' }, { name: '初始值', value: 'initial' }];
 
@@ -493,7 +515,8 @@ class LongPressBackground {
         });
         // 创建字体大小输入
         this.createCustomInput({
-            labelText: '字体大小:', inputType: 'text', inputId: 'fontSizeLabel', placeholder: '例如:16px,1rem', buttonText: '应用',
+            labelText: '字体大小:', inputType: 'text', inputId: 'fontSizeLabel', placeholder: '例如:16px,1rem',
+            buttonText: '应用',
             onApply: fontSize => this.setStyle('font-size', fontSize)
         });
         // 创建字体选择器
@@ -501,10 +524,12 @@ class LongPressBackground {
         // 创建水平对齐方式选择器
         this.createSelectContainer(textAlignments, '水平对齐', 'text-align', align => this.setStyle('text-align', align));
         // 创建垂直对齐方式选择器
-        this.createSelectContainer(verticalAlignments, '垂直对齐', 'vertical-align', align => this.setStyle('vertical-align', align));
+        this.createSelectContainer(verticalAlignments, '垂直对齐', 'vertical-align',
+            align => this.setStyle('vertical-align', align));
         // 添加垂直对齐数值输入
         this.createCustomInput({
-            labelText: '垂直对齐值:', inputType: 'text', inputId: 'verticalAlignInput', placeholder: '例如:10px, -5px, 50%',
+            labelText: '垂直对齐值:', inputType: 'text', inputId: 'verticalAlignInput',
+            placeholder: '例如:10px, -5px, 50%',
             buttonText: '应用', onApply: value => { this.setStyle('vertical-align', value); }
         });
     }
@@ -567,7 +592,8 @@ class LongPressBackground {
 
     // 清除所有边框设置
     clearAllBorders() {
-        const borderProperties = ['border', 'borderTop', 'borderRight', 'borderBottom', 'borderLeft', 'borderWidth', 'borderStyle',
+        const borderProperties = ['border', 'borderTop', 'borderRight', 'borderBottom', 'borderLeft', 'borderWidth',
+        'borderStyle',
             'borderColor', 'borderRadius'];
 
         borderProperties.forEach(prop => this.longPressedElement.style[prop] = '');
@@ -579,7 +605,8 @@ class LongPressBackground {
             arrow = document.createElement('span'), list = document.createElement('div');
 
         container.className = 'custom', btn.type = 'button', btn.className = 'select-btn', btn.textContent = btnText;
-        arrow.className = 'dropdown-arrow', arrow.innerHTML = '▼', list.className = 'select-list', list.style.display = 'none';
+        arrow.className = 'dropdown-arrow', arrow.innerHTML = '▼', list.className = 'select-list',
+        list.style.display = 'none';
 
         // 创建字体选项
         arr?.forEach(obj => {
@@ -700,24 +727,24 @@ class LongPressBackground {
     // 保存样式到文件
     async saveStylesToFile() {
         const lement = this.longPressedElement; // 长按的元素
-        if (!lement) return alert('请先长按一个元素以设置样式！');
+        if (!lement) return alert('请先长按一个元素以设置样式!');
 
         try {
             // 1. 获取当前页面使用的CSS文件
             const styleFileDir = this.getCurrentStyleFile();
-            if (!styleFileDir) return alert('无法获取当前页面的CSS文件！');
+            if (!styleFileDir) return alert('无法获取当前页面的CSS文件!');
 
             // 2. 生成元素的选择器
             const selector = this.generateElementSelector(lement);
-            if (!selector) return alert('无法为元素生成有效的选择器！');
+            if (!selector) return alert('无法为元素生成有效的选择器!');
 
             // 3. 获取当前元素的内联样式
             const styles = this.getInlineStyles(lement);
-            if (Object.keys(styles).length === 0) return alert('当前元素没有通过长按设置的样式！');
+            if (Object.keys(styles).length === 0) return alert('当前元素没有通过长按设置的样式!');
 
             // 5. 获取现有的CSS文件内容
             const existingContent = await this.fetchCSSFile(styleFileDir);
-            if (existingContent === null) return alert('无法读取CSS文件！');
+            if (existingContent === null) return alert('无法读取CSS文件!');
 
             // 6. 更新CSS内容并保存到服务器
             const updatedContent = this.updateCSSContent(existingContent, selector, styles),
@@ -763,7 +790,8 @@ class LongPressBackground {
 
             // 为当前元素添加兄弟位置
             if (!selector.startsWith('#')) {
-                const siblings = Array.from(current.parentElement?.children || []).filter(el => el.tagName === current.tagName);
+                const siblings = Array.from(current.parentElement?.children || [])
+                    .filter(el => el.tagName === current.tagName);
                 if (siblings.length > 1) {
                     const index = siblings.indexOf(current) + 1;
                     selector += `:nth-of-type(${index})`;
@@ -840,7 +868,7 @@ class LongPressBackground {
         }
     }
 
-    // 更新CSS内容（添加新规则或更新现有规则）
+    // 更新CSS内容(添加新规则或更新现有规则)
     updateCSSContent(cssContent, selector, newStyles) {
         // 检查是否已经存在该选择器的规则
         const lines = cssContent.split('\n');
@@ -904,7 +932,7 @@ class LongPressBackground {
         }
     }
 
-    // 从CSS文件中应用样式到元素（移除内联样式）
+    // 从CSS文件中应用样式到元素(移除内联样式)
     applyStylesFromCSS(element, styles) {
         element.removeAttribute('style'), void element.offsetWidth; // 强制浏览器重新计算样式
     }

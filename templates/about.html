@@ -102,7 +102,7 @@
 			</div>
 			{{empty}}
 			<p style="color:green;">✓ 正确: 空数组显示空状态消息</p>
-			<p>暂无数据，请稍后再试</p>
+			<p>暂无数据,请稍后再试</p>
 			{{endfor}}
 			<hr>
 			<h5>空对象测试</h5>
@@ -130,12 +130,12 @@
 			<p>欢迎回来, {{user.name}}!</p>
 			<p>您的会员等级: {{user.membershipLevel}}</p>
 			{{if user.membershipLevel === 'VIP'}}
-			<p>🎉 您是VIP会员，享受专属特权!</p>
+			<p>🎉 您是VIP会员,享受专属特权!</p>
 			{{endif}}
 		</div>
 		{{else}}
 		<div class="user-status logged-out">
-			<p>您尚未登录，<a href="/login">请先登录</a></p>
+			<p>您尚未登录,<a href="/login">请先登录</a></p>
 		</div>
 		{{endif}}
 		<hr>

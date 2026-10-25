@@ -677,10 +677,12 @@
                     <input type="password" id="currentPassword" placeholder="当前密码" maxlength="72" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="newPassword" placeholder="新密码(至少6位)" maxlength="72" autocomplete="off">
+                    <input type="password" id="newPassword" placeholder="新密码(至少6位)"
+                        maxlength="72" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="confirmPassword" placeholder="再次输入新密码" maxlength="72" autocomplete="off">
+                    <input type="password" id="confirmPassword" placeholder="再次输入新密码"
+                        maxlength="72" autocomplete="off">
                 </div>
                 <div class="flex-buttons">
                     <button type="button" class="btn" id="changePasswordBtn">确认提交</button>
@@ -694,7 +696,8 @@
         <div class="card" id="manage2faPanel" hidden>
             <div id="backupManageMessage" class="message" hidden></div>
             <div id="backupCodesPanel" hidden>
-                <p class="info">备份码已生成,请选择你喜欢的保存方式;<br>注意:备用码只显示一次,共10组,每组不可二次使用,请务必妥善保管;</p>
+                <p class="info">备份码已生成,请选择你喜欢的保存方式;<br>
+                注意:备用码只显示一次,共10组,每组不可二次使用,请务必妥善保管;</p>
                 <div class="flex-buttons">
                     <button type="button" class="btn btn-outline" id="saveBackupFileBtn">💾 保存到文件</button>
                     <button type="button" class="btn btn-outline" id="printBackupCodesBtn">🖨️ 打印备份码</button>
@@ -718,11 +721,11 @@
 
             <div id="enable2faPanel" hidden style="margin-top:16px;">
                 <form onsubmit="return false;" class="form-group">
-                    <p>请使用 Google Authenticator 或类似应用扫描二维码添加认证：</p>
+                    <p>请使用 Google Authenticator 或类似应用扫描二维码添加认证:</p>
                     <div class="qr-placeholder">
                         <img id="qrCodeImg" alt="2FA QR Code">
                     </div>
-                    <p>或在应用中手动输入下方密钥：<code id="secretCode">-</code></p>
+                    <p>或在应用中手动输入下方密钥:<code id="secretCode">-</code></p>
                     <input type="text" id="verifyToken" placeholder="请输入6位验证码" maxlength="6" autocomplete="off">
                     <div class="flex-buttons">
                         <button type="button" class="btn" id="confirm2faBtn">验证并启用</button>
@@ -737,7 +740,7 @@
         <div class="card" id="webauthnCard">
             <h2>
                 <span class="title-text">
-                    硬件认证（指纹/人脸等） <span id="webauthnStatusIcon"></span>
+                    硬件认证(指纹/人脸等) <span id="webauthnStatusIcon"></span>
                 </span>
                 <button type="button" class="btn" id="toggleWebAuthnBtn">启用硬件认证</button>
             </h2>
@@ -848,7 +851,8 @@
                         const res = await fetch('/api/user');
                         if (res.ok) {
                             const user = await res.json();
-                            if (user.email === targetEmail && user.emailVerified === true) stopEmailPolling(), location.reload();
+                            if (user.email === targetEmail && user.emailVerified === true) stopEmailPolling(),
+                            location.reload();
                         }
                     } catch (e) { console.error(e); }
                 }, 2000);
@@ -878,15 +882,18 @@
                 const isPanelVisible = !backupCodesPanel.hidden;
                 toggleBackupPanelBtn.disabled = false;
                 if (isPanelVisible) {
-                    toggleBackupPanelBtn.textContent = '📴 关闭备份码显示', toggleBackupPanelBtn.classList.remove('btn-warning');
+                    toggleBackupPanelBtn.textContent = '📴 关闭备份码显示',
+                    toggleBackupPanelBtn.classList.remove('btn-warning');
                     toggleBackupPanelBtn.classList.add('btn-secondary');
                 } else {
-                    toggleBackupPanelBtn.textContent = '🔄 生成新的备份码', toggleBackupPanelBtn.classList.remove('btn-secondary');
+                    toggleBackupPanelBtn.textContent = '🔄 生成新的备份码',
+                    toggleBackupPanelBtn.classList.remove('btn-secondary');
                     toggleBackupPanelBtn.classList.add('btn-warning');
                 }
             },
             hideBackupPanel = () => {
-                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', latestBackupCodes = [], syncBackupButtonState();
+                backupCodesPanel.hidden = true, backupCodesList.innerHTML = '', latestBackupCodes = [],
+                syncBackupButtonState();
                 const infoPara = document.querySelector('#backupCodesPanel .info');
                 if (infoPara) infoPara.classList.remove('info-border-flow');
             },
@@ -923,7 +930,8 @@
                 if (currentUser) newUsernameInput.value = currentUser.username, newEmailInput.value = currentUser.email;
                 if (isEmailPollingActive) stopEmailPolling();
                 profileCurrentPasswordInput.value = '', editProfileBtn.disabled = true, newUsernameInput.focus();
-                updateProfileBtn.disabled = false, updateProfileBtn.textContent = '保存修改', hideMessage(updateProfileMessage);
+                updateProfileBtn.disabled = false, updateProfileBtn.textContent = '保存修改',
+                hideMessage(updateProfileMessage);
             },
             // 密码修改模块
             resetPasswordForm = () => {
@@ -937,7 +945,8 @@
             },
             openChangePasswordCard = () => {
                 closeEditProfileCard(), changePasswordCard.hidden = false, showChangePasswordBtn.disabled = true;
-                resetPasswordForm(), setTimeout(() => currentPasswordInput.focus(), 50), hideMessage(changePasswordMessage);
+                resetPasswordForm(), setTimeout(() => currentPasswordInput.focus(), 50),
+                hideMessage(changePasswordMessage);
             },
             // 备份码模块
             renderBackupCodes = codes => {
@@ -968,7 +977,8 @@
             },
             saveBackupCodesToFile = (backupCodes, prefix = '我的账户备份码') => {
                 if (backupCodes?.length === 0) return alert('没有可保存的备份码');
-                const now = new Date(), time = now.toLocaleString(), fileTime = time.replace(/[\/:]/g, '-').replace(/ /g, '_');
+                const now = new Date(), time = now.toLocaleString(), fileTime = time.replace(/[\/:]/g, '-').replace(/ /g,
+                '_');
                 let content = `===== ${prefix} =====\n生成时间: ${time}\n\n`;
                 content += `共计 ${backupCodes.length} 个备用码,请妥善保管,每个码仅可使用一次;\n\n`;
                 backupCodes.forEach((code, idx) => content += `备用码${idx + 1}: ${code}\n`);
@@ -985,17 +995,18 @@
                 printBackupContainer.innerHTML = `
                 <div class="print-backup">
                     <h1>🔐 ${title}</h1>
-                    <p class="timestamp">生成时间：${new Date().toLocaleString()}</p>
+                    <p class="timestamp">生成时间:${new Date().toLocaleString()}</p>
                     <div class="codes-grid">
                         ${backupCodes.map(code => `<div class="code-card">${code}</div>`).join('')}
                     </div>
                     <div class="warning">⚠️ 每个备用码仅能使用一次,请妥善保管;</div>
                     <div class="footer">共计 ${backupCodes.length} 个备用码</div>
                 </div>`;
-                printBackupCodesBtn.disabled = true, window.print(), setTimeout(() => printBackupContainer.innerHTML = '', 500);
+                printBackupCodesBtn.disabled = true, window.print(), setTimeout(() => printBackupContainer.innerHTML = '',
+                500);
             },
             deleteBackupCodes = async () => {
-                if (!confirm('⚠️ 确定要删除所有备份码吗？删除后将无法使用备份码恢复登录')) return;
+                if (!confirm('⚠️ 确定要删除所有备份码吗?删除后将无法使用备份码恢复登录')) return;
 
                 deleteBackupCodesBtn.disabled = true;
                 const result = await requestApi('/api/delete-backup-codes', { method: 'POST' }, backupManageMessage,
@@ -1016,7 +1027,8 @@
                 secretCode.textContent = '加载中...', enable2faPanel.hidden = false, confirm2faBtn.disabled = false;
                 const { ok, data } = await requestApi('/api/enable-2fa', { method: 'POST' }, confirmMessage, toggle2faBtn),
                     { qrCode, secret } = data;
-                if (ok && qrCode && secret) qrCodeImg.src = qrCode, secretCode.textContent = secret, verifyTokenInput.focus();
+                if (ok && qrCode && secret) qrCodeImg.src = qrCode, secretCode.textContent = secret,
+                verifyTokenInput.focus();
                 else enable2faPanel.hidden = true;
             },
             hideEnable2faPanel = () => {
@@ -1026,11 +1038,13 @@
             // WebAuthn 硬件认证模块
             loadWebAuthnData = async () => {
                 try {
-                    const { ok, data } = await requestApi('/api/webauthn/credentials', { method: 'GET' }, null, null, true);
+                    const { ok, data } = await requestApi('/api/webauthn/credentials', { method: 'GET' }, null, null,
+                    true);
                     if (ok) currentWebAuthnCredentials = data.credentials || [];
                     else throw new Error(data.message);
                 } catch (err) {
-                    currentWebAuthnCredentials = [], showMessage(webauthnMessage, 'error', '加载硬件凭证失败,请刷新页面重试');
+                    currentWebAuthnCredentials = [], showMessage(webauthnMessage, 'error',
+                    '加载硬件凭证失败,请刷新页面重试');
                 } finally { refreshWebAuthnUI() }
             },
             addWebAuthnDevice = async () => {
@@ -1054,7 +1068,7 @@
                 } catch (err) {
                     if (err.name === 'AbortError' || err.name === 'NotAllowedError')
                         return hideMessage(webauthnMessage), false;
-                    return showMessage(webauthnMessage, 'error', '添加失败：' + (err.message)), false;
+                    return showMessage(webauthnMessage, 'error', '添加失败:' + (err.message)), false;
                 }
             },
             renderCredentialsList = () => {
@@ -1072,7 +1086,7 @@
 
                     delBtn.addEventListener('click', async e => {
                         e.preventDefault();
-                        if (!confirm('确定删除此设备吗？删除后将无法用于登录验证;')) return;
+                        if (!confirm('确定删除此设备吗?删除后将无法用于登录验证;')) return;
                         const { ok } = await requestApi('/api/webauthn/credentials/delete',
                             {
                                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1096,11 +1110,12 @@
                 await loadWebAuthnData();
                 const targetState = !currentUser?.webauthnEnabled;
                 if (!targetState) {
-                    if (!confirm('确定关闭硬件验证吗？关闭后登录时不再需要硬件验证;')) return;
+                    if (!confirm('确定关闭硬件验证吗?关闭后登录时不再需要硬件验证;')) return;
                     const oldUser = { ...currentUser };
                     if (currentUser) currentUser.webauthnEnabled = false;
                     refreshWebAuthnUI();
-                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null, toggleWebAuthnBtn);
+                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null,
+                    toggleWebAuthnBtn);
                     if (ok) await loadUser();
                     else {
                         if (currentUser) currentUser.webauthnEnabled = oldUser?.webauthnEnabled;
@@ -1114,7 +1129,8 @@
                         await addWebAuthnDevice();
                     } finally { toggleWebAuthnBtn.disabled = false }
                 } else {
-                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null, toggleWebAuthnBtn);
+                    const { ok, data } = await requestApi('/api/webauthn/toggle', { method: 'POST' }, null,
+                    toggleWebAuthnBtn);
                     if (ok) {
                         await loadUser(), await loadWebAuthnData();
                         if (data.backupCodes?.length) renderBackupCodes(data.backupCodes);
@@ -1141,7 +1157,8 @@
                 .map(input => input.value.trim());
 
             if (!username || !email || !pwd) return showMessage(updateProfileMessage, 'error', '请填写所有字段');
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMessage(updateProfileMessage, 'error', '邮箱格式不正确');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMessage(updateProfileMessage, 'error',
+            '邮箱格式不正确');
             const emailChanged = currentUser && email !== currentUser.email;
             let skipFinallyRestore = false;
             try {
@@ -1193,7 +1210,7 @@
             try {
                 const isPanelVisible = !backupCodesPanel.hidden;
                 if (isPanelVisible) return hideBackupPanel();
-                if (!confirm('重新生成备用码,将会使旧备用码失效,是否继续？')) return toggleBackupPanelBtn.disabled = false;
+                if (!confirm('重新生成备用码,将会使旧备用码失效,是否继续?')) return toggleBackupPanelBtn.disabled = false;
 
                 const result = await requestApi('/api/regenerate-backup-codes', { method: 'POST' }, backupManageMessage,
                     toggleBackupPanelBtn);
@@ -1221,7 +1238,7 @@
                 if (enable2faPanel.hidden) await showEnable2faPanel();
                 else hideEnable2faPanel();
             } else {
-                if (!confirm('确定关闭双因素认证吗？关闭后账户安全性将降低;')) return;
+                if (!confirm('确定关闭双因素认证吗?关闭后账户安全性将降低;')) return;
                 toggle2faBtn.disabled = true;
                 try {
                     const { ok, data } = await requestApi('/api/disable-2fa', { method: 'POST' }, null, null, true);
@@ -1261,7 +1278,7 @@
         deleteAccountBtn.addEventListener('click', async () => {
             const pwd = deleteAccountPassword.value.trim();
             if (!pwd) return showMessage(deleteAccountMessage, 'error', '请输入密码');
-            if (!confirm('您确定要永久注销账户吗？此操作不可撤销,所有数据将被删除!!!')) return;
+            if (!confirm('您确定要永久注销账户吗?此操作不可撤销,所有数据将被删除!!!')) return;
 
             const { ok } = await requestApi('/api/delete-account', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1285,8 +1302,10 @@
             { input: verifyTokenInput, button: confirm2faBtn }
         ],
             clearMessageMappings = [
-                { messageEl: updateProfileMessage, inputs: [newUsernameInput, newEmailInput, profileCurrentPasswordInput] },
-                { messageEl: changePasswordMessage, inputs: [currentPasswordInput, newPasswordInput, confirmPasswordInput] },
+                { messageEl: updateProfileMessage, inputs: [newUsernameInput, newEmailInput,
+                profileCurrentPasswordInput] },
+                { messageEl: changePasswordMessage, inputs: [currentPasswordInput, newPasswordInput,
+                confirmPasswordInput] },
                 { messageEl: confirmMessage, inputs: [verifyTokenInput] },
                 { messageEl: deleteAccountMessage, inputs: [deleteAccountPassword] }
             ],

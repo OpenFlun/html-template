@@ -1,15 +1,15 @@
 /**
  * 模板引擎服务
  *
- * 功能区块（按代码顺序）：
- *   1. 常量(路径和正则)及工具函数：高频正则预编译,路径安全检查,基础字符串处理,入口文件识别处理
- *   2. 模板区块处理工具：区块解析和清理（忽略嵌套标签）
- *   3. 包含文件处理：文件包含与依赖追踪
- *   4. 用户自定义功能系统：路由/函数/变量加载
- *   5. 模板功能处理系统：变量动态替换、函数执行、条件判断和循环处理
- *   6. 模板结构验证：标签完整性检查
- *   7. 模板文件操作：路径获取
- *   8. 模板渲染引擎核心：模板合成,文件验证,渲染
+ * 功能区块(按代码顺序):
+ *   1. 常量(路径和正则)及工具函数:高频正则预编译,路径安全检查,基础字符串处理,入口文件识别处理
+ *   2. 模板区块处理工具:区块解析和清理(忽略嵌套标签)
+ *   3. 包含文件处理:文件包含与依赖追踪
+ *   4. 用户自定义功能系统:路由/函数/变量加载
+ *   5. 模板功能处理系统:变量动态替换、函数执行、条件判断和循环处理
+ *   6. 模板结构验证:标签完整性检查
+ *   7. 模板文件操作:路径获取
+ *   8. 模板渲染引擎核心:模板合成,文件验证,渲染
  *   9. 模块功能导出
  */
 import fs from 'fs';
@@ -25,7 +25,8 @@ let isCompilationMode = false;
 const fsPromises = fs.promises;
 /**
  * 当前工作目录
- * >查看定义:@see {@link CWD}、{@link templatesDir}、{@link staticDir}、{@link customizeDir}、{@link accountDir}、{@link defaultPort}
+ * >查看定义:@see {@link CWD}、{@link templatesDir}、{@link staticDir}、
+ *{@link customizeDir}、{@link accountDir}、{@link defaultPort}
  */
 const CWD = process.cwd(), templatesDir = 'templates', staticDir = 'static', customizeDir = 'customize',
 	accountDir = 'account', defaultPort = 7296;
@@ -40,7 +41,7 @@ const templatesAbsDir = path.join(CWD, templatesDir);
  */
 const pRes = path.resolve;
 /**
- * 已写入文件忽略列表（监控文件写入时使用,防止编译器误触发重新编译）
+ * 已写入文件忽略列表(监控文件写入时使用,防止编译器误触发重新编译)
  * >查看定义:@see {@link writtenFilesToIgnore}
  */
 const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
@@ -68,7 +69,7 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 	},
 
 	/**
-	 * 检查路径是否安全（防止目录遍历攻击）
+	 * 检查路径是否安全(防止目录遍历攻击)
 	 * @param {string} requestedPath - 请求的路径
 	 * @param {string} baseDir - 基础目录
 	 * @returns {boolean} 路径是否安全
@@ -88,7 +89,7 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 	},
 
 	/**
-	 * 安全地将值转换为字符串，处理 null、undefined 和对象
+	 * 安全地将值转换为字符串,处理 null、undefined 和对象
 	 * @param {any} value - 需要转换的值
 	 * @returns {string} 转换后的字符串
 	 */
@@ -107,55 +108,55 @@ const writtenFilesToIgnore = [], userFeatures = {}, includedFiles = new Set(),
 	/**
 	 * 解析并验证端口值
 	 * @param {string|number} portValue - 端口值
-	 * @param {string} source - 来源描述（用于错误消息）
+	 * @param {string} source - 来源描述(用于错误消息)
 	 * @returns {number} 有效的端口号或默认值
 	 */
 	_parseAndValidatePort = (portValue, source) => {
 		const portNum = parseInt(portValue);
 		if (!isNaN(portNum) && portNum > 0 && portNum < 65536) return portNum;
-		console.warn(`警告: ${source} "${portValue}" 无效，已启用默认端口:${defaultPort}`);
+		console.warn(`警告: ${source} "${portValue}" 无效,已启用默认端口:${defaultPort}`);
 		return defaultPort;
 	};
 
 /**
- * 统一服务器配置解析函数（与 dev-server.js 完全一致）
+ * 统一服务器配置解析函数(与 dev-server.js 完全一致)
  *
- * 配置解析优先级：
- *  端口：
+ * 配置解析优先级:
+ *  端口:
  *    1. 命令行参数 (--port 或 -p)
  *    2. 函数参数 (options.port)
  *    3. 环境变量 (process.env.PORT)
  *    4. 默认值 (常量 defaultPort)
  *
- *  主机名：
+ *  主机名:
  *    1. 命令行参数 (--host 或 -H)
  *    2. 函数参数 (options.host)
  *    3. 环境变量 (process.env.HOST)
  *    4. 默认值 ("localhost")
  *
- *  热重载：
+ *  热重载:
  *    1. 命令行参数 (--hot-reload/--no-hot-reload)
  *    2. 函数参数 (options.hotReload)
  *    3. 环境变量 (process.env.HOTRELOAD)
  *    4. 默认值 (true)
  *
- *  登录模式：
+ *  登录模式:
  *    1. 命令行参数 (--account/--no-account)
  *    2. 函数参数 (options.account)
  *    3. 环境变量 (process.env.ACCOUNT)
  *    4. 默认值 (false)
  *
- *  HTTPS：
+ *  HTTPS:
  *    1. 命令行参数 (--https/--no-https)
  *    2. 函数参数 (options.https)
  *    3. 环境变量 (process.env.HTTPS === 'true')
  *    4. 默认值 (false)
  *
- *  HTTPS证书路径（仅在启用HTTPS时必须提供）：
+ *  HTTPS证书路径(仅在启用HTTPS时必须提供):
  *    1. 命令行参数 (--https-key, --https-cert)
  *    2. 函数参数 (options.httpsKey, options.httpsCert)
  *    3. 环境变量 (process.env.HTTPS_KEY, process.env.HTTPS_CERT)
- *    4. 若仍未提供，启动时抛出错误
+ *    4. 若仍未提供,启动时抛出错误
  */
 const parseServerConfig = (options = {}, defaults = {}) => {
 	let port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath;
@@ -205,7 +206,7 @@ const parseServerConfig = (options = {}, defaults = {}) => {
 	else if (defaults.https !== undefined) httpsEnabled = defaults.https;
 	else httpsEnabled = false;
 
-	// 解析HTTPS证书路径（只有在 httpsEnabled 为 true 时才需要）
+	// 解析HTTPS证书路径(只有在 httpsEnabled 为 true 时才需要)
 	if (httpsEnabled) {
 		const keyArgIndex = args.findIndex(arg => arg === '--https-key');
 		if (keyArgIndex !== -1 && args[keyArgIndex + 1]) httpsKeyPath = args[keyArgIndex + 1];
@@ -220,8 +221,8 @@ const parseServerConfig = (options = {}, defaults = {}) => {
 		else if (defaults.httpsCert) httpsCertPath = defaults.httpsCert;
 
 		if (!httpsKeyPath || !httpsCertPath) {
-			console.error('❌ 启用HTTPS时必须同时提供证书私钥路径和证书文件路径！');
-			console.error('   请通过以下方式之一指定：');
+			console.error('❌ 启用HTTPS时必须同时提供证书私钥路径和证书文件路径!');
+			console.error('   请通过以下方式之一指定:');
 			console.error('   1. 命令行: --https-key <path> --https-cert <path>');
 			console.error('   2. 环境变量: HTTPS_KEY=<path> HTTPS_CERT=<path>');
 			console.error('   3. 函数参数: { httpsKey: "...", httpsCert: "..." }');
@@ -234,7 +235,7 @@ const parseServerConfig = (options = {}, defaults = {}) => {
 };
 
 /**
- * 生成页面URL（支持HTTP/HTTPS和自定义主机名）
+ * 生成页面URL(支持HTTP/HTTPS和自定义主机名)
  * @param {string} page - 页面文件名
  * @param {number} port - 端口号
  * @param {boolean} useHttps - 是否使用HTTPS
@@ -249,7 +250,7 @@ const generateUrls = (page, port, useHttps, host) => {
 };
 
 /**
- * 动态识别入口文件（优先级策略）
+ * 动态识别入口文件(优先级策略)
  * 1. 查找包含\<!-- \@entry -->标记的文件
  * 2. 按优先级列表匹配(index.html > main.html > home.html)
  * 3. 返回首字母排序的第一个HTML文件
@@ -272,7 +273,7 @@ const findEntryFile = async cachedPages => {
 
 	// ==================== 2. 模板区块处理工具 ====================
 	/**
-	 * 解析模板内容并定位所有区块的起止位置（忽略嵌套标签）
+	 * 解析模板内容并定位所有区块的起止位置(忽略嵌套标签)
 	 * @param {string} content - 模板内容
 	 * @returns {Object} 区块元数据 {blockName: [{startIndex, endIndex, innerContent}]}
 	 */
@@ -288,13 +289,13 @@ const findEntryFile = async cachedPages => {
 			const openName = content.slice(startIndex + 2, openEndIndex).trim(), closeTag = `[~${openName}]`,
 				closeStartIndex = content.indexOf(closeTag, openEndIndex + 1), endIndex = closeStartIndex + closeTag.length;
 
-			// 没有找到闭标签，跳过
+			// 没有找到闭标签,跳过
 			if (closeStartIndex === -1) {
 				index = openEndIndex + 1;
 				continue;
 			}
 
-			// 直接记录当前区块，不检查嵌套情况
+			// 直接记录当前区块,不检查嵌套情况
 			if (!blocks[openName]) blocks[openName] = [];
 			blocks[openName].push({ startIndex, endIndex, innerContent: content.slice(openEndIndex + 1, closeStartIndex) });
 			index = endIndex;
@@ -360,7 +361,7 @@ const processIncludes = async (content, currentFile = '', inclusionStack = new S
 
 		// 确保路径安全
 		if (!_isSafePath(includePath, templatesAbsDir)) {
-			console.warn(`⛔ 包含路径不安全，已跳过: ${fileName}`), parts.push('');
+			console.warn(`⛔ 包含路径不安全,已跳过: ${fileName}`), parts.push('');
 			continue;
 		}
 
@@ -402,7 +403,7 @@ const monitorFileWrites = () => {
 	const sWrite = fs.writeFileSync, fWrite = fs.writeFile, pWrite = fsPromises.writeFile, pNormalize = path.normalize,
 		ignoreTimers = new Map(),
 
-		// 内联记录逻辑（加入忽略列表 + 2 秒后自动移除）
+		// 内联记录逻辑(加入忽略列表 + 2 秒后自动移除)
 		track = path => {
 			if (typeof path !== 'string') return;
 			const normalized = pNormalize(pRes(CWD, path));
@@ -424,7 +425,7 @@ const monitorFileWrites = () => {
 		return process.nextTick(track, file), r;
 	};
 
-	// 劫持异步写入（回调版）
+	// 劫持异步写入(回调版)
 	fs.writeFile = (file, ...args) => {
 		const r = fWrite.call(fs, file, ...args);
 		return process.nextTick(track, file), r;
@@ -445,11 +446,11 @@ const monitorFileWrites = () => {
 },
 
 	/**
-	* 异步安全加载模块（兼容 ESM 和 CJS）
-	* 优先使用 default 导出（ESM 默认导出 / CJS module.exports）
+	* 异步安全加载模块(兼容 ESM 和 CJS)
+	* 优先使用 default 导出(ESM 默认导出 / CJS module.exports)
 	* 仅当 default 导出存在且包含 setupRoutes / functions / variables 时才使用,否则使用整个模块
 	* @param {string} modulePath - 模块文件路径
-	* @param {boolean} forceReload - 是否强制重新加载（绕过缓存）
+	* @param {boolean} forceReload - 是否强制重新加载(绕过缓存)
 	*/
 	_safeImport = async (modulePath, forceReload = false) => {
 		try {
@@ -466,17 +467,17 @@ const monitorFileWrites = () => {
 	};
 
 /**
- * 加载用户自定义功能（路由/函数/变量）
+ * 加载用户自定义功能(路由/函数/变量)
  * >查看定义:@see {@link loadUserFeatures}
- * @param {Object} app - Express应用实例（仅服务器模式需要）
+ * @param {Object} app - Express应用实例(仅服务器模式需要)
  * @param {boolean} isCompileMode - 是否为编译模式
- * @param {boolean} forceReload - 是否强制重新加载（绕过缓存）
+ * @param {boolean} forceReload - 是否强制重新加载(绕过缓存)
  * @returns {Promise<Object>} 用户功能集合
  */
 const loadUserFeatures = async (app = null, isCompileMode = false, forceReload = false) => {
 	const featuresDir = path.join(CWD, customizeDir);
 
-	// 检查并创建目录（如果是编译模式）
+	// 检查并创建目录(如果是编译模式)
 	try {
 		await fsPromises.access(featuresDir);
 	} catch {
@@ -499,7 +500,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 				continue;
 			}
 
-			// 注册路由（仅限服务器模式且有 app 实例）
+			// 注册路由(仅限服务器模式且有 app 实例)
 			if (typeof userFeature.setupRoutes === 'function' && app) userFeature.setupRoutes(app);
 
 			// 收集函数
@@ -539,8 +540,8 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	},
 
 	/**
-	 * 处理所有循环结构，包括简单循环和键值对循环
-	 * 支持特性：
+	 * 处理所有循环结构,包括简单循环和键值对循环
+	 * 支持特性:
 	 * - 简单循环: {{for item in collection}}...{{empty}}...{{endfor}}
 	 * - 键值对循环: {{for key, value in object}}...{{empty}}...{{endfor}}
 	 * - empty分支: 当集合为空时显示替代内容
@@ -548,7 +549,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	 * - 循环控制: 支持{{break}}和{{continue}}语句
 	 * @param {string} content - 模板内容
 	 * @param {Object} variables - 变量上下文
-	 * @returns {string} 处理后的内容，所有循环结构已展开为实际内容
+	 * @returns {string} 处理后的内容,所有循环结构已展开为实际内容
 	 */
 	_processLoops = (content, variables) => {
 		let result = content;
@@ -609,15 +610,15 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	},
 
 	/**
-	 * 处理条件判断结构，支持多分支条件判断
-	 * 语法支持：
+	 * 处理条件判断结构,支持多分支条件判断
+	 * 语法支持:
 	 * - 主条件: {{if condition}}...{{endif}}
 	 * - 多分支: {{if condition}}...{{else if condition2}}...{{else}}...{{endif}}
-	 * - 嵌套条件: 支持最多20层嵌套，通过迭代方式处理
-	 * 使用COMPLEX_IF_REGEX匹配主结构，ELSE_IF_REGEX匹配else if分支
+	 * - 嵌套条件: 支持最多20层嵌套,通过迭代方式处理
+	 * 使用COMPLEX_IF_REGEX匹配主结构,ELSE_IF_REGEX匹配else if分支
 	 * @param {string} content - 模板内容
 	 * @param {Object} variables - 变量上下文
-	 * @returns {string} 处理后的内容，条件判断已根据变量值解析
+	 * @returns {string} 处理后的内容,条件判断已根据变量值解析
 	 */
 	_processConditionals = (content, variables) => {
 		let result = content, hasChanges = true, iterationCount = 0;
@@ -665,18 +666,18 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	},
 
 	/**
-	 * 处理用户自定义函数调用，支持多种参数类型和复杂表达式
+	 * 处理用户自定义函数调用,支持多种参数类型和复杂表达式
 	 * 函数调用格式: {{user:functionName(arg1, arg2, ...)}}
-	 * 参数类型支持：
-	 * - 字符串: "string" 或 'string'（引号内的内容作为字面量）
-	 * - 变量: {{variable}}（变量引用，使用当前上下文中的值）
-	 * - 布尔值: true/false（直接转换为布尔类型）
-	 * - 数字: 123（直接转换为数字类型）
-	 * - 特殊值: null/undefined（转换为对应JavaScript值）
-	 * 函数从customize目录加载，支持模块化组织
+	 * 参数类型支持:
+	 * - 字符串: "string" 或 'string'(引号内的内容作为字面量)
+	 * - 变量: {{variable}}(变量引用,使用当前上下文中的值)
+	 * - 布尔值: true/false(直接转换为布尔类型)
+	 * - 数字: 123(直接转换为数字类型)
+	 * - 特殊值: null/undefined(转换为对应JavaScript值)
+	 * 函数从customize目录加载,支持模块化组织
 	 * @param {string} content - 模板内容
 	 * @param {Object} variables - 变量上下文
-	 * @returns {string} 处理后的内容，函数调用已替换为执行结果
+	 * @returns {string} 处理后的内容,函数调用已替换为执行结果
 	 */
 	_processUserFunctions = (content, variables) => {
 		return content.replace(_resetRegex(userFuncRegex),
@@ -722,12 +723,12 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 
 	/**
 	 * 根据点分隔的路径从对象中获取嵌套属性值
-	 * 支持多级属性访问，如: user.profile.name
-	 * 使用reduce方法逐级访问属性，遇到undefined时停止并返回
-	 * 安全处理不存在的路径，避免抛出异常
+	 * 支持多级属性访问,如: user.profile.name
+	 * 使用reduce方法逐级访问属性,遇到undefined时停止并返回
+	 * 安全处理不存在的路径,避免抛出异常
 	 * @param {Object} obj - 源对象
 	 * @param {string} path - 点分隔的属性路径
-	 * @returns {any} 属性值，如果路径不存在则返回undefined
+	 * @returns {any} 属性值,如果路径不存在则返回undefined
 	 */
 	_getValueByPath = (obj, path) => {
 		return path.split('.').reduce((current, key) => {
@@ -738,14 +739,14 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	},
 
 	/**
-	 * 创建安全的沙箱环境用于表达式求值，防止恶意代码执行
-	 * 复制原始变量但阻止原型访问，确保安全性
-	 * 添加安全的工具函数支持：
+	 * 创建安全的沙箱环境用于表达式求值,防止恶意代码执行
+	 * 复制原始变量但阻止原型访问,确保安全性
+	 * 添加安全的工具函数支持:
 	 * - 基础类型: String, Number, Boolean, Array, Date, Math, JSON
 	 * - 逻辑运算符: and, or, not, eq, neq, gt, lt, gte, lte
 	 * 使用Object.create(null)创建无原型的干净对象
 	 * @param {Object} variables - 原始变量上下文
-	 * @returns {Object} 安全的沙箱环境，包含变量和受限函数
+	 * @returns {Object} 安全的沙箱环境,包含变量和受限函数
 	 */
 	_createSafeSandbox = variables => {
 		const safeVariables = Object.create(null);
@@ -769,7 +770,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	 * 表达式求值函数,在安全沙箱环境中执行JavaScript表达式
 	 * 使用vm模块创建安全上下文,避免使用eval
 	 * 将沙箱环境中的变量和函数作为参数传入执行上下文
-	 * 支持完整的JavaScript表达式语法，包括:
+	 * 支持完整的JavaScript表达式语法,包括:
 	 * - 算术运算: +, -, *, /, %
 	 * - 比较运算: ==, !=, ===, !==, >, <, >=, <=
 	 * - 逻辑运算: &&, ||, !
@@ -778,7 +779,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	 * - 属性访问: obj.property
 	 * @param {string} expr - 待求值的JavaScript表达式
 	 * @param {Object} variables - 变量上下文
-	 * @returns {any} 表达式求值结果，求值失败时返回null
+	 * @returns {any} 表达式求值结果,求值失败时返回null
 	 */
 	_evaluateExpression = (expr, variables) => {
 		try {
@@ -798,12 +799,12 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	/**
 	 * 处理对象属性访问、简单变量替换和复杂表达式求值
 	 * 使用evaluateExpression函数在安全沙箱中执行表达式
-	 * 功能包括：
+	 * 功能包括:
 	 * - 还原带反引号变量: `{{variable}}` → {{variable}}
 	 * - 对象属性访问: {{object.property}}支持多级属性访问
 	 * - 简单变量替换: {{variable}}替换为变量值
 	 * - 跳过特殊标签: 用户函数,循环,控制和判断
-	 * 表达式支持特性：
+	 * 表达式支持特性:
 	 * - 数学运算: {{1 + 2 * 3}}
 	 * - 逻辑运算: {{a && b || c}}
 	 * - 比较运算: {{value > 10}}
@@ -813,7 +814,7 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 	 * 使用getValueByPath函数解析多级属性路径
 	 * @param {string} content - 模板内容
 	 * @param {Object} variables - 变量上下文
-	 * @returns {string} 处理后的内容，简单变量和对象属性已替换
+	 * @returns {string} 处理后的内容,简单变量和对象属性已替换
 	 */
 	_processVariablesAndExpressions = (content, variables) => {
 		let result = content;
@@ -863,12 +864,12 @@ const loadUserFeatures = async (app = null, isCompileMode = false, forceReload =
 		return result;
 	},
 
-	// 模块处理函数数组（所有依赖函数已定义，顺序安全）
+	// 模块处理函数数组(所有依赖函数已定义,顺序安全)
 	processingPhases = [_processLoops, _processConditionals, _processUserFunctions, _processVariablesAndExpressions],
 
 	/**
 	 * 迭代式模板处理器
-	 * 按数组顺序多次处理模板，直到没有变化或达到最大迭代次数
+	 * 按数组顺序多次处理模板,直到没有变化或达到最大迭代次数
 	 * @param {string} content - 模板内容
 	 * @param {Object} variables - 变量上下文
 	 * @param {number} maxIterations - 最大迭代次数:10
@@ -971,7 +972,7 @@ const processVariables = (content, requestVariables = {}) => {
 
 // ==================== 7. 模板文件操作 ====================
 /**
- * 获取模板目录下所有可用的HTML文件路径（排除base.html）
+ * 获取模板目录下所有可用的HTML文件路径(排除base.html)
  * >查看定义:@see {@link getAvailableTemplates}
  * @returns {Promise<string[]>} 过滤后HTML文件路径数组
  */
@@ -989,7 +990,7 @@ const getAvailableTemplates = async () => {
 			}
 			return results;
 		}, templates = await getAllHtmlFiles(templatesAbsDir);
-		if (templates.length === 0) throw new Error('未找到任何可用模板文件，请检查模板目录');
+		if (templates.length === 0) throw new Error('未找到任何可用模板文件,请检查模板目录');
 
 		return templates;
 	} catch (error) {
@@ -1028,7 +1029,7 @@ const getAvailableTemplates = async () => {
 			}
 		}
 
-		replacements.sort((a, b) => b.startIndex - a.startIndex); // 按索引从大到小排序，避免替换时影响后续索引
+		replacements.sort((a, b) => b.startIndex - a.startIndex); // 按索引从大到小排序,避免替换时影响后续索引
 		// 执行替换
 		for (const { startIndex, innerContent, endIndex } of replacements)
 			finalHtml = finalHtml.slice(0, startIndex) + innerContent + finalHtml.slice(endIndex);
@@ -1058,8 +1059,8 @@ const validateTemplateFile = async (fileName, isDev = false) => {
  * 模板渲染函数,处理模板继承关系
  * >查看定义:@see {@link renderTemplate}
  * @param {string} templateFile - 模板文件名
- * @returns {Promise<string>} 渲染后的HTML内容（不包含变量替换）
- * 核心流程：
+ * @returns {Promise<string>} 渲染后的HTML内容(不包含变量替换)
+ * 核心流程:
  * 1. 检测[extends]指令
  * 2. 剥离继承指令行
  * 3. 加载基模板并合并内容
@@ -1071,7 +1072,7 @@ const renderTemplate = async templateFile => {
 		extendsMatch = templateContent.match(_resetRegex(extendsRegex));   // 匹配[extends]指令
 
 	if (!extendsMatch) return _renderTemplateContent(templateContent, '');
-	const remainingContent = templateContent.slice(extendsMatch[0].length), // 移除整行（包括指令和注释）
+	const remainingContent = templateContent.slice(extendsMatch[0].length), // 移除整行(包括指令和注释)
 		baseTemplateFile = extendsMatch[1].trim(), basePath = path.isAbsolute(baseTemplateFile)
 			? path.join(templatesAbsDir, baseTemplateFile) : path.join(path.dirname(templatePath), baseTemplateFile);
 

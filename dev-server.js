@@ -1,13 +1,13 @@
 /**
  * 开发服务器模块 - 动态模板渲染服务器
  *
- * 模块结构：
+ * 模块结构:
  * 1. 依赖导入与服务器初始化
  * 2. 工具函数
  * 3. 全局CORS中间件和静态资源配置(/static路径)
  * 4. 服务器生命周期管理(printAvailablePages, startServer)
- * 5. 请求页面路由处理(自动路由与模板渲染) —— 已在 startServer 内部动态添加
- * 6. 热重载功能实现(文件监听、事件处理、服务器重启) —— setupHotReload, restartServer
+ * 5. 请求页面路由处理(自动路由与模板渲染) -- 已在 startServer 内部动态添加
+ * 6. 热重载功能实现(文件监听、事件处理、服务器重启) -- setupHotReload, restartServer
  * 7. 导出接口与启动执行(module.exports, startServer)
  */
 
@@ -33,12 +33,12 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 
 	// ==================== 2.工具函数 ====================
 	/**
-	 * 创建带WebSocket的服务器（支持HTTP/HTTPS）
+	 * 创建带WebSocket的服务器(支持HTTP/HTTPS)
 	 * @param {Express} app Express应用
 	 * @param {boolean} hotReload 是否启用热重载
 	 * @param {boolean} useHttps 是否使用HTTPS
-	 * @param {string} keyPath HTTPS私钥路径（useHttps=true时必须）
-	 * @param {string} certPath HTTPS证书路径（useHttps=true时必须）
+	 * @param {string} keyPath HTTPS私钥路径(useHttps=true时必须)
+	 * @param {string} certPath HTTPS证书路径(useHttps=true时必须)
 	 * @returns {http.Server|https.Server} 创建的服务器实例
 	 */
 	createServerWithSocket = (app, hotReload, useHttps = false, keyPath = null, certPath = null) => {
@@ -88,9 +88,9 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	},
 
 	/**
-	* 根据启用状态同步 account 相关文件（统一备份目录）
-	* - 启用时：若主目录已有文件则保留,否则从备份恢复或复制默认
-	* - 停用时：将主目录文件移动到备份目录
+	* 根据启用状态同步 account 相关文件(统一备份目录)
+	* - 启用时:若主目录已有文件则保留,否则从备份恢复或复制默认
+	* - 停用时:将主目录文件移动到备份目录
 	* @param {boolean} enable - true 启用,false 停用
 	*/
 	syncAccountFiles = async enable => {
@@ -202,7 +202,7 @@ const printAvailablePages = (pages, port, hotReload, useHttps, host) => {
 	if (hotReload) console.log(`✅ 热重载功能已启用(监听目录->${templatesAbsDir},${staticDir},${customizeDir})`);
 
 	if (useHttps && (host === 'localhost' || host === '127.0.0.1')) {
-		console.warn('⚠️  警告: 使用 HTTPS 访问 localhost 会导致浏览器证书安全警告（自签名证书或证书域名不匹配）');
+		console.warn('⚠️  警告: 使用 HTTPS 访问 localhost 会导致浏览器证书安全警告(自签名证书或证书域名不匹配)');
 		console.warn('   请使用 --host 参数指定与证书 CN/SAN 匹配的域名,例如: --host www.abc.com');
 	}
 
@@ -221,12 +221,12 @@ const printAvailablePages = (pages, port, hotReload, useHttps, host) => {
  * @async
  * @param {Object} [options] - 配置对象
  * @param {number} [options.port] - 可选端口号
- * @param {string} [options.host] - 服务器主机名（默认localhost）
+ * @param {string} [options.host] - 服务器主机名(默认localhost)
  * @param {boolean} [options.hotReload] - 是否启用热重载
  * @param {boolean} [options.account] - 是否启用登录模式
  * @param {boolean} [options.https] - 是否启用HTTPS
- * @param {string} [options.httpsKey] - HTTPS私钥路径（启用HTTPS时必须）
- * @param {string} [options.httpsCert] - HTTPS证书路径（启用HTTPS时必须）
+ * @param {string} [options.httpsKey] - HTTPS私钥路径(启用HTTPS时必须)
+ * @param {string} [options.httpsCert] - HTTPS证书路径(启用HTTPS时必须)
  * @returns {Promise<number>} 启动成功后返回实际使用的端口号
  */
 const startServer = async (options = {}) => {
@@ -234,7 +234,7 @@ const startServer = async (options = {}) => {
 		const config = parseServerConfig(options),
 			{ port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath } = config,
 
-			// 保存配置到文件（用于后续编译时沿用）
+			// 保存配置到文件(用于后续编译时沿用)
 			configToSave = {
 				port, host, https: httpsEnabled, httpsKey: httpsKeyPath, httpsCert: httpsCertPath
 			};
@@ -318,7 +318,7 @@ const startServer = async (options = {}) => {
 	},
 
 	/**
-	 * 重启服务器（保持HTTPS和主机名配置）
+	 * 重启服务器(保持HTTPS和主机名配置)
 	 */
 	restartServer = async () => {
 		try {
@@ -340,4 +340,5 @@ const startServer = async (options = {}) => {
 
 // ==================== 7.导出接口与启动执行 ====================
 export { startServer };
-if (process.argv[1] === __filename) startServer().catch(error => (console.error('服务器启动失败:', error), process.exit(1)));
+if (process.argv[1] === __filename)
+    startServer().catch(error => (console.error('服务器启动失败:', error), process.exit(1)));

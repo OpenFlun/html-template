@@ -4,9 +4,9 @@ import { fileURLToPath } from 'url';
 
 // 获取 __dirname (仅用于迁移)
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
-    // 常量定义(直接覆盖文件列表和复制列表)
-    alwaysOverwriteFiles = ['f-README.md', 'f-CHANGELOG.md'], filesToCopy = ['templates', 'customize', 'static', 'dev.js',
-        'build.js', 'restoreDefaults.js', 'f-README.md', 'f-CHANGELOG.md'],
+    // 常量定义:alwaysOverwriteFiles 为强制覆盖列表(当前为空),filesToCopy 为复制列表
+    alwaysOverwriteFiles = [], filesToCopy = ['templates', 'customize', 'static', 'dev.js',
+        'build.js', 'restoreDefaults.js'],
     // 日志函数
     log = (message, config, isErrorLog = false) => {
         if (isErrorLog) console.log(`❌ ${message}`);
@@ -16,16 +16,16 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
     showHelp = () => {
         console.log(`
     文件复制工具 - 使用说明:
-        默认行为: 跳过已存在的目录，没有的目录执行复制，根目录已有的文件跳过，根目录没有的文件复制
+        默认行为: 跳过已存在的目录,没有的目录执行复制,根目录已有的文件跳过,根目录没有的文件复制
 
         主模式(3选1):
           --overwrite          覆盖所有已存在的包文件和目录
-          --skip-files         跳过所有已有文件，所有没有的文件执行复制后创建
-          --skip-dirs          （默认）
+          --skip-files         跳过所有已有文件,所有没有的文件执行复制后创建
+          --skip-dirs          (默认)
 
         可选参数(2选1):
-          --account            启用登录模式（会复制 templates/account 和 customize/account.js）
-          --no-account         禁用登录模式，跳过复制上述文件/目录（默认）
+          --account            启用登录模式(会复制 templates/account 和 customize/account.js)
+          --no-account         禁用登录模式,跳过复制上述文件/目录(默认)
         可选参数:
           --verbose            详细模式,显示操作信息
 
@@ -72,7 +72,8 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
             shouldAlwaysOverwrite = alwaysOverwriteFiles.includes(fileName);
 
         // 判断是否应该跳过文件
-        if (shouldSkipFile(destExists, isRootItem, config, shouldAlwaysOverwrite)) return log(`跳过已存在文件:${fileName}`, config);
+        if (shouldSkipFile(destExists, isRootItem, config, shouldAlwaysOverwrite))
+            return log(`跳过已存在文件:${fileName}`, config);
 
         // 记录覆盖操作
         if (destExists) {
@@ -138,7 +139,7 @@ const runCopyFiles = async (options = {}) => {
         account: options.account ?? false,
         packageDir: __dirname                        // 包所在目录,用于路径判断
     },
-        // 目标目录（项目根目录）：npm 场景用 INIT_CWD，手动执行 / import 调用用 cwd
+        // 目标目录(项目根目录):npm 场景用 INIT_CWD,手动执行 / import 调用用 cwd
         targetDir = path.resolve(process.env.INIT_CWD || process.cwd());
 
     console.log('✅ 开始复制文件'); // 关键消息总是显示
@@ -155,7 +156,7 @@ const runCopyFiles = async (options = {}) => {
         await Promise.all(
             filesToCopy.map(item => copyFileOrDir(path.join(__dirname, item), path.join(targetDir, item), true, config)));
 
-        console.log('✅ 文件复制完成！');
+        console.log('✅ 文件复制完成!');
         // 添加专业支持信息
         console.log('\n✅ 专业支持:');
         console.log('✅ • 开发文档: https://www.npmjs.com/package/@flun/html-template');

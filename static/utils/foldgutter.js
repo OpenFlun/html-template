@@ -1,7 +1,9 @@
-// CodeMirror库 - 折叠处理逻辑的优化和扩展 (https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.min.js)
+// CodeMirror库 - 折叠处理逻辑的优化和扩展
+// (https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.min.js)
 
 (function (mod) {
-    if (typeof exports == "object" && typeof module == "object") mod(require("../../lib/codemirror"), require("./foldcode"));
+    if (typeof exports == "object" &&
+    typeof module == "object") mod(require("../../lib/codemirror"), require("./foldcode"));
     else if (typeof define == "function" && define.amd) define(["../../lib/codemirror", "./foldcode"], mod);
     else mod(CodeMirror);
 })((CodeMirror) => {
@@ -62,8 +64,10 @@
         },
         classTest = cls => new RegExp(`(^|\\s)${cls}(?:$|\\s)\\s*`),
         updateFoldInfo = (cm, state, from, to) => {
-            const opts = state.options, minSize = cm.foldOption(opts, "minFoldSize"), func = cm.foldOption(opts, "rangeFinder"),
-                { indicatorFolded, indicatorOpen, gutter } = opts, clsOpen = typeof indicatorOpen == "string" && classTest(indicatorOpen),
+            const opts = state.options, minSize = cm.foldOption(opts, "minFoldSize"),
+                func = cm.foldOption(opts, "rangeFinder"),
+                { indicatorFolded, indicatorOpen, gutter } = opts,
+                clsOpen = typeof indicatorOpen == "string" && classTest(indicatorOpen),
                 clsFolded = typeof indicatorFolded == "string" && classTest(indicatorFolded);
 
             // 根据条件返回应使用的标记元素
@@ -89,7 +93,7 @@
 
                 // 已折叠 → 应显示折叠标记
                 if (folded) shouldShow = true, clsTest = clsFolded, indicator = indicatorFolded, title = "点击展开";
-                // 未折叠，检查是否有可折叠范围
+                // 未折叠,检查是否有可折叠范围
                 else {
                     range = func?.(cm, Pos(cur, 0));
                     if (range?.to.line - range?.from.line >= minSize)

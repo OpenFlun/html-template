@@ -24,8 +24,8 @@
     "index.js",
     "restoreDefaults.js",
     "index.d.ts",
-    "f-CHANGELOG.md",
-    "f-README.md",
+    "CHANGELOG.md",
+    "README.md",
     "LICENSE"
   ],
   "type": "module",

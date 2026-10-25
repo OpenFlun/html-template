@@ -2,9 +2,10 @@
 
 ### 本包基于 ESM 模块系统编写->拥抱趋势
 
-- **推荐方式**：使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
-- **兼容方式**：Node.js ≥ 23.5.0 原生支持 `require(esm)`;22.12+ 需开启 `--experimental-require-module` 标志;
-- **重要**：本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为 `.mjs`;
+- **推荐方式**:使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
+- **兼容方式**:Node.js ≥ 23.5.0 原生支持 `require(esm)`;22.12+ 需开启 `--experimental-require-module` 标志;
+- **重要**:本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为 
+  `.mjs`;
 
 ---
 
@@ -61,7 +62,8 @@ graph TB
 
 ### 允许安装脚本执行
 
-本包在安装时可能触发某些依赖包的自动脚本（如 `postinstall` 等）;如果你的 npm 全局配置或项目配置禁止了脚本执行（例如设置了 `ignore-scripts=true`）,可能会导致安装不完整或运行时异常;
+本包在安装时可能触发某些依赖包的自动脚本(如 `postinstall` 等);如果你的 npm 全局配置或项目配置禁止了脚本执行(例如设置了 
+`ignore-scripts=true`),可能会导致安装不完整或运行时异常;
 
 推荐在项目根目录的 `package.json` 中添加 `allowScripts` 字段,显式放行本包及其依赖的脚本:
 
@@ -73,25 +75,26 @@ graph TB
     "@flun/webauthn-server": true,
     "@flun/env": true,
     "@flun/mailer": true
-    // 如果依赖的其它包（如 electron-winstaller 等）也有脚本,请按需添加,格式相同
+    // 如果依赖的其它包(如 electron-winstaller 等)也有脚本,请按需添加,格式相同
   }
 }
 ```
 
-> 如果你信任所有安装包,也可以直接在项目 `.npmrc` 中设置 `allow-scripts = false`（表示关闭脚本拦截,所有脚本均允许执行）,或删除 `ignore-script` 字段;
+> 如果你信任所有安装包,也可以直接在项目 `.npmrc` 中设置 `allow-scripts = false`(表示关闭脚本拦截,所有脚本均允许执行),
+  或删除 `ignore-script` 字段;
 
 ---
 
 ## 安装
 
 ```sh
-# 初始化项目（如果尚未初始化）
+# 初始化项目(如果尚未初始化)
 npm init -y
 
 # 在 package.json 中添加 "type": "module"
 npm pkg set type=module
 
-# 本地安装（推荐）
+# 本地安装(推荐)
 npm i @flun/html-template # 简写
 # 或
 # 全局安装
@@ -102,7 +105,7 @@ npm i -D @flun/desktop-builder              # 将 Node.js 网站一键打包为�
 npm i @flun/dns-auto-ssl                    # https证书申请及配置自动续期
 npm i @flun/env                             # .env 文件的环境变量调用
 npm i @flun/mailer                          # 邮件发送
-npm i @flun/nodejs-mobile-gyp               # 移动端原生模块构建支持（node-gyp）
+npm i @flun/nodejs-mobile-gyp               # 移动端原生模块构建支持(node-gyp)
 npm i @flun/nodejs-mobile-react-native      # 移动端与 React Native 集成
 npm i @flun/node-mobile-app                 # 移动应用编译打包
 npm i passport-desktop-win32-ia32-msvc      # Windows 桌面端 Passport 32 位 MSVC 平台包
@@ -110,17 +113,17 @@ npm i passport-desktop-win32-x64-msvc       # Windows 桌面端 Passport 64 位 
 npm i @flun/windows                         # Windows 服务安装和管理
 npm i @flun/webauthn-server                 # 身份验证服务后端处理
 npm i @flun/webauthn-browser                # 身份验证前端处理
-# 所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
+所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
 ```
-> **重要提示**：初次使用最好在空项目中执行安装,安装过程会自动复制 ESM 示例和必要文件到根目录
+> **重要提示**:初次使用最好在空项目中执行安装,安装过程会自动复制 ESM 示例和必要文件到根目录
 
 ---
 
 ## 快速开始
 
-### 方式一：通过npm脚本（推荐）
+### 方式一:通过npm脚本(推荐)
 
-在您的 `package.json` 中添加以下脚本：
+在您的 `package.json` 中添加以下脚本:
 
 ```json
 {
@@ -132,38 +135,38 @@ npm i @flun/webauthn-browser                # 身份验证前端处理
 }
 ```
 
-**dev.js（ESM）**
+**dev.js(ESM)**
 ```javascript
 import { startDevServer } from '@flun/html-template';
 startDevServer({ port: 7296, hotReload: true });
-// 如需启用 HTTPS,请参考下文“配置选项 → 启用 HTTPS”章节
+// 如需启用 HTTPS,请参考下文"配置选项 → 启用 HTTPS"章节
 ```
 
-**build.js（ESM）**
+**build.js(ESM)**
 ```javascript
 import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' });
 ```
 
-**restoreDefaults.js（ESM）**
+**restoreDefaults.js(ESM)**
 ```javascript
 import { initProject } from '@flun/html-template';
 initProject({ mode: 'overwrite', verbose: true });
 ```
 
-然后使用：
+然后使用:
 ```sh
-# 启动开发服务器（实时预览和热重载,默认不启用登录）
+# 启动开发服务器(实时预览和热重载,默认不启用登录)
 npm run dev
 
 # 启动开发服务器并启用登录系统
 npm run dev -- --account
 
-# 编译模板（生成最终HTML文件）
+# 编译模板(生成最终HTML文件)
 npm run build
 ```
 
-### 方式二：直接运行文件
+### 方式二:直接运行文件
 ```sh
 # 启动开发服务器
 node dev.js
@@ -180,36 +183,38 @@ node build.js
 ## 配置选项
 
 ### 自定义端口
-- **命令行参数**：`node dev.js --port 8080` 或 `node dev.js -p 8080`
-- **环境变量**：`PORT=8080 node dev.js`
-- **编程方式**：
+- **命令行参数**:`node dev.js --port 8080` 或 `node dev.js -p 8080`
+- **环境变量**:`PORT=8080 node dev.js`
+- **编程方式**:
   ```javascript
   import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 8080 });
   ```
 
 ### 热重载控制
-- **启用**（默认）：`node dev.js` 或 `node dev.js --hot-reload`
-- **禁用**：`node dev.js --no-hot-reload`
-- **编程方式**：
+- **启用**(默认):`node dev.js` 或 `node dev.js --hot-reload`
+- **禁用**:`node dev.js --no-hot-reload`
+- **编程方式**:
 ```javascript
   import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 7296, hotReload: true }); // 启用热重载(默认)
 ```
 ### 登录系统控制
-- **启用**：`node dev.js --account`
-- **禁用**（默认）：`node dev.js --no-account`
-- **编程方式**：
+- **启用**:`node dev.js --account`
+- **禁用**(默认):`node dev.js --no-account`
+- **编程方式**:
 ```javascript
   import { startDevServer } from '@flun/html-template';
   startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
 ```
-> **文件管理**：启用时,若 `customize/account.js` 和 `templates/account/` 缺失,会自动从包内复制默认文件;停用时,会将这两个文件/目录移至项目根目录的 `account_bak/` 统一备份,避免残留导致误渲染;再次启用时,优先保留您的自定义修改,仅当缺失时才从备份恢复或复制默认模板,多次开关不会丢失定制内容;
+> **文件管理**:启用时,若 `customize/account.js` 和 `templates/account/` 缺失,会自动从包内复制默认文件;停用时,
+  会将这两个文件/目录移至项目根目录的 `account_bak/` 统一备份,避免残留导致误渲染;再次启用时,优先保留您的自定义修改,
+  仅当缺失时才从备份恢复或复制默认模板,多次开关不会丢失定制内容;
 
 ---
 
 ### 自定义打包目录
-- **编程方式**（默认输出到`dist`目录）：
+- **编程方式**(默认输出到`dist`目录):
 ```javascript
 import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
@@ -219,16 +224,16 @@ compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
 
 开发服务器支持 HTTPS 协议,适用于需要安全连接、测试 PWA 或与第三方 API 交互的场景;
 
-#### 方式一：使用自动 SSL 证书（推荐）
+#### 方式一:使用自动 SSL 证书(推荐)
 
-1. 安装自动 SSL 工具包：
+1. 安装自动 SSL 工具包:
    ```sh
    npm i @flun/dns-auto-ssl --save-dev
    ```
 
 2. 打开项目根目录下的 DnsAutoSSL.js,按提示配置你的域名等参数;
 
-3. 在 `dev.js` 中取消注释相关配置项：
+3. 在 `dev.js` 中取消注释相关配置项:
    ```javascript
    import { startDevServer } from '@flun/html-template';
    import { domains, certPath, keyPath } from './DnsAutoSSL.js';
@@ -243,9 +248,9 @@ compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
    });
    ```
 
-#### 方式二：使用自定义证书
+#### 方式二:使用自定义证书
 
-若已有证书文件（`.key` 和 `.crt`/`.pem`）,直接指定路径：
+若已有证书文件(`.key` 和 `.crt`/`.pem`),直接指定路径:
 
 ```javascript
 startDevServer({
@@ -259,29 +264,29 @@ startDevServer({
 
 #### 命令行参数快速启用
 
-也可通过命令行直接启用 HTTPS（需预先准备好证书文件）：
+也可通过命令行直接启用 HTTPS(需预先准备好证书文件):
 
 ```sh
 node dev.js --https --https-key 你的私钥文件路径和文件名 --https-cert 你的证书文件路径和文件名 --host example.com
 ```
 
-> **注意**：
-> - 使用 HTTPS 时,`host` 参数必须与证书中的域名（CN 或 SAN）完全一致;
+> **注意**:
+> - 使用 HTTPS 时,`host` 参数必须与证书中的域名(CN 或 SAN)完全一致;
 > - 若用 `localhost` 访问 HTTPS,浏览器会提示不安全,请按控制台警告改用正确的域名访问;
 > - 有关 `DnsAutoSSL.js` 的详细配置,请参考该文件内的注释或 `@flun/dns-auto-ssl` 文档;
 
 ## 模板标签使用指南
 
 ### 基础概念
-1. **模板继承**：子模板中必须使用 `[extends base.html]` 声明继承关系(可以指定任意父html)
-2. **区块覆盖**：如果没有引入区块标签,会默认继承基模板内容
-3. **清空内容**：如需将基础模板的标签内容赋值为空,直接在子模板中引入该空标签
+1. **模板继承**:子模板中必须使用 `[extends base.html]` 声明继承关系(可以指定任意父html)
+2. **区块覆盖**:如果没有引入区块标签,会默认继承基模板内容
+3. **清空内容**:如需将基础模板的标签内容赋值为空,直接在子模板中引入该空标签
 
 ### 标签快捷输入方式
-**HBuilder用户**：
+**HBuilder用户**:
 1. 输入 `b!` 后按 Enter
 2. 输入标签名,自动创建开闭标签对
-HBuilder自定义代码块配置(HTML和js)：
+HBuilder自定义代码块配置(HTML和js):
 ```json
 {
     "custom-tag": {
@@ -295,7 +300,7 @@ HBuilder自定义代码块配置(HTML和js)：
     }
 }
 ```
-**VS Code用户**：
+**VS Code用户**:
 1. 安装 "html-custom-tags" 扩展
 2. 输入 `[!标签名]` 后按空格,自动输出 `[~标签名]`
 ***并且其还支持大部分语言语法高亮,标签特殊高亮,标签统计,标签一键全复制等功能***
@@ -310,24 +315,24 @@ npm up @flun/html-template
 
 ### 恢复初始示例文件
 ```sh
-# 基本命令（跳过已存在目录）
+# 基本命令(跳过已存在目录)
 node ./node_modules/@flun/html-template/copy-files.js
 
-# 常用选项：
+# 常用选项:
 node ./node_modules/@flun/html-template/copy-files.js --skip-files --verbose
 ```
-**主参数(三选一)**：
+**主参数(三选一)**:
 - `--overwrite` - 覆盖已存在的文件和目录
-- `--skip-files` - 跳过所有存在的文件（包括目录中的文件）
-- `--skip-dirs` - 跳过已存在的目录（默认）
+- `--skip-files` - 跳过所有存在的文件(包括目录中的文件)
+- `--skip-dirs` - 跳过已存在的目录(默认)
 > **可选参数(二选一)**:
-> - `--account`             启用登录模式（会复制 templates/account 和 customize/account.js）
-> - `--no-account`          禁用登录模式,跳过复制上述文件/目录（默认）
+> - `--account`             启用登录模式(会复制 templates/account 和 customize/account.js)
+> - `--no-account`          禁用登录模式,跳过复制上述文件/目录(默认)
 
 > **可选参数**:
 > - `--verbose`             详细模式,显示更多信息
 
-> **帮助**：
+> **帮助**:
 > - `--help `   - 显示帮助信息
 
 #### 编程方式
@@ -335,7 +340,7 @@ node ./node_modules/@flun/html-template/copy-files.js --skip-files --verbose
 import { initProject } from '@flun/html-template';
 
 // 恢复初始文件的多种方式
-initProject();                                        // 使用默认设置（跳过已存在目录）
+initProject();                                        // 使用默认设置(跳过已存在目录)
 initProject({ mode: 'overwrite', verbose: true });    // 覆盖所有包文件并显示详细信息
 initProject({ mode: 'overwrite', verbose: false });   // 覆盖所有包文件并静默输出
 initProject({ mode: 'skip-files', verbose: true });   // 跳过已存在文件并显示详细信息
@@ -346,24 +351,25 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 
 ## 工作流程
 
-1. **安装包**：自动复制模板文件到项目根目录
-2. **自定义开发**：修改HTML模板文件满足需求
-3. **添加功能**：将自定义逻辑写入 `customize` 目录
-4. **开发调试**：使用 `node dev.js` 运行开发服务器
-5. **编译部署**：使用 `node build.js` 编译模板
+1. **安装包**:自动复制模板文件到项目根目录
+2. **自定义开发**:修改HTML模板文件满足需求
+3. **添加功能**:将自定义逻辑写入 `customize` 目录
+4. **开发调试**:使用 `node dev.js` 运行开发服务器
+5. **编译部署**:使用 `node build.js` 编译模板
 
-> **注意**：编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js` 入口文件;
+> **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js` 
+  入口文件;
 
 ---
 
 ## 核心功能
 
 ### 模板引擎特性
-- **继承机制**：`[extends base.html]` 实现模板层级结构
-- **区块系统**：`[!blockName]` 和 `[~blockName]` 定义可替换内容区块
-- **变量系统**：`{{variable}}` 语法支持动态内容、条件判断和循环处理 (条件判断支持20层嵌套)
-- **包含功能**：`[include header.html]` 实现文件复用
-- **用户函数**：支持自定义函数的注册与调用
+- **继承机制**:`[extends base.html]` 实现模板层级结构
+- **区块系统**:`[!blockName]` 和 `[~blockName]` 定义可替换内容区块
+- **变量系统**:`{{variable}}` 语法支持动态内容、条件判断和循环处理 (条件判断支持20层嵌套)
+- **包含功能**:`[include header.html]` 实现文件复用
+- **用户函数**:支持自定义函数的注册与调用
 
 ### 开发服务器功能
 - 自动将URL路径映射到对应模板文件
@@ -389,7 +395,8 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 - 支持长按元素选择设置其各种属性样式(比如:边距,颜色,字体等等);
 - 支持跳转到编辑器修改整个页面样式文件:
 > - 编辑器功能: 颜色选择 · 编辑 · 自动补全 · 代码折叠 · 预览 · 保存应用· 取消
-> **开关灵活**：您可通过 `--account` / `--no-account` 随时启用或关闭登录功能;关闭时相关文件自动迁移至 `account_bak/` 备份,启用时智能恢复,确保项目整洁且自定义内容不丢失;
+> **开关灵活**:您可通过 `--account` / `--no-account` 随时启用或关闭登录功能;关闭时相关文件自动迁移至 `account_bak/` 备份,
+  启用时智能恢复,确保项目整洁且自定义内容不丢失;
 
 ### 自定义拖动元素(默认支持主题图标和返回顶部图标)
 - 登录系统额外支持编辑器和预览容器拖动
@@ -438,12 +445,12 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 ```
 
 ### 表达式支持
-- 数学运算：`{{a + b * c}}`
-- 比较运算：`{{value > 10}}`
-- 逻辑运算：`{{a && b || c}}`
-- 三元运算符：`{{condition ? value1 : value2}}`
-- 函数调用：`{{Math.max(a, b)}}`
-- 属性访问：`{{user.profile.name}}`
+- 数学运算:`{{a + b * c}}`
+- 比较运算:`{{value > 10}}`
+- 逻辑运算:`{{a && b || c}}`
+- 三元运算符:`{{condition ? value1 : value2}}`
+- 函数调用:`{{Math.max(a, b)}}`
+- 属性访问:`{{user.profile.name}}`
 
 ---
 
@@ -508,17 +515,17 @@ export default {
 
 **代码执行安全**
 - 表达式在隔离的沙箱环境中运行
-- 禁用危险函数（`require`、`process`、`eval`等）
-- 执行超时保护（1.5秒自动终止）
+- 禁用危险函数(`require`、`process`、`eval`等)
+- 执行超时保护(1.5秒自动终止)
 
 **数据安全**
-- 阻止原型污染攻击（防护`__proto__`、`constructor`等）
+- 阻止原型污染攻击(防护`__proto__`、`constructor`等)
 - 自动过滤不安全的关键字
-- 防止无限循环（最多10次迭代）
+- 防止无限循环(最多10次迭代)
 
 ### 🛡️ 自动防护机制
 
-**模板处理时自动启用：**
+**模板处理时自动启用:**
 - 变量访问安全检查
 - 函数调用权限控制
 - 资源使用限制
@@ -528,7 +535,7 @@ export default {
 
 ### 💡 使用建议
 
-**安全做法：**
+**安全做法:**
 ```html
 <!-- 使用内置安全函数 -->
 <p>{{user.utils.safeFormat(data)}}</p>
@@ -537,7 +544,7 @@ export default {
 [include header.html]
 ```
 
-**避免做法：**
+**避免做法:**
 ```html
 <!-- 直接执行用户输入 -->
 <p>{{userInput}}</p>
@@ -549,7 +556,7 @@ export default {
 ---
 ### ⚠️ 重要提醒
 
-虽然我们提供了多重安全防护,但您仍需：
+虽然我们提供了多重安全防护,但您仍需:
 1. 谨慎处理用户输入数据
 2. 验证自定义函数的参数安全性
 3. 定期更新到最新版本
@@ -561,16 +568,18 @@ export default {
 ## 故障排除
 
 ### 常见问题
-1. **模板不生效**：确保子模板开头有 `[extends base.html]`
-2. **区块不显示**：检查开闭标签名称是否一致
-3. **热重载失效**：确认修改的是模板或静态目录中的文件
-4. **路由不工作**：检查是否正确定义了 `setupRoutes` 导出
-5. **找不到函数**: 1. 检查函数名是否正确,2. 确认文件在 `customize` 目录内,3. 确认使用了 `export const functions = {...}` 语法
-6. **ESM 相关错误**：检查 `package.json` 是否包含 `"type": "module"`,或启动文件是否具有 `.mjs` 扩展名;
-7. **HTTPS 证书错误**：请确保 `host` 参数与证书中的域名完全匹配,且证书未被吊销或过期;建议开发环境和生产环境都使用 `@flun/dns-auto-ssl` 自动处理证书->避免意外情况;
+1. **模板不生效**:确保子模板开头有 `[extends base.html]`
+2. **区块不显示**:检查开闭标签名称是否一致
+3. **热重载失效**:确认修改的是模板或静态目录中的文件
+4. **路由不工作**:检查是否正确定义了 `setupRoutes` 导出
+5. **找不到函数**: 1. 检查函数名是否正确,2. 确认文件在 `customize` 目录内,3. 确认使用了 `export const functions = {...}` 
+   语法
+6. **ESM 相关错误**:检查 `package.json` 是否包含 `"type": "module"`,或启动文件是否具有 `.mjs` 扩展名;
+7. **HTTPS 证书错误**:请确保 `host` 参数与证书中的域名完全匹配,且证书未被吊销或过期;建议开发环境和生产环境都使用 
+   `@flun/dns-auto-ssl` 自动处理证书->避免意外情况;
 
 ### 获取帮助
-如果遇到问题,可以：
+如果遇到问题,可以:
 1. 运行恢复初始文件脚本
 2. 检查浏览器控制台错误信息
 3. 确认文件路径和名称是否

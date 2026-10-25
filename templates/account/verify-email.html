@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/static/themeImg.css" /> <!-- 主题图标 -->
     <link rel="stylesheet" href="/static/topImg.css" /> <!-- 返回顶部图标 -->
     <style>
-        /* 覆盖 body 布局：居中卡片,背景由变量接管 */
+        /* 覆盖 body 布局:居中卡片,背景由变量接管 */
         body {
             display: flex;
             align-items: center;
@@ -169,7 +169,8 @@
     <script>
         (async () => {
             const urlParams = new URLSearchParams(window.location.search), token = urlParams.get('token'),
-                type = urlParams.get('type') || 'register', [messageDiv, actionDiv, title] = ['message', 'action', 'pageTitle']
+                type = urlParams.get('type') || 'register',
+                [messageDiv, actionDiv, title] = ['message', 'action', 'pageTitle']
                     .map(id => document.getElementById(id)),
 
                 // 根据 type 决定失败时的操作链接
@@ -187,7 +188,8 @@
             // 根据 type 选择不同的 API 端点
             const apiEndpoint = type === 'new-email' ? '/api/verify-new-email' : '/api/verify-email';
             try {
-                const response = await fetch(`${apiEndpoint}?token=${encodeURIComponent(token)}`), data = await response.json();
+                const response = await fetch(`${apiEndpoint}?token=${encodeURIComponent(token)}`),
+                    data = await response.json();
 
                 if (response.ok) {
                     title.classList.add('hidden'), actionDiv.hidden = true;

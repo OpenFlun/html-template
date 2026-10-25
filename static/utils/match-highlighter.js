@@ -13,7 +13,7 @@ function attachCustomHighlight(editor) {
         currentMarks.forEach(mark => mark.clear()), currentMarks = [];
     }
 
-    // 定义分隔符:空白字符 + CSS语法标点（不包括 . # - _ 这些可能出现在标识符中的字符）
+    // 定义分隔符:空白字符 + CSS语法标点(不包括 . # - _ 这些可能出现在标识符中的字符)
     function isSeparator(ch) {
         if (!ch) return false;
         if (/\s/.test(ch)) return true; // 空白字符

@@ -26,23 +26,24 @@ import { injectScript } from './customize/hotReloadInjector.js';
  * const writtenFilesToIgnore = []; // 热重载时需忽略的文件路径列表
  *
  * // 函数列表:
- * getAvailableTemplates();         // 获取所有可用模板文件（排除 base.html）
+ * getAvailableTemplates();         // 获取所有可用模板文件(排除 base.html)
  * parseServerConfig();             // 解析服务器配置参数
  * generateUrls();                  // 生成服务器访问URL列表
  * findEntryFile();                 // 动态识别入口文件('@entry'标记 > 优先级列表 > 首字母排序)
  * validateTemplateFile();          // 验证模板文件标签结构完整性
- * renderTemplate();                // 核心模板渲染（处理 extends 继承与区块合并）
+ * renderTemplate();                // 核心模板渲染(处理 extends 继承与区块合并)
  * processIncludes();               // 递归处理 [include] 包含指令
  * setCompilationMode();            // 设置编译模式并清空依赖记录
  * getIncludedFiles();              // 获取编译过程中记录的所有被包含文件
  * processVariables();              // 模板变量替换、表达式求值与用户函数执行入口
  * loadUserFeatures();              // 从 customize 目录加载用户路由、函数和变量
- * monitorFileWrites();             // 启动文件写入监控（用于热重载排除）
+ * monitorFileWrites();             // 启动文件写入监控(用于热重载排除)
  * ```
  * >查看定义:@see
  * - 常量:{@link path}、{@link fsPromises}、{@link CWD}、{@link templatesDir}、{@link templatesAbsDir}、{@link staticDir}、
  *{@link customizeDir}、{@link accountDir}、{@link defaultPort}、{@link writtenFilesToIgnore}
- * - 函数:{@link getAvailableTemplates}、{@link parseServerConfig}、{@link generateUrls}、{@link findEntryFile}、{@link validateTemplateFile}、{@link renderTemplate}、
+ * - 函数:{@link getAvailableTemplates}、{@link parseServerConfig}、{@link generateUrls}、
+ *{@link findEntryFile}、{@link validateTemplateFile}、{@link renderTemplate}、
  *{@link processIncludes}、{@link setCompilationMode}、{@link getIncludedFiles}、{@link processVariables}、
  *{@link loadUserFeatures}、{@link monitorFileWrites}
  */
@@ -100,7 +101,7 @@ declare module './customize/hotReloadInjector.js' {
 
 // =================================== 模块导出入口 ===================================
 /**
- * HTML开发服务器模块 主要功能：
+ * HTML开发服务器模块 主要功能:
  * ```js
  * startDevServer(); // 启动开发服务器
  * initProject();    // 初始化模板文件
@@ -113,8 +114,8 @@ declare module './customize/hotReloadInjector.js' {
  *  // 启动服务器示例
  *  import { startDevServer } from '@flun/html-template';
  *
- *  // 如果需要启用 https，请先安装 `@flun/dns-auto-ssl`,并在生成的示例文件 (DnsAutoSSL.js) 中配置相关参数，
- *  // 然后将下面导入部分注释取消并使用这些配置项,或使用自己已有的证书路径和域名配置项进行替换。
+ *  // 如果需要启用 https,请先安装 `@flun/dns-auto-ssl`,并在生成的示例文件 (DnsAutoSSL.js) 中配置相关参数,
+ *  // 然后将下面导入部分注释取消并使用这些配置项,或使用自己已有的证书路径和域名配置项进行替换;
  *
  *  // import { domains, certPath, keyPath } from './DnsAutoSSL.js';
  *
@@ -122,7 +123,7 @@ declare module './customize/hotReloadInjector.js' {
  *  startDevServer({
  *      port: 7296,
  *      hotReload: true,
- *      account: false,   // 默认参数：不启用登录系统
+ *      account: false,   // 默认参数:不启用登录系统
  *      // https: true,
  *      // httpsKey: keyPath,
  *      // httpsCert: certPath,

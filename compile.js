@@ -1,24 +1,25 @@
 /**
  * 模板编译与打包工具
  *
- * 模块结构：
- * 1. 递归目录复制工具（copyDir）
+ * 模块结构:
+ * 1. 递归目录复制工具(copyDir)
  * 2. 路由文件处理及入口文件生成
- *    - 路由检测（checkUserRoutesExist）
- *    - 入口文件生成（generateServerEntry）—— 支持沿用开发配置（端口/HTTPS/证书/host）
- *    - 依赖管理（mergeDependencies → 返回完整 package.json）
- * 3. 编译模板所有文件（compile）
- * 4. 批量编译主流程（compileAllTemplates）
+ *    - 路由检测(checkUserRoutesExist)
+ *    - 入口文件生成(generateServerEntry)-- 支持沿用开发配置(端口/HTTPS/证书/host)
+ *    - 依赖管理(mergeDependencies → 返回完整 package.json)
+ * 3. 编译模板所有文件(compile)
+ * 4. 批量编译主流程(compileAllTemplates)
  * 5. 导出接口与执行编译
  *
- * 核心改进：
- * - 复用 parseServerConfig 读取开发阶段配置（端口、HTTPS、证书、主机名）
- * - 生成的 server.js 严格沿用这些配置，不擅自改变默认行为
+ * 核心改进:
+ * - 复用 parseServerConfig 读取开发阶段配置(端口、HTTPS、证书、主机名)
+ * - 生成的 server.js 严格沿用这些配置,不擅自改变默认行为
  * - 若启用 HTTPS 则自动复制证书文件到输出目录/certs
  */
 import {
 	path, fsPromises, CWD, getAvailableTemplates, parseServerConfig, validateTemplateFile, renderTemplate, processIncludes,
-	processVariables, setCompilationMode, getIncludedFiles, loadUserFeatures, findEntryFile, templatesDir, staticDir, customizeDir
+     processVariables, setCompilationMode, getIncludedFiles, loadUserFeatures, findEntryFile,
+     templatesDir, staticDir, customizeDir
 } from './services/templateService.js';
 import PK from './package.json' with { type: 'json' };
 import util from 'util';
@@ -26,7 +27,8 @@ import { exec } from 'child_process';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 let cachedPages = [];
-const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename), execPromise = util.promisify(exec),
+const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
+    execPromise = util.promisify(exec),
 
 	// ==================== 1. 递归目录复制工具 ====================
 	copyDir = async (src, destDir) => {
@@ -94,7 +96,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	},
 
 	installDependencies = async (targetDir) => {
-		console.log('📦 正在安装项目依赖，请稍候...');
+		console.log('📦 正在安装项目依赖,请稍候...');
 		try {
 			const { stdout, stderr } = await execPromise('npm install', { cwd: targetDir });
 			if (stdout) console.log(stdout);
@@ -106,10 +108,10 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 	},
 
 	/**
-	 * 生成服务端入口文件内容（ESM 格式），沿用开发配置
+	 * 生成服务端入口文件内容(ESM 格式),沿用开发配置
 	 * @param {boolean} hasUserRoutes - 是否存在用户自定义路由
 	 * @param {string} entryFile - 入口文件名
-	 * @param {object} buildConfig - 编译配置（port, host, httpsEnabled, httpsKeyPath, httpsCertPath）
+	 * @param {object} buildConfig - 编译配置(port, host, httpsEnabled, httpsKeyPath, httpsCertPath)
 	 * @returns {string} server.js 文件内容
 	 */
 	generateServerEntry = async (hasUserRoutes, entryFile, buildConfig) => {
@@ -140,7 +142,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			// 默认根路由
 			defaultRootRoute = `app.get('/', (req, res) => res.redirect('/${entryFile}'));`,
 			httpServerCreation = ` server = http.createServer(app),	protocol = 'http';`;
-		// 服务器创建代码（仅赋值,不再重复声明）
+		// 服务器创建代码(仅赋值,不再重复声明)
 		let serverCreationCode;
 		if (httpsEnabled && httpsKeyPath && httpsCertPath) {
 			const safeKeyPath = JSON.stringify(httpsKeyPath), safeCertPath = JSON.stringify(httpsCertPath);
@@ -151,13 +153,13 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				    };
 				    server = https.createServer(options, app);
 				    protocol = 'https';
-				    console.log(\`🔒 使用 HTTPS，证书路径: ${safeKeyPath}, ${safeCertPath}\`);
+				    console.log(\`🔒 使用 HTTPS,证书路径: ${safeKeyPath}, ${safeCertPath}\`);
 				} catch (err) {
-				    console.error('HTTPS 证书加载失败，降级为 HTTP:', err.message);
+				    console.error('HTTPS 证书加载失败,降级为 HTTP:', err.message);
 				    ${httpServerCreation}
 				}`;
 		} else {
-			const warning = httpsEnabled ? `console.warn('⚠️ HTTPS 已启用但未提供证书路径，降级为 HTTP 启动');` : '';
+			const warning = httpsEnabled ? `console.warn('⚠️ HTTPS 已启用但未提供证书路径,降级为 HTTP 启动');` : '';
 			serverCreationCode = `
 				${httpServerCreation}
 				${warning}`;
@@ -190,7 +192,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				const loadUserRoutes = async () => {
 				    const featuresDir = path.join(__dirname, '${customizeDir}');
 				    if (!fs.existsSync(featuresDir)) {
-				        return console.log(\`   ℹ️ \${featuresDir} 目录不存在，跳过路由加载\`);
+				        return console.log(\`   ℹ️ \${featuresDir} 目录不存在,跳过路由加载\`);
 				    }
 				    const routeFiles = fs.readdirSync(featuresDir).filter(file => file.endsWith('.js'));
 				    for (const file of routeFiles) {
@@ -221,7 +223,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 				wrapAppMethods(app),${corsAndSecurity},start();`;
 		}
 
-		// 无用户路由（纯静态服务器）
+		// 无用户路由(纯静态服务器)
 		return `${baseImports}
 			${declarations};
 			${corsAndSecurity};
@@ -230,7 +232,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			${serverCreationCode}
 			server.listen(port, host, () => {
 			    console.log(\`\\n🚀 静态服务器已启动: \${protocol}://\${host}:\${port}\`);
-			    console.log('📁 当前仅提供静态文件服务（未检测到用户路由）'),console.log('按 Ctrl+C 停止服务器');
+			    console.log('📁 当前仅提供静态文件服务(未检测到用户路由)'),console.log('按 Ctrl+C 停止服务器');
 			});`;
 	},
 
@@ -255,8 +257,8 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 
 // ==================== 4. 批量编译主流程 ====================
 /**
- * 全量模板编译与打包，沿用开发阶段配置（端口、HTTPS、证书、主机名）
- * @param {string|Object} [options] - 配置项，可以是字符串（输出目录）或对象（支持 outputDir 字段）
+ * 全量模板编译与打包,沿用开发阶段配置(端口、HTTPS、证书、主机名)
+ * @param {string|Object} [options] - 配置项,可以是字符串(输出目录)或对象(支持 outputDir 字段)
  * @param {string} [options.outputDir='dist'] - 自定义打包输出目录
  */
 const compileAllTemplates = async (options = {}) => {
@@ -264,7 +266,7 @@ const compileAllTemplates = async (options = {}) => {
 	const outputDir = options.outputDir || 'dist';
 
 	try {
-		// 1. 读取开发阶段配置（与 dev-server 行为完全一致）
+		// 1. 读取开发阶段配置(与 dev-server 行为完全一致)
 		let defaults = {};
 		const configFile = path.join(CWD, '.dev-config.json');
 		try {
@@ -281,7 +283,7 @@ const compileAllTemplates = async (options = {}) => {
 		setCompilationMode(true), cachedPages = await getAvailableTemplates();
 		for (const file of cachedPages) await validateTemplateFile(file);
 
-		// 3. 加载用户自定义功能（编译模式）
+		// 3. 加载用户自定义功能(编译模式)
 		await loadUserFeatures(null, true), console.log(`ℹ️ 变量已从${customizeDir}目录加载`);
 
 		// 4. 创建打包目录
@@ -323,8 +325,8 @@ const compileAllTemplates = async (options = {}) => {
 		// 8. 安装依赖
 		await installDependencies(outputDir);
 
-		if (hasUserRoutes) console.log('\n🚀 检测到自定义路由，已创建完整服务端入口文件');
-		else console.log('\n📄 已生成静态文件服务器（无用户路由）');
+		if (hasUserRoutes) console.log('\n🚀 检测到自定义路由,已创建完整服务端入口文件');
+		else console.log('\n📄 已生成静态文件服务器(无用户路由)');
 
 		console.log(`👉 启动服务器命令: cd ${outputDir} && node server.js`);
 		setCompilationMode(false);

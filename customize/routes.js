@@ -17,7 +17,7 @@ try {
 	({ accountRouter } = await import('./account.js'));
 } catch { }
 
-// 非认证路由：元素样式、CSS编辑、图片管理、自定义API等
+// 非认证路由:元素样式、CSS编辑、图片管理、自定义API等
 export default {
 	setupRoutes: app => {
 		if (!accountRouter) {
@@ -114,17 +114,17 @@ export default {
 				res.status(500).json({ error: '服务器错误' });
 			}
 		});
-		console.log('✅ 非认证路由加载完成（routes.js）');
+		console.log('✅ 非认证路由加载完成(routes.js)');
 
 		// ============ 其它自定义API路由 ============
-		app.get('/api/greeting', (req, res) => res.json({ message: '你好！这是来自用户自定义路由的问候！' }));
+		app.get('/api/greeting', (req, res) => res.json({ message: '你好!这是来自用户自定义路由的问候!' }));
 		app.get('/api/hi/:name', (req, res) =>
 			res.json({
 				message: `你好, ${req.params.name}!`, timestamp: new Date().toLocaleString('zh-CN')
 			})
 		);
-		app.post('/api/contact', (req, res) => res.json({ success: true, message: '感谢您的留言！' }));
+		app.post('/api/contact', (req, res) => res.json({ success: true, message: '感谢您的留言!' }));
 
-		console.log('✅ 自定义路由已加载！');
+		console.log('✅ 自定义路由已加载!');
 	},
 };

@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <!-- 备份码面板（异常时动态显示） -->
+        <!-- 备份码面板(异常时动态显示) -->
         <div id="backupPanel" class="backup-panel" hidden>
             <div class="form-group">
                 <input type="text" id="backupCodeInput" placeholder="请输入10位备用码" maxlength="10" autocomplete="off">
@@ -168,7 +168,8 @@
     <script src="/static/topImg.js" defer></script>
     <script src="/static/utils/browser.js"></script>
     <script>
-        const [totpSection, webauthnSection, backupPanel, messageDiv, totpInput, verifyTotpBtn, backupCodeInput, submitBackupBtn,
+        const [totpSection, webauthnSection, backupPanel, messageDiv, totpInput, verifyTotpBtn, backupCodeInput,
+        submitBackupBtn,
             retryHardwareBtn] = ['totpSection', 'webauthnSection', 'backupPanel', 'message', 'totpInput',
                 'verifyTotpBtn', 'backupCodeInput', 'submitBackupBtn', 'retryHardwareBtn']
                 .map(id => document.getElementById(id)),
@@ -188,7 +189,7 @@
                 totpSection.hidden = true, webauthnSection.hidden = true, backupPanel.hidden = false;
                 backupCodeInput.value = '', backupCodeInput.focus();
             },
-            // 统一处理验证响应（TOTP 和备份码共用）
+            // 统一处理验证响应(TOTP 和备份码共用)
             handleVerifyResponse = async token => {
                 if (!token) return setMessage('请输入验证码/备用码'), false;
                 const totp = token.length === 6, isBackup = token.length === 10;
@@ -207,11 +208,12 @@
                     if (response.ok) return window.location.href = '/', true;
                     // 处理锁定情况
                     if (data.locked) return setMessage(data.message), setFormDisabled(true), false;
-                    // 处理普通失败（包含 remainingAttempts）
+                    // 处理普通失败(包含 remainingAttempts)
                     if (data.remainingAttempts !== undefined) {
                         const failuresSoFar = 9 - data.remainingAttempts;
                         setMessage(`${data.message} (已失败 ${failuresSoFar} 次)`);
-                        if (failuresSoFar >= maxNum && totp) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
+                        if (failuresSoFar >= maxNum &&
+                        totp) showBackupPanel(`连续失败 ${failuresSoFar} 次,请使用备用码登录`);
                     }
                     else setMessage(data.message);
                     return activeInput.value = '', activeInput.focus(), activeBtn.disabled = false, false;
@@ -228,7 +230,8 @@
                     return showBackupPanel('当前浏览器不支持硬件安全验证,请使用备用码登录'), false;
                 if (!currentUsername) return showBackupPanel('无法获取用户身份,请使用备用码登录'), false;
                 if (retryHardwareBtn && !retryHardwareBtn.hasListener)
-                    retryHardwareBtn.addEventListener('click', () => performHardwareVerification()), retryHardwareBtn.hasListener = true;
+                    retryHardwareBtn.addEventListener('click', () => performHardwareVerification()),
+                    retryHardwareBtn.hasListener = true;
                 if (hardwareRunning) return false;
 
                 hardwareRunning = true, clearMessage();
@@ -265,7 +268,8 @@
             initPage = () => {
                 backupPanel.hidden = true;
                 if (method === 'webauthn')
-                    totpSection.hidden = true, webauthnSection.hidden = false, performHardwareVerification().catch(e => console.warn(e));
+                    totpSection.hidden = true, webauthnSection.hidden = false,
+                    performHardwareVerification().catch(e => console.warn(e));
                 else totpSection.hidden = false, webauthnSection.hidden = true, totpInput.focus();
 
                 // 事件监听

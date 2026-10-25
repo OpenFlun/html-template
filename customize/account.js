@@ -1,5 +1,5 @@
 // /customize/account.js
-// 用户认证模块：包含 session、登录保护中间件及所有认证路由
+// 用户认证模块:包含 session、登录保护中间件及所有认证路由
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -19,19 +19,21 @@ import { fileURLToPath } from 'url';
 import { injectScript } from './hotReloadInjector.js';
 
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename), CWD = process.cwd(),
-    pageDir = 'templates', accountDir = 'account', usersFile = path.join(__dirname, 'users.json'), pendingRegistrations = new Map(),
+    pageDir = 'templates', accountDir = 'account', usersFile = path.join(__dirname, 'users.json'),
+    pendingRegistrations = new Map(),
     recentPasswordResets = new Map(), mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/, Store = session.Store;
 
 // 邮件发送配置检查
 if (!env.MAIL_HOST || !env.MAIL_USER || !env.MAIL_PWD)
-    console.error('❌ 邮件服务未配置,请在根目录env文件中正确配置 MAIL_HOST、MAIL_USER、MAIL_PWD 后重新启动!'), process.exit(1);
+    console.error('❌ 邮件服务未配置,请在根目录env文件中正确配置 MAIL_HOST、MAIL_USER、MAIL_PWD 后重新启动!'),
+    process.exit(1);
 
 // 邮件发送配置
 const transporter = createTransport({
     host: env.MAIL_HOST, port: env.MAIL_PORT, secure: true,
     auth: { user: env.MAIL_USER, pass: env.MAIL_PWD }
 });
-if (!transporter) console.error('❌ 邮件传输器创建失败,请检查邮件服务配置！'), process.exit(1);
+if (!transporter) console.error('❌ 邮件传输器创建失败,请检查邮件服务配置!'), process.exit(1);
 
 // ========== 辅助函数 ==========
 const readUsers = () => {
@@ -115,7 +117,7 @@ const readUsers = () => {
             default: return;
         }
 
-        const html = `<p>点击👉 <a href="${baseUrl}/${link}token=${token}">验证链接</a> 完成验证；此链接一小时内有效！</p>`;
+        const html = `<p>点击👉 <a href="${baseUrl}/${link}token=${token}">验证链接</a> 完成验证;此链接一小时内有效!</p>`;
         await sendEmail({ to: email, subject, html });
     },
     sendSecurityAlertEmail = async (req, user, actionType) => {
@@ -131,7 +133,7 @@ const readUsers = () => {
                 actionDescription = '添加了一台新的硬件验证设备';
                 break;
             case 'backup_code_lock':
-                subject = '安全警报：账户临时锁定';
+                subject = '安全警报:账户临时锁定';
                 actionDescription = '连续多次输入错误的备用码,账户已被临时锁定24小时';
                 break;
             default: return;
@@ -139,7 +141,8 @@ const readUsers = () => {
 
         const html = `
             <p>主人好!</p>
-            <p>网站账户(${user.username})于 <strong>${now}</strong>在 <strong>${clientIp}</strong> ${actionDescription};</p>
+            <p>网站账户(${user.username})于 <strong>${now}</strong>在
+                <strong>${clientIp}</strong> ${actionDescription};</p>
             <p>如果是您的操作,请忽略此邮件,否则请前往处理;</p>
             <p style="margin-left:65%;">此致<br/>&emsp;&nbsp;安全中心</p>
         `;
@@ -151,7 +154,8 @@ const readUsers = () => {
 
         const domainRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (domainRegex.test(hostname)) return hostname;
-        throw new Error(`无效的 RP ID (${hostname}),请使用有效的域名、localhost或127.0.0.1,并确保使用HTTPS或localhost访问;`);
+        throw new Error(`无效的 RP ID (${hostname}),` +
+            `请使用有效的域名、localhost或127.0.0.1,并确保使用HTTPS或localhost访问;`);
     },
     getOrigin = req => `${req.protocol}://${req.get('host')}`,
     getClientIp = req => {
@@ -257,7 +261,8 @@ const readUsers = () => {
                 const sessionLoginTime = req.session.loginTime || 0;
                 if (user.passwordChangedAt > sessionLoginTime) {
                     req.session.destroy(() => {
-                        if (req.path.startsWith('/api/')) return res.status(401).json({ message: '密码已修改,请重新登录' });
+                        if (req.path.startsWith('/api/'))
+                            return res.status(401).json({ message: '密码已修改,请重新登录' });
                         return res.redirect('/login');
                     });
                     return;
@@ -301,7 +306,8 @@ const readUsers = () => {
         // ========== 公开认证API ==========
         app.post('/api/register', authLimiter, async (req, res) => {
             const { username, email, password } = req.body;
-            if (!hasAllFields(req.body, ['username', 'email', 'password'])) return res.status(400).json({ message: '所有字段必填' });
+            if (!hasAllFields(req.body, ['username', 'email', 'password']))
+                return res.status(400).json({ message: '所有字段必填' });
             if (!validateEmail(email)) return res.status(400).json({ message: '邮箱格式不正确' });
             if (!validatePasswordLength(password)) return res.status(400).json({ message: '密码至少6位' });
 
@@ -324,7 +330,8 @@ const readUsers = () => {
             const pending = pendingRegistrations.get(token);
             if (!pending) return res.status(400).json({ message: '链接已失效或不存在' });
             const { expires, username, email, password } = pending;
-            if (expires < Date.now()) return pendingRegistrations.delete(token), res.status(400).json({ message: '链接已过期' });
+            if (expires < Date.now()) return pendingRegistrations.delete(token),
+                res.status(400).json({ message: '链接已过期' });
 
             const users = readUsers(), newUser = createUserObject(username, email, password, true);
             users.push(newUser), writeUsers(users), pendingRegistrations.delete(token);
@@ -379,7 +386,7 @@ const readUsers = () => {
             const { twoFactorSecret, backupCodes } = user;
             let verified = false, backupValid = false;
 
-            // TOTP 验证（6位）
+            // TOTP 验证(6位)
             if (token.length === 6) {
                 try {
                     verified = await verifyTotp(twoFactorSecret, token);
@@ -388,7 +395,7 @@ const readUsers = () => {
                 }
             }
 
-            // 备份码验证（长度:10位）
+            // 备份码验证(长度:10位)
             if (!verified && backupCodes?.length) {
                 for (let i = 0; i < backupCodes.length; i++) {
                     const match = await verifyPassword(token, backupCodes[i]);
@@ -405,11 +412,13 @@ const readUsers = () => {
                 if (user.codeFailures >= 9) {
                     user.codeLockUntil = Date.now() + 24 * oneHour;
                     await sendSecurityAlertEmail(req, user, 'backup_code_lock'), touchAndSaveUser(users, user);
-                    return res.status(401).json({ message: '输入错误次数过多,账户已被锁定24小时,请隔天重试或联系管理员', locked: true });
+                    return res.status(401).json({ message: '输入错误次数过多,账户已被锁定24小时,请隔天重试或联系管理员',
+                        locked: true });
                 } else {
                     const remaining = 9 - user.codeFailures;
                     touchAndSaveUser(users, user);
-                    return res.status(401).json({ message: `输入错误,剩余尝试次数:${remaining}`, remainingAttempts: remaining });
+                    return res.status(401).json({ message: `输入错误,剩余尝试次数:${remaining}`,
+                        remainingAttempts: remaining });
                 }
             }
 
@@ -453,7 +462,8 @@ const readUsers = () => {
             const now = Date.now();
             user.password = await hashPassword(newPassword), user.passwordChangedAt = now, user.passwordResetToken = null;
             user.passwordResetExpires = null, touchAndSaveUser(users, user);
-            recentPasswordResets.set(user.email, Date.now() + fifteenMin), res.json({ success: true, message: '密码已重置' });
+            recentPasswordResets.set(user.email, Date.now() + fifteenMin), res.json({ success: true,
+                message: '密码已重置' });
         });
 
         app.get('/api/verify-new-email', async (req, res) => {
@@ -465,7 +475,8 @@ const readUsers = () => {
 
             const emailTaken = isEmailTaken(users, user.pendingEmail, user.id);
             if (emailTaken)
-                return clearPendingFields(user), writeUsers(users), res.status(409).json({ message: '该邮箱已被使用,请检查修改' });
+                return clearPendingFields(user), writeUsers(users),
+                    res.status(409).json({ message: '该邮箱已被使用,请检查修改' });
 
             user.email = user.pendingEmail, user.emailVerified = true, clearPendingFields(user);
             touchAndSaveUser(users, user), res.json({ success: true, message: '新邮箱验证成功' });
@@ -524,12 +535,14 @@ const readUsers = () => {
             const emailChanged = newEmail !== user.email;
             if (emailChanged) {
                 const token = generateToken();
-                user.pendingEmail = newEmail, user.pendingEmailToken = token, user.pendingEmailExpires = Date.now() + oneHour;
+                user.pendingEmail = newEmail, user.pendingEmailToken = token,
+                    user.pendingEmailExpires = Date.now() + oneHour;
                 user.username = newUsername, touchAndSaveUser(users, user);
                 await sendVerificationEmail(req, newEmail, token, 'change-email');
                 res.json({ success: true, message: '资料修改已提交,请查收新邮箱,并完成验证更新', emailChanged: true });
             }
-            else user.username = newUsername, touchAndSaveUser(users, user), res.json({ success: true, message: '资料修改成功' });
+            else user.username = newUsername, touchAndSaveUser(users, user), res.json({ success: true,
+                message: '资料修改成功' });
         });
 
         app.post('/api/change-password', async (req, res) => {
@@ -541,8 +554,10 @@ const readUsers = () => {
             if (!result) return res.status(404).json({ message: '用户不存在' });
 
             const { user, users } = result;
-            if (!(await verifyPassword(currentPassword, user.password))) return res.status(401).json({ message: '当前密码错误' });
-            if (await verifyPassword(newPassword, user.password)) return res.status(400).json({ message: '新旧密码不能相同' });
+            if (!(await verifyPassword(currentPassword, user.password)))
+                return res.status(401).json({ message: '当前密码错误' });
+            if (await verifyPassword(newPassword, user.password))
+                return res.status(400).json({ message: '新旧密码不能相同' });
 
             const now = Date.now();
             user.password = await hashPassword(newPassword), user.passwordChangedAt = now, touchAndSaveUser(users, user);
@@ -586,14 +601,16 @@ const readUsers = () => {
             if (!result) return res.status(404).json({ message: '用户不存在' });
 
             const { user, users } = result;
-            user.twoFactorEnabled = false, user.twoFactorSecret = null, touchAndSaveUser(users, user), res.json({ success: true });
+            user.twoFactorEnabled = false, user.twoFactorSecret = null, touchAndSaveUser(users, user),
+                res.json({ success: true });
         });
 
         app.post('/api/regenerate-backup-codes', async (req, res) => {
             const result = getCurrentUser(req);
             if (!result) return res.status(404).json({ message: '用户不存在' });
             const { user, users } = result;
-            if (!user.twoFactorEnabled && !user.webauthnEnabled) return res.status(400).json({ message: '未启用任何多因素认证' });
+            if (!user.twoFactorEnabled && !user.webauthnEnabled)
+                return res.status(400).json({ message: '未启用任何多因素认证' });
 
             const { plainCodes, hashedCodes } = generateBackupCodes();
             user.backupCodes = hashedCodes, touchAndSaveUser(users, user), res.json({ backupCodes: plainCodes });
@@ -727,7 +744,7 @@ const readUsers = () => {
             res.json(response);
         });
 
-        // 开始硬件验证登录（生成断言选项）
+        // 开始硬件验证登录(生成断言选项)
         app.post('/api/webauthn/login/begin', authLimiter, async (req, res) => {
             try {
                 const { username } = req.body;
@@ -766,7 +783,8 @@ const readUsers = () => {
 
                 let credential = user.webauthnCredentials.find(c => c.id === assertionResponse.id);
                 if (!credential) {
-                    credential = user.webauthnCredentials.find(c => c.id.toLowerCase() === assertionResponse.id.toLowerCase());
+                    credential = user.webauthnCredentials.find(c =>
+                        c.id.toLowerCase() === assertionResponse.id.toLowerCase());
                     if (!credential) return res.status(400).json({ message: '凭证不匹配' });
                 }
 
@@ -794,6 +812,6 @@ const readUsers = () => {
                 return res.status(400).json({ message: err.message });
             }
         });
-        console.log('✅ 认证路由已加载（account.js）');
+        console.log('✅ 认证路由已加载(account.js)');
     }
 export { accountRouter };
