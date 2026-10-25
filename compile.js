@@ -18,8 +18,8 @@
  */
 import {
 	path, fsPromises, CWD, getAvailableTemplates, parseServerConfig, validateTemplateFile, renderTemplate, processIncludes,
-     processVariables, setCompilationMode, getIncludedFiles, loadUserFeatures, findEntryFile,
-     templatesDir, staticDir, customizeDir
+	processVariables, setCompilationMode, getIncludedFiles, loadUserFeatures, findEntryFile,
+	templatesDir, staticDir, customizeDir
 } from './services/templateService.js';
 import PK from './package.json' with { type: 'json' };
 import util from 'util';
@@ -28,7 +28,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 let cachedPages = [];
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
-    execPromise = util.promisify(exec),
+	execPromise = util.promisify(exec),
 
 	// ==================== 1. 递归目录复制工具 ====================
 	copyDir = async (src, destDir) => {
@@ -79,7 +79,7 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
 			mergedDeps = { ...templateDeps, ...userDeps };
 			for (const pkg of excludeList) delete mergedDeps[pkg];
 		}
-		if (!mergedDeps.express) mergedDeps.express = '^5.2.1';
+		if (!mergedDeps.express) mergedDeps.express = '^5.3.0';
 		const finalPkg = {
 			name: 'dist-server', version: '1.0.0', ...basePkg,
 			type: 'module', main: 'server.js',
