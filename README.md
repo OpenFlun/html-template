@@ -4,7 +4,7 @@
 
 - **推荐方式**:使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
 - **兼容方式**:Node.js ≥ 23.5.0 原生支持 `require(esm)`;22.12+ 需开启 `--experimental-require-module` 标志;
-- **重要**:本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为 
+- **重要**:本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为
   `.mjs`;
 
 ---
@@ -62,7 +62,7 @@ graph TB
 
 ### 允许安装脚本执行
 
-本包在安装时可能触发某些依赖包的自动脚本(如 `postinstall` 等);如果你的 npm 全局配置或项目配置禁止了脚本执行(例如设置了 
+本包在安装时可能触发某些依赖包的自动脚本(如 `postinstall` 等);如果你的 npm 全局配置或项目配置禁止了脚本执行(例如设置了
 `ignore-scripts=true`),可能会导致安装不完整或运行时异常;
 
 推荐在项目根目录的 `package.json` 中添加 `allowScripts` 字段,显式放行本包及其依赖的脚本:
@@ -99,21 +99,6 @@ npm i @flun/html-template # 简写
 # 或
 # 全局安装
 npm i -g @flun/html-template # 简写
-
-# flun其它npm家族安装包:
-npm i -D @flun/desktop-builder              # 将 Node.js 网站一键打包为当前桌面应用
-npm i @flun/dns-auto-ssl                    # https证书申请及配置自动续期
-npm i @flun/env                             # .env 文件的环境变量调用
-npm i @flun/mailer                          # 邮件发送
-npm i @flun/nodejs-mobile-gyp               # 移动端原生模块构建支持(node-gyp)
-npm i @flun/nodejs-mobile-react-native      # 移动端与 React Native 集成
-npm i @flun/node-mobile-app                 # 移动应用编译打包
-npm i passport-desktop-win32-ia32-msvc      # Windows 桌面端 Passport 32 位 MSVC 平台包
-npm i passport-desktop-win32-x64-msvc       # Windows 桌面端 Passport 64 位 MSVC 平台包
-npm i @flun/windows                         # Windows 服务安装和管理
-npm i @flun/webauthn-server                 # 身份验证服务后端处理
-npm i @flun/webauthn-browser                # 身份验证前端处理
-所有家族包在支持 .d.ts 提示环境下,鼠标焦点包名都有丰富的导出和使用示例提示,再也不必到处翻找使用文档;建议在VScode环境下使用;
 ```
 > **重要提示**:初次使用最好在空项目中执行安装,安装过程会自动复制 ESM 示例和必要文件到根目录
 
@@ -357,7 +342,7 @@ initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已
 4. **开发调试**:使用 `node dev.js` 运行开发服务器
 5. **编译部署**:使用 `node build.js` 编译模板
 
-> **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js` 
+> **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js`
   入口文件;
 
 ---
@@ -572,10 +557,10 @@ export default {
 2. **区块不显示**:检查开闭标签名称是否一致
 3. **热重载失效**:确认修改的是模板或静态目录中的文件
 4. **路由不工作**:检查是否正确定义了 `setupRoutes` 导出
-5. **找不到函数**: 1. 检查函数名是否正确,2. 确认文件在 `customize` 目录内,3. 确认使用了 `export const functions = {...}` 
+5. **找不到函数**: 1. 检查函数名是否正确,2. 确认文件在 `customize` 目录内,3. 确认使用了 `export const functions = {...}`
    语法
 6. **ESM 相关错误**:检查 `package.json` 是否包含 `"type": "module"`,或启动文件是否具有 `.mjs` 扩展名;
-7. **HTTPS 证书错误**:请确保 `host` 参数与证书中的域名完全匹配,且证书未被吊销或过期;建议开发环境和生产环境都使用 
+7. **HTTPS 证书错误**:请确保 `host` 参数与证书中的域名完全匹配,且证书未被吊销或过期;建议开发环境和生产环境都使用
    `@flun/dns-auto-ssl` 自动处理证书->避免意外情况;
 
 ### 获取帮助
