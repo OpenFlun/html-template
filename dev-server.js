@@ -233,11 +233,9 @@ const startServer = async (options = {}) => {
 	try {
 		const config = parseServerConfig(options),
 			{ port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath } = config,
-
 			// 保存配置到文件(用于后续编译时沿用)
-			configToSave = {
-				port, host, https: httpsEnabled, httpsKey: httpsKeyPath, httpsCert: httpsCertPath
-			};
+			configToSave = { port, host, https: httpsEnabled, httpsKey: httpsKeyPath, httpsCert: httpsCertPath };
+
 		await fsPromises.writeFile(path.join(CWD, '.dev-config.json'), JSON.stringify(configToSave, null, 2), 'utf8');
 		currentHttpsConfig = { https: httpsEnabled, keyPath: httpsKeyPath, certPath: httpsCertPath };
 		currentHost = host, await syncAccountFiles(account), await loadUserFeatures(app);
@@ -341,4 +339,4 @@ const startServer = async (options = {}) => {
 // ==================== 7.导出接口与启动执行 ====================
 export { startServer };
 if (process.argv[1] === __filename)
-    startServer().catch(error => (console.error('服务器启动失败:', error), process.exit(1)));
+	startServer().catch(error => (console.error('服务器启动失败:', error), process.exit(1)));
