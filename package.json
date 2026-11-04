@@ -54,9 +54,9 @@
     "npm": ">=10.0.0"
   },
   "dependencies": {
-    "@flun/env": "^3.2.0",
-    "@flun/mailer": "^2.1.25",
-    "@flun/webauthn-server": "^2.1.10",
+    "@flun/env": "*",
+    "@flun/mailer": "*",
+    "@flun/webauthn-server": "*",
     "bcrypt": "^6.0.0",
     "chalk": "^6.0.1",
     "chokidar": "^6.0.0",
