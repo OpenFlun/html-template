@@ -1,15 +1,17 @@
-# HTML模板工具包
+# @flun/html-template
 
-### 本包基于 ESM 模块系统编写->拥抱趋势
+## 简介
+
+HTML 模板工具包,提供开发服务器和模板编译功能,支持自定义标签与快捷输入、变量定义、包含文件引用,帮助开发者模块化处理 HTML;
+
+**本包基于 ESM 模块系统编写**
 
 - **推荐方式**:使用 `import` / `export` 语法,静态分析更友好,工具链兼容性最佳;
 - **兼容方式**:Node.js ≥ 23.5.0 原生支持 `require(esm)`;22.12+ 需开启 `--experimental-require-module` 标志;
 - **重要**:本文档所有示例均采用 **ESM 标准**,请确保你的项目 `package.json` 中已设置 `"type": "module"`,或将脚本后缀改为
   `.mjs`;
 
----
-
-## 架构概览
+### 架构概览
 
 ```mermaid
 graph TB
@@ -56,9 +58,83 @@ graph TB
     P --> R
     R --> O
 ```
+
+### 使用流程
+
+1. **安装包**:自动复制模板文件到项目根目录
+2. **自定义开发**:修改HTML模板文件满足需求
+3. **添加功能**:将自定义逻辑写入 `customize` 目录
+4. **开发调试**:使用 `node dev.js` 运行开发服务器
+5. **编译部署**:使用 `node build.js` 编译模板
+
+> **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js`
+  入口文件;
+
 ---
 
-## 配置
+## 特性
+
+### 模板引擎特性
+- **继承机制**:`[extends base.html]` 实现模板层级结构
+- **区块系统**:`[!blockName]` 和 `[~blockName]` 定义可替换内容区块
+- **变量系统**:`{{variable}}` 语法支持动态内容、条件判断和循环处理 (条件判断支持20层嵌套)
+- **包含功能**:`[include header.html]` 实现文件复用
+- **用户函数**:支持自定义函数的注册与调用
+
+### 开发服务器功能
+- 自动将URL路径映射到对应模板文件
+- 通过 `/static` 路径提供静态文件服务
+- 模板结构验证与错误提示
+- 用户功能热加载和页面热重载功能
+
+### 编译系统优势
+- 分析模板依赖关系
+- 包含文件去重处理
+- 按需生成Express服务入口
+- 智能编译顺序控制
+- 继承开发阶段的配置(比如https启用,端口配置等等)
+
+### 登录系统支持
+
+登录系统支持密码、2FA、硬件等验证;支持用户名或邮箱登录;
+
+### 页面样式在线修改(需启用登录系统)
+- 支持长按元素选择设置其各种属性样式(比如:边距,颜色,字体等等);
+- 支持跳转到编辑器修改整个页面样式文件:
+> - 编辑器功能: 颜色选择 · 编辑 · 自动补全 · 代码折叠 · 预览 · 保存应用· 取消
+> **开关灵活**:您可通过 `--account` / `--no-account` 随时启用或关闭登录功能;关闭时相关文件自动迁移至 `account_bak/` 备份,
+  启用时智能恢复,确保项目整洁且自定义内容不丢失;
+
+### 自定义拖动元素(默认支持主题图标和返回顶部图标)
+- 登录系统额外支持编辑器和预览容器拖动
+
+## 包目录结构
+
+随包发布的文件:
+
+```
+@flun/html-template/
+├── index.js            库入口,导出 compile / initProject / startDevServer
+├── index.d.ts          类型声明
+├── compile.js          模板编译(npm run build)
+├── dev-server.js       开发服务器(npm run dev)
+├── dev.js              开发入口
+├── build.js            构建脚本
+├── copy-files.js       postinstall 复制模板资源到项目
+├── restoreDefaults.js  恢复默认模板与资源
+├── templates/          默认模板(页面、区块、include 文件)
+├── services/           模板服务与中间件
+├── static/             静态资源(CSS、JS、图片)
+├── customize/          用户扩展(变量、函数、路由、热重载)
+├── package.json        包配置
+├── README.md           本文件
+├── CHANGELOG.md        更新日志
+└── LICENSE             许可
+```
+
+---
+
+## 安装前准备
 
 ### 允许安装脚本执行
 
@@ -100,15 +176,32 @@ npm i @flun/html-template # 简写
 # 全局安装
 npm i -g @flun/html-template # 简写
 ```
+
 > **重要提示**:初次使用最好在空项目中执行安装,安装过程会自动复制 ESM 示例和必要文件到根目录
 
 ---
 
-## 快速开始
+## 命令行
 
-### 方式一:通过npm脚本(推荐)
+### 快速开始
 
-在您的 `package.json` 中添加以下脚本:
+```bash
+npm run dev    # 启动开发服务器(实时预览和热重载)
+npm run build  # 编译模板(生成最终 HTML 文件)
+```
+
+### 命令
+
+本包通过 npm scripts 提供命令,安装后在项目根目录执行:
+
+```bash
+npm run build  # 编译全部模板,生成 Express 服务入口
+npm run dev    # 启动开发服务器(模板热重载、静态资源服务)
+```
+
+`postinstall` 会在安装时自动执行,将 ESM 示例与必要文件复制到项目根目录;
+
+在 `package.json` 中添加脚本:
 
 ```json
 {
@@ -120,52 +213,64 @@ npm i -g @flun/html-template # 简写
 }
 ```
 
-**dev.js(ESM)**
+也可以直接运行文件:
+
+```sh
+node dev.js            # 启动开发服务器
+node dev.js --account  # 启动开发服务器并启用登录系统
+node build.js          # 编译模板
+```
+
+---
+
+## 函数方式
+
+### 快速开始
+
+```js
+import { compile, initProject, startDevServer } from '@flun/html-template';
+
+await initProject();
+await compile();
+```
+
+### 导出
+
+| 导出 | 作用 |
+|---|---|
+| `compile` | 编译全部模板,生成 Express 服务入口 |
+| `initProject` | 复制 ESM 示例与必要文件到项目根目录 |
+| `startDevServer` | 启动开发服务器 |
+
+### 项目入口文件
+
+在项目中创建以下入口文件(ESM):
+
+**dev.js**
+
 ```javascript
 import { startDevServer } from '@flun/html-template';
 startDevServer({ port: 7296, hotReload: true });
-// 如需启用 HTTPS,请参考下文"配置选项 → 启用 HTTPS"章节
+// 如需启用 HTTPS,请参考"参考配置 → 启用 HTTPS"章节
 ```
 
-**build.js(ESM)**
+**build.js**
+
 ```javascript
 import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' });
 ```
 
-**restoreDefaults.js(ESM)**
+**restoreDefaults.js**
+
 ```javascript
 import { initProject } from '@flun/html-template';
 initProject({ mode: 'overwrite', verbose: true });
 ```
 
-然后使用:
-```sh
-# 启动开发服务器(实时预览和热重载,默认不启用登录)
-npm run dev
-
-# 启动开发服务器并启用登录系统
-npm run dev -- --account
-
-# 编译模板(生成最终HTML文件)
-npm run build
-```
-
-### 方式二:直接运行文件
-```sh
-# 启动开发服务器
-node dev.js
-
-# 启动开发服务器并启用登录系统
-node dev.js --account
-
-# 编译模板
-node build.js
-```
-
 ---
 
-## 配置选项
+## 参考配置
 
 ### 自定义端口
 - **命令行参数**:`node dev.js --port 8080` 或 `node dev.js -p 8080`
@@ -332,61 +437,6 @@ initProject({ mode: 'skip-files', verbose: true });   // 跳过已存在文件�
 initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已存在文件,显示详细信息,并跳过恢复登录相关文件
 ```
 
----
-
-## 工作流程
-
-1. **安装包**:自动复制模板文件到项目根目录
-2. **自定义开发**:修改HTML模板文件满足需求
-3. **添加功能**:将自定义逻辑写入 `customize` 目录
-4. **开发调试**:使用 `node dev.js` 运行开发服务器
-5. **编译部署**:使用 `node build.js` 编译模板
-
-> **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js`
-  入口文件;
-
----
-
-## 核心功能
-
-### 模板引擎特性
-- **继承机制**:`[extends base.html]` 实现模板层级结构
-- **区块系统**:`[!blockName]` 和 `[~blockName]` 定义可替换内容区块
-- **变量系统**:`{{variable}}` 语法支持动态内容、条件判断和循环处理 (条件判断支持20层嵌套)
-- **包含功能**:`[include header.html]` 实现文件复用
-- **用户函数**:支持自定义函数的注册与调用
-
-### 开发服务器功能
-- 自动将URL路径映射到对应模板文件
-- 通过 `/static` 路径提供静态文件服务
-- 模板结构验证与错误提示
-- 用户功能热加载和页面热重载功能
-
-### 编译系统优势
-- 分析模板依赖关系
-- 包含文件去重处理
-- 按需生成Express服务入口
-- 智能编译顺序控制
-- 继承开发阶段的配置(比如https启用,端口配置等等)
-
-## 附加功能
-### 登录系统支持
-- 登录系统支持密码,2FA,硬件等验证;支持用户名或邮箱登录;
-- 包含文件去重处理
-- 按需生成Express服务入口
-- 智能编译顺序控制
-
-### 页面样式在线修改(需启用登录系统)
-- 支持长按元素选择设置其各种属性样式(比如:边距,颜色,字体等等);
-- 支持跳转到编辑器修改整个页面样式文件:
-> - 编辑器功能: 颜色选择 · 编辑 · 自动补全 · 代码折叠 · 预览 · 保存应用· 取消
-> **开关灵活**:您可通过 `--account` / `--no-account` 随时启用或关闭登录功能;关闭时相关文件自动迁移至 `account_bak/` 备份,
-  启用时智能恢复,确保项目整洁且自定义内容不丢失;
-
-### 自定义拖动元素(默认支持主题图标和返回顶部图标)
-- 登录系统额外支持编辑器和预览容器拖动
-
----
 
 ## 模板语法示例
 
@@ -490,9 +540,9 @@ export default {
 
 # 安全机制说明
 
-## 我们为您构建了多层安全防护
+## 安全防护
 
-### 🔒 核心安全特性
+### 核心安全特性
 
 **路径安全**
 - 所有文件访问都限制在项目目录内
@@ -508,7 +558,7 @@ export default {
 - 自动过滤不安全的关键字
 - 防止无限循环(最多10次迭代)
 
-### 🛡️ 自动防护机制
+### 自动防护机制
 
 **模板处理时自动启用:**
 - 变量访问安全检查
@@ -518,7 +568,7 @@ export default {
 
 **用户无需额外配置**,所有安全防护在后台自动运行;
 
-### 💡 使用建议
+### 使用建议
 
 **安全做法:**
 ```html
@@ -539,7 +589,7 @@ export default {
 ```
 
 ---
-### ⚠️ 重要提醒
+### 重要提醒
 
 虽然我们提供了多重安全防护,但您仍需:
 1. 谨慎处理用户输入数据
@@ -550,7 +600,7 @@ export default {
 这些防护措施确保您的模板渲染过程安全可靠,让您可以专注于业务开发;
 
 ---
-## 故障排除
+## 常见问题
 
 ### 常见问题
 1. **模板不生效**:确保子模板开头有 `[extends base.html]`
@@ -565,10 +615,21 @@ export default {
 
 ### 获取帮助
 如果遇到问题,可以:
+
 1. 运行恢复初始文件脚本
 2. 检查浏览器控制台错误信息
-3. 确认文件路径和名称是否
+3. 确认文件路径和名称是否正确
 
 ---
 
-此模板工具包提供了从开发到生产的完整流程,适合各种规模的Web项目开发;
+## 许可证
+
+ISC
+
+---
+
+## 贡献
+
+- 源码:[GitHub](https://github.com/OpenFlun/html-template)
+- 问题反馈:[Issues](https://github.com/OpenFlun/html-template/issues)
+- 主页:[npm 包页面](https://www.npmjs.com/package/@flun/html-template#readme)
