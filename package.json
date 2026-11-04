@@ -1,8 +1,11 @@
 {
   "name": "@flun/html-template",
   "version": "5.1.14",
-  "description": "一个HTML模板工具包,提供开发服务器和模板编译功能,支持自定义标签和快捷输入,变量定义,包含文件引用,帮助开发者模块化处理HTML;",
+  "description": "一个HTML模板工具包,提供开发服务器和模板编译功能,支持自定义标签、快捷输入、变量、包含文件,模块化处理HTML;",
   "main": "index.js",
+  "bin": {
+    "html-template": "bin/cli.js"
+  },
   "types": "index.d.ts",
   "keywords": [
     "html",
@@ -12,10 +15,11 @@
     "template-engine"
   ],
   "files": [
-    "templates",
+    "bin",
+    "customize",
     "services",
     "static",
-    "customize",
+    "templates",
     "build.js",
     "compile.js",
     "copy-files.js",
@@ -54,6 +58,7 @@
     "@flun/mailer": "*",
     "@flun/webauthn-server": "*",
     "bcrypt": "^6.0.0",
+    "chalk": "^6.0.1",
     "chokidar": "^6.0.0",
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",
@@ -69,8 +74,8 @@
     "nodemon": "^1.0.2"
   },
   "scripts": {
-    "dev": "node dev-server.js",
     "build": "node compile.js",
-    "postinstall": "node copy-files.js 2>&1"
+    "postinstall": "node copy-files.js 2>&1",
+    "start": "node dev-server.js"
   }
 }

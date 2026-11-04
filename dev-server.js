@@ -227,11 +227,17 @@ const printAvailablePages = (pages, port, hotReload, useHttps, host) => {
  * @param {boolean} [options.https] - 是否启用HTTPS
  * @param {string} [options.httpsKey] - HTTPS私钥路径(启用HTTPS时必须)
  * @param {string} [options.httpsCert] - HTTPS证书路径(启用HTTPS时必须)
+ * @param {Object} [defaults] - 持久化配置,优先级低于 options 与环境变量;命令行入口传入 .dev-config.json 内容
+ * @param {number} [defaults.port] - 持久化端口号
+ * @param {string} [defaults.host] - 持久化主机名
+ * @param {boolean} [defaults.https] - 持久化 HTTPS 开关
+ * @param {string} [defaults.httpsKey] - 持久化 HTTPS 私钥路径
+ * @param {string} [defaults.httpsCert] - 持久化 HTTPS 证书路径
  * @returns {Promise<number>} 启动成功后返回实际使用的端口号
  */
-const startServer = async (options = {}) => {
+const startServer = async (options = {}, defaults = {}) => {
 	try {
-		const config = parseServerConfig(options),
+		const config = parseServerConfig(options, defaults),
 			{ port, host, hotReload, account, httpsEnabled, httpsKeyPath, httpsCertPath } = config,
 			// 保存配置到文件(用于后续编译时沿用)
 			configToSave = { port, host, https: httpsEnabled, httpsKey: httpsKeyPath, httpsCert: httpsCertPath };

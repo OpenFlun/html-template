@@ -64,8 +64,8 @@ graph TB
 1. **安装包**:自动复制模板文件到项目根目录
 2. **自定义开发**:修改HTML模板文件满足需求
 3. **添加功能**:将自定义逻辑写入 `customize` 目录
-4. **开发调试**:使用 `node dev.js` 运行开发服务器
-5. **编译部署**:使用 `node build.js` 编译模板
+4. **开发调试**:使用 `html-template start` 启动开发服务器
+5. **编译部署**:使用 `html-template build` 编译模板
 
 > **注意**:编译只会打包 `customize`、`static` 目录及文件,和编译模板生成的文件;根据是否有自定义路由,动态创建 `server.js`
   入口文件;
@@ -108,28 +108,31 @@ graph TB
 ### 自定义拖动元素(默认支持主题图标和返回顶部图标)
 - 登录系统额外支持编辑器和预览容器拖动
 
+---
+
 ## 包目录结构
 
 随包发布的文件:
 
 ```
 @flun/html-template/
-├── index.js            库入口,导出 compile / initProject / startDevServer
-├── index.d.ts          类型声明
-├── compile.js          模板编译(npm run build)
-├── dev-server.js       开发服务器(npm run dev)
-├── dev.js              开发入口
-├── build.js            构建脚本
-├── copy-files.js       postinstall 复制模板资源到项目
-├── restoreDefaults.js  恢复默认模板与资源
-├── templates/          默认模板(页面、区块、include 文件)
-├── services/           模板服务与中间件
-├── static/             静态资源(CSS、JS、图片)
-├── customize/          用户扩展(变量、函数、路由、热重载)
-├── package.json        包配置
-├── README.md           本文件
-├── CHANGELOG.md        更新日志
-└── LICENSE             许可
+├── bin/
+│   └── cli.js              命令行入口
+├── customize/              用户扩展(变量、函数、路由、热重载)
+├── services/               模板服务与中间件
+├── static/                 静态资源(CSS、JS、图片)
+├── templates/              默认模板(页面、区块、include 文件)
+├── build.js                构建脚本示例
+├── compile.js              模板编译
+├── copy-files.js           postinstall 复制模板资源到项目
+├── dev-server.js           开发服务器
+├── dev.js                  开发入口示例
+├── index.js                库入口,导出 compile / initProject / startDevServer
+├── restoreDefaults.js      恢复默认模板与资源示例
+├── index.d.ts              类型声明
+├── CHANGELOG.md            更新日志
+├── README.md               本文件
+└── LICENSE                 许可
 ```
 
 ---
@@ -156,9 +159,6 @@ graph TB
 }
 ```
 
-> 如果你信任所有安装包,也可以直接在项目 `.npmrc` 中设置 `allow-scripts = false`(表示关闭脚本拦截,所有脚本均允许执行),
-  或删除 `ignore-script` 字段;
-
 ---
 
 ## 安装
@@ -183,43 +183,87 @@ npm i -g @flun/html-template # 简写
 
 ## 命令行
 
+安装后通过 `npx html-template` 或全局命令 `html-template` 调用;命令在 `npm scripts` 中运行时,
+工作目录取 `INIT_CWD`,即发起 npm 命令的项目根目录;
+
+```bash
+html-template <命令> [选项]
+```
+
 ### 快速开始
 
 ```bash
-npm run dev    # 启动开发服务器(实时预览和热重载)
-npm run build  # 编译模板(生成最终 HTML 文件)
+npx html-template start    # 启动开发服务器
+npx html-template build    # 编译模板,输出到 dist
 ```
 
 ### 命令
 
-本包通过 npm scripts 提供命令,安装后在项目根目录执行:
+| 命令      | 说明                              |
+| --------- | --------------------------------- |
+| `start`   | 启动开发服务器,支持热重载与 HTTPS |
+| `build`   | 编译模板,生成 Express 服务入口    |
+| `restore` | 恢复默认模板与资源到项目根目录    |
+| `help`    | 显示帮助                          |
 
-```bash
-npm run build  # 编译全部模板,生成 Express 服务入口
-npm run dev    # 启动开发服务器(模板热重载、静态资源服务)
-```
+### 选项
 
-`postinstall` 会在安装时自动执行,将 ESM 示例与必要文件复制到项目根目录;
+`start` 的选项:
 
-在 `package.json` 中添加脚本:
+| 参数                  | 作用                                          |
+| --------------------- | --------------------------------------------- |
+| `-p <port>`           | 监听端口,默认 `7296`;完整写法 `--port`        |
+| `-H <host>`           | 监听主机名,默认 `localhost`;完整写法 `--host` |
+| `--account`           | 启用登录系统;加 `--no-account` 禁用,默认禁用  |
+| `--hot-reload`        | 启用热重载;加 `--no-hot-reload` 禁用,默认启用 |
+| `--https`             | 启用 HTTPS;加 `--no-https` 禁用,默认关闭      |
+| `--https-key <path>`  | HTTPS 私钥路径,启用 HTTPS 时必填              |
+| `--https-cert <path>` | HTTPS 证书路径,启用 HTTPS 时必填              |
+
+`build` 的选项:
+
+| 参数       | 作用                                  |
+| ---------- | ------------------------------------- |
+| `-o <dir>` | 输出目录,默认 `dist`;完整写法 `--out` |
+
+`restore` 的选项:
+
+| 参数           | 作用                                         |
+| -------------- | -------------------------------------------- |
+| `--overwrite`  | 覆盖已存在的文件与目录                       |
+| `--skip-files` | 跳过已存在文件,仅复制缺失项                  |
+| `--skip-dirs`  | 跳过已存在目录,默认                          |
+| `--account`    | 启用登录系统;加 `--no-account` 禁用,默认禁用 |
+| `--verbose`    | 显示详细日志                                 |
+
+### 配置优先级
+
+`start` 的配置按字段独立判定,同一字段由高到低取值:
+
+1. 显式参数,如 `npx html-template start -p 8080`;
+2. 环境变量,如 `PORT=8080 npx html-template start`;
+3. 项目根目录的 `.dev-config.json`;
+4. 内置默认值。
+
+高优先级来源只覆盖它指定的字段,其余字段继续向下取值;
+`.dev-config.json` 由上次 `start` 自动写入,记录端口、主机名与 HTTPS 配置;
+
+### 自定义入口文件
+
+`postinstall` 会把 `dev.js`、`build.js`、`restoreDefaults.js` 复制到项目根目录,
+可在其中直接写死配置,再通过 `npm scripts` 调用:
 
 ```json
 {
   "scripts": {
-    "dev": "node dev.js",
+    "start": "node dev.js",
     "build": "node build.js",
-    "restoreDefaults": "node restoreDefaults.js"
+    "restore": "node restoreDefaults.js"
   }
 }
 ```
 
-也可以直接运行文件:
-
-```sh
-node dev.js            # 启动开发服务器
-node dev.js --account  # 启动开发服务器并启用登录系统
-node build.js          # 编译模板
-```
+适合需要固定参数、或要与其他构建步骤串联的场景;日常使用命令行的 `start`/`build`/`restore` 即可;
 
 ---
 
@@ -228,74 +272,56 @@ node build.js          # 编译模板
 ### 快速开始
 
 ```js
-import { compile, initProject, startDevServer } from '@flun/html-template';
+import { compile, startDevServer } from '@flun/html-template';
 
-await initProject();
-await compile();
+startDevServer();  // 启动开发服务器
+await compile();   // 编译模板,输出到 dist
 ```
 
 ### 导出
 
-| 导出 | 作用 |
-|---|---|
-| `compile` | 编译全部模板,生成 Express 服务入口 |
-| `initProject` | 复制 ESM 示例与必要文件到项目根目录 |
-| `startDevServer` | 启动开发服务器 |
+| 导出             | 作用                                |
+| ---------------- | ----------------------------------- |
+| `compile`        | 编译全部模板,生成 Express 服务入口  |
+| `initProject`    | 复制 ESM 示例与必要文件到项目根目录 |
+| `startDevServer` | 启动开发服务器                      |
 
-### 项目入口文件
+### initProject
 
-在项目中创建以下入口文件(ESM):
-
-**dev.js**
-
-```javascript
-import { startDevServer } from '@flun/html-template';
-startDevServer({ port: 7296, hotReload: true });
-// 如需启用 HTTPS,请参考"参考配置 → 启用 HTTPS"章节
-```
-
-**build.js**
-
-```javascript
-import { compile } from '@flun/html-template';
-compile({ outputDir: 'dist' });
-```
-
-**restoreDefaults.js**
+复制包内 ESM 示例与必要文件到项目根目录,由 `postinstall` 自动执行;
+需要重置或切换登录系统时手动调用,对应命令行的 `restore`:
 
 ```javascript
 import { initProject } from '@flun/html-template';
-initProject({ mode: 'overwrite', verbose: true });
+
+initProject();                                        // 默认:跳过已存在目录
+initProject({ mode: 'overwrite', verbose: true });    // 覆盖所有包文件并显示详细信息
+initProject({ mode: 'skip-files', verbose: true });   // 跳过已存在文件并显示详细信息
+initProject({ mode: 'skip-files', account: false });  // 跳过已存在文件,不恢复登录相关文件
 ```
 
 ---
 
 ## 参考配置
 
+本节说明各函数参数的用法;命令行选项见[命令行](#命令行);
+
 ### 自定义端口
-- **命令行参数**:`node dev.js --port 8080` 或 `node dev.js -p 8080`
-- **环境变量**:`PORT=8080 node dev.js`
-- **编程方式**:
-  ```javascript
-  import { startDevServer } from '@flun/html-template';
-  startDevServer({ port: 8080 });
-  ```
+```javascript
+import { startDevServer } from '@flun/html-template';
+startDevServer({ port: 8080 });
+```
 
 ### 热重载控制
-- **启用**(默认):`node dev.js` 或 `node dev.js --hot-reload`
-- **禁用**:`node dev.js --no-hot-reload`
-- **编程方式**:
 ```javascript
-  import { startDevServer } from '@flun/html-template';
-  startDevServer({ port: 7296, hotReload: true }); // 启用热重载(默认)
+import { startDevServer } from '@flun/html-template';
+startDevServer({ port: 7296, hotReload: true }); // 启用热重载(默认)
 ```
+
 ### 登录系统控制
-- **启用**:`node dev.js --account`
-- **禁用**(默认):`node dev.js --no-account`
-- **编程方式**:
 ```javascript
-  import { startDevServer } from '@flun/html-template';
-  startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
+import { startDevServer } from '@flun/html-template';
+startDevServer({ port: 7296, account: false }); // 禁用登录(默认)
 ```
 > **文件管理**:启用时,若 `customize/account.js` 和 `templates/account/` 缺失,会自动从包内复制默认文件;停用时,
   会将这两个文件/目录移至项目根目录的 `account_bak/` 统一备份,避免残留导致误渲染;再次启用时,优先保留您的自定义修改,
@@ -304,7 +330,6 @@ initProject({ mode: 'overwrite', verbose: true });
 ---
 
 ### 自定义打包目录
-- **编程方式**(默认输出到`dist`目录):
 ```javascript
 import { compile } from '@flun/html-template';
 compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
@@ -313,6 +338,7 @@ compile({ outputDir: 'dist' }); // 默认参数:目录名 dist;
 ### 启用 HTTPS
 
 开发服务器支持 HTTPS 协议,适用于需要安全连接、测试 PWA 或与第三方 API 交互的场景;
+命令行启用方式见[命令行](#命令行)中的 `--https`、`--https-key`、`--https-cert`;
 
 #### 方式一:使用自动 SSL 证书(推荐)
 
@@ -352,18 +378,7 @@ startDevServer({
 });
 ```
 
-#### 命令行参数快速启用
-
-也可通过命令行直接启用 HTTPS(需预先准备好证书文件):
-
-```sh
-node dev.js --https --https-key 你的私钥文件路径和文件名 --https-cert 你的证书文件路径和文件名 --host example.com
-```
-
-> **注意**:
-> - 使用 HTTPS 时,`host` 参数必须与证书中的域名(CN 或 SAN)完全一致;
-> - 若用 `localhost` 访问 HTTPS,浏览器会提示不安全,请按控制台警告改用正确的域名访问;
-> - 有关 `DnsAutoSSL.js` 的详细配置,请参考该文件内的注释或 `@flun/dns-auto-ssl` 文档;
+---
 
 ## 模板标签使用指南
 
@@ -396,48 +411,6 @@ HBuilder自定义代码块配置(HTML和js):
 ***并且其还支持大部分语言语法高亮,标签特殊高亮,标签统计,标签一键全复制等功能***
 
 ---
-## 项目维护
-
-### 更新版本
-```sh
-npm up @flun/html-template
-```
-
-### 恢复初始示例文件
-```sh
-# 基本命令(跳过已存在目录)
-node ./node_modules/@flun/html-template/copy-files.js
-
-# 常用选项:
-node ./node_modules/@flun/html-template/copy-files.js --skip-files --verbose
-```
-**主参数(三选一)**:
-- `--overwrite` - 覆盖已存在的文件和目录
-- `--skip-files` - 跳过所有存在的文件(包括目录中的文件)
-- `--skip-dirs` - 跳过已存在的目录(默认)
-> **可选参数(二选一)**:
-> - `--account`             启用登录模式(会复制 templates/account 和 customize/account.js)
-> - `--no-account`          禁用登录模式,跳过复制上述文件/目录(默认)
-
-> **可选参数**:
-> - `--verbose`             详细模式,显示更多信息
-
-> **帮助**:
-> - `--help `   - 显示帮助信息
-
-#### 编程方式
-```javascript
-import { initProject } from '@flun/html-template';
-
-// 恢复初始文件的多种方式
-initProject();                                        // 使用默认设置(跳过已存在目录)
-initProject({ mode: 'overwrite', verbose: true });    // 覆盖所有包文件并显示详细信息
-initProject({ mode: 'overwrite', verbose: false });   // 覆盖所有包文件并静默输出
-initProject({ mode: 'skip-files', verbose: true });   // 跳过已存在文件并显示详细信息
-initProject({ mode: 'skip-files', verbose: true, account: false }); // 跳过已存在文件,显示详细信息,并跳过恢复登录相关文件
-```
-
-
 ## 模板语法示例
 
 ### 条件判断
@@ -538,7 +511,7 @@ export default {
 }
 ```
 
-# 安全机制说明
+---
 
 ## 安全防护
 
@@ -589,6 +562,7 @@ export default {
 ```
 
 ---
+
 ### 重要提醒
 
 虽然我们提供了多重安全防护,但您仍需:
@@ -600,6 +574,7 @@ export default {
 这些防护措施确保您的模板渲染过程安全可靠,让您可以专注于业务开发;
 
 ---
+
 ## 常见问题
 
 ### 常见问题
