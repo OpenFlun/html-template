@@ -1,6 +1,6 @@
 # 变更日志
 
-## [6.0.0] - 2026-11-04 19:55
+## [6.0.0] - 2026-11-04 19:58
 ### 破坏性变更
 - `package.json` 的 `scripts.dev` 改名为 `scripts.start`;此前通过 `npm run dev` 启动的脚本需改为 `npm run start`;
 
