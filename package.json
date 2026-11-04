@@ -44,6 +44,7 @@
     "type": "git",
     "url": "git+https://github.com/OpenFlun/html-template.git"
   },
+  "gitee": "https://gitee.com/OpenFlun/html-template.git",
   "homepage": "https://github.com/OpenFlun/html-template#readme",
   "bugs": {
     "url": "https://github.com/OpenFlun/html-template/issues"
