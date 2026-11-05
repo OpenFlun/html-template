@@ -1,0 +1,33 @@
+
+数据库测试指令:(cmd)
+	# 1. 创建新设备记录 (必须提供整数)
+	curl -X POST http://localhost:7296/api/device-data ^
+	  -H "Content-Type: application/json" ^
+	  -d "{ \"person\": 100, \"rule\": 81 }"
+
+	# 2. 获取所有设备数据
+	curl -X GET http://localhost:7296/api/device-data
+
+	# 3. 根据ID获取单个设备
+	# 使用上一步创建的ID替换 {id}
+	curl -X GET http://localhost:7296/api/device-data/{id}
+
+	# 4. 更新设备记录 (全部字段)
+	Bash
+	curl -X PUT http://localhost:7296/api/device-data/{id} \
+	  -H "Content-Type: application/json" \
+	  -d '{
+	    "person": 10,
+	    "rule": 20
+	  }'
+
+	# 5. 部分更新设备记录 (只更新person字段)
+	Bash
+	curl -X PUT http://localhost:7296/api/device-data/{id} \
+	  -H "Content-Type: application/json" \
+	  -d '{
+	    "person": 1003
+	  }'
+
+	# 6. 删除设备记录
+	curl -X DELETE http://localhost:7296/api/device-data/{id}
