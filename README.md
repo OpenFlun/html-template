@@ -126,10 +126,11 @@ graph TB
 ├── compile.js              模板编译
 ├── copy-files.js           postinstall 复制模板资源到项目
 ├── dev-server.js           开发服务器
-├── dev.js                  开发入口示例
+
 ├── index.js                库入口,导出 compile / initProject / startDevServer
 ├── restoreDefaults.js      恢复默认模板与资源示例
 ├── index.d.ts              类型声明
+├── package.json            本文件
 ├── CHANGELOG.md            更新日志
 ├── README.md               本文件
 └── LICENSE                 许可
