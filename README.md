@@ -607,6 +607,6 @@ ISC
 ## 贡献
 
 - 源码:[GitHub](https://github.com/OpenFlun/html-template)
-- 中国:[gitee](https://gitee.com/OpenFlun/html-template)
+- 中国镜像:[gitee](https://gitee.com/OpenFlun/html-template)
 - 问题反馈:[Issues](https://github.com/OpenFlun/html-template/issues)
 - 主页:[npm 包页面](https://www.npmjs.com/package/@flun/html-template#readme)

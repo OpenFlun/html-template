@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import chalk from 'chalk';
 
 // 获取 __dirname (仅用于迁移)
 const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__filename),
@@ -9,8 +10,8 @@ const __filename = fileURLToPath(import.meta.url), __dirname = path.dirname(__fi
         'build.js', 'restoreDefaults.js'],
     // 日志函数
     log = (message, config, isErrorLog = false) => {
-        if (isErrorLog) console.log(`❌ ${message}`);
-        else if (config.verbose) console.log(`✅ ${message}`); // 非错误日志只在详细模式下显示
+        if (isErrorLog) console.log(chalk.red('✗ ') + message);
+        else if (config.verbose) console.log(chalk.gray('· ') + message); // 非错误日志只在详细模式下显示
     },
     // 显示帮助信息
     showHelp = () => {
@@ -142,13 +143,13 @@ const runCopyFiles = async (options = {}) => {
         // 目标目录(项目根目录):npm 场景用 INIT_CWD,手动执行 / import 调用用 cwd
         targetDir = path.resolve(process.env.INIT_CWD || process.cwd());
 
-    console.log('✅ 开始复制文件'); // 关键消息总是显示
+    console.log(chalk.green('✓ ') + chalk.greenBright('开始复制文件')); // 关键消息总是显示
     if (config.verbose) {
-        console.log(`✅ 包目录: ${__dirname}`);
-        console.log(`✅ 目标目录: ${targetDir}`);
-        console.log(`✅ 待处理: ${filesToCopy.join(', ')}`);
-        console.log(`✅ 模式: ${config.mode}`);
-        console.log(`✅ account 模式: ${config.account ? '启用' : '禁用'}`);
+        console.log(chalk.gray('包目录: ') + __dirname);
+        console.log(chalk.gray('目标目录: ') + targetDir);
+        console.log(chalk.gray('待处理: ') + filesToCopy.join(', '));
+        console.log(chalk.gray('模式: ') + config.mode);
+        console.log(chalk.gray('account 模式: ') + (config.account ? '启用' : '禁用'));
     }
 
     try {
@@ -156,20 +157,19 @@ const runCopyFiles = async (options = {}) => {
         await Promise.all(
             filesToCopy.map(item => copyFileOrDir(path.join(__dirname, item), path.join(targetDir, item), true, config)));
 
-        console.log('✅ 文件复制完成!');
+        console.log(chalk.green('✓ ') + chalk.greenBright('文件复制完成'));
         // 添加专业支持信息
-        console.log('\n✅ 专业支持:');
-        console.log('✅ • 开发文档: https://www.npmjs.com/package/@flun/html-template');
-        console.log('✅ • 技术支持: open@flun.top');
-        console.log('✅ • 企业微信: https://work.weixin.qq.com/kfid/kfc44c370d4ddbac6f0');
+        console.log(''), console.log(chalk.cyan('专业支持:'));
+        console.log(chalk.gray('  开发文档: ') + 'https://www.npmjs.com/package/@flun/html-template');
+        console.log(chalk.gray('  技术支持: ') + 'open@flun.top');
+        console.log(chalk.gray('  企业微信: ') + 'https://work.weixin.qq.com/kfid/kfc44c370d4ddbac6f0');
     } catch (error) {
-        const errorMsg = `❌ 复制过程中发生错误: ${error.message}`;
-        console.log(errorMsg);
+        const errorMsg = `复制过程中发生错误: ${error.message}`;
+        console.log(chalk.red('✗ ') + errorMsg);
         throw new Error(errorMsg);
     }
 };
 
-export { runCopyFiles };
 // 如果通过命令行调用
 if (process.argv[1] === __filename) {
     if (process.argv.includes('--help')) showHelp();  // 处理命令行参数
@@ -187,5 +187,6 @@ if (process.argv[1] === __filename) {
     else account = false; // 默认
 
     runCopyFiles({ mode, verbose: process.argv.includes('--verbose'), account })
-        .catch(error => (console.log(`❌ 未处理的错误: ${error.message}`), process.exit(1)));
+        .catch(error => (console.log(chalk.red('✗ ') + `未处理的错误: ${error.message}`), process.exit(1)));
 }
+export { runCopyFiles };

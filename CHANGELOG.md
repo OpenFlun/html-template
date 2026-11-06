@@ -1,5 +1,8 @@
 # 变更日志
 
+## [6.0.1] - 2026-11-06 11:43
+- 优化了一些细节体验;
+
 ## [6.0.0] - 2026-11-04 19:58
 ### 破坏性变更
 - `package.json` 的 `scripts.dev` 改名为 `scripts.start`;此前通过 `npm run dev` 启动的脚本需改为 `npm run start`;
@@ -23,11 +26,3 @@
 - `package.json` 的 `files` 字段按目录、源文件、类型声明、文档、许可五类分组;
 - `@flun/help` 已弃用,替代包为 `@flun/flun`,查看全部作用域包改用 `npx @flun/flun pkgs`;
   此前版本 CHANGELOG 中的旧表述属历史记录,不再回改;
-
-## [5.1.14] - 2026-10-27 22:20
-### 变更
-- 文件'f-README.md'和'f-CHANGELOG.md'不再复制到用户根目录,如需全面掌握所有作用域包信息请直接安装 "@flun/help" 包,
-  然后运行:
-```sh
-    npx @flun/help
-```
