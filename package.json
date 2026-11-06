@@ -1,6 +1,6 @@
 {
   "name": "@flun/html-template",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "一个HTML模板工具包,提供开发服务器和模板编译功能,支持自定义标签、快捷输入、变量、包含文件,模块化处理HTML;",
   "main": "index.js",
   "bin": {
